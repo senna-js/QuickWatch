@@ -1,13 +1,9 @@
-/* QuickWatch - Custom Styles */
-
-/* Base styles */
 body {
   background-color: black;
   color: white;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Smooth scrolling for the movie carousel */
 .movie-carousel {
   scrollbar-width: thin;
   scrollbar-color: #4b5563 #1f2937;
@@ -31,7 +27,6 @@ body {
   border-radius: 10px;
 }
 
-/* Movie card hover effects */
 .movie-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   background-color: rgb(24, 24, 27);
@@ -49,7 +44,6 @@ body {
   z-index: 10;
 }
 
-/* Button hover animations */
 button {
   transition: all 0.3s ease;
 }
@@ -63,7 +57,6 @@ button:hover {
   background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.1) 80%, rgba(0,0,0,0) 100%);
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .movie-carousel {
     scroll-snap-type: x mandatory;

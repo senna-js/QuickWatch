@@ -196,7 +196,6 @@
     to { opacity: .25; }
 }
 
-/* Show spinner when active */
 .spinner-container.active {
     display: block;
 }
