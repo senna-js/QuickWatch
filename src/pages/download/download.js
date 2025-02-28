@@ -1,11 +1,11 @@
-// Search Page
+// Download Search
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 
 /**
- * Renders the search page
+ * Renders the download search page
  * @param {HTMLElement} container
  */
-export function renderSearchPage(container) {
+export function renderDownloadPage(container) {
   container.innerHTML = `
     <div class="fixed left-0 top-0 h-full w-16 bg-zinc-900 flex flex-col items-center py-8 space-y-8 hidden md:flex">
       <a href="/" class="text-zinc-400 hover:text-white">
@@ -38,9 +38,9 @@ export function renderSearchPage(container) {
     </div>
       
     <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 md:mb-8">Search</h1>
+      <h1 class="text-3xl md:text-4xl font-bold mb-6 md:mb-8">Download Search (BETA)</h1>
       <div class="mb-6 md:mb-8">
-        <input type="text" id="search-input" placeholder="Search for movies or TV shows..." 
+        <input type="text" id="search-input" placeholder="Search for movies or TV shows to download..." 
           class="w-full p-3 md:p-4 bg-zinc-800 rounded-lg text-white outline-none focus:ring-2 focus:ring-zinc-400">
       </div>
       <div id="search-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
@@ -168,7 +168,7 @@ function displaySearchResults(results, container) {
     `;
     
     resultCard.addEventListener('click', () => {
-      window.history.pushState(null, null, `/${item.media_type}/${item.id}`);
+      window.history.pushState(null, null, `/dl/${item.media_type}/${item.id}`);
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
     

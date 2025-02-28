@@ -5,6 +5,8 @@ import { renderWatchlistPage } from './pages/watchlist/watchlist.js';
 import { renderSearchPage } from './pages/search/search.js';
 import { renderDetailsPage } from './pages/details/details.js';
 import { render404Page } from './pages/404.js';
+import { renderDownloadPage } from './pages/download/download.js';
+import { renderDownloadDetailsPage } from './pages/download/download-details.js';
 
 export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q';
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -55,6 +57,10 @@ function handleRoute() {
     document.title = 'QW Search';
     renderSearchPage(appContainer);
   } 
+  else if (path === '/download') {
+    document.title = 'QW Download';
+    renderDownloadPage(appContainer);
+  }
   else if (path.match(/^\/movie\/[\d]+$/)) {
     document.title = 'QW Movie';
     const id = path.split('/')[2];
@@ -65,6 +71,13 @@ function handleRoute() {
     const id = path.split('/')[2];
     renderDetailsPage(appContainer, { type: 'tv', id });
   } 
+  else if (path.match(/^\/dl\/movie\/[\d]+$/) || path.match(/^\/dl\/tv\/[\d]+$/)) {
+    document.title = 'QW Download';
+    const parts = path.split('/');
+    const type = parts[2];
+    const id = parts[3];
+    renderDownloadDetailsPage(appContainer, { type, id });
+  }
   else {
     document.title = 'QW 404';
     render404Page(appContainer);

@@ -16,6 +16,9 @@ export function renderWatchlistPage(container) {
       <a href="/watchlist" class="text-zinc-400 hover:text-white">
         <i class="fas fa-bookmark text-2xl"></i>
       </a>
+      <a href="/download" class="text-zinc-400 hover:text-white">
+        <i class="fas fa-download text-2xl"></i>
+      </a>
     </div>
   
   <div class="fixed bottom-0 left-0 w-full bg-zinc-900 flex justify-around items-center py-4 z-50 md:hidden">
@@ -27,6 +30,9 @@ export function renderWatchlistPage(container) {
     </a>
     <a href="/watchlist" class="text-zinc-400 hover:text-white">
       <i class="fas fa-bookmark text-xl"></i>
+    </a>
+    <a href="/download" class="text-zinc-400 hover:text-white">
+      <i class="fas fa-download text-xl"></i>
     </a>
   </div>
     
