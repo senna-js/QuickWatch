@@ -90,11 +90,11 @@ async function loadMediaDetails(type, id) {
     
     let torrentsData = [];
     try {
-      const LOCAL_CORS_PROXY = window.location.protocol + '//' + window.location.host + '/cors/';
+      const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
       
       const apiEndpoint = type === 'tv' 
-        ? `${LOCAL_CORS_PROXY}https://fusme.link/show/${imdbId}?locale=en`
-        : `${LOCAL_CORS_PROXY}https://fusme.link/movie/${imdbId}/torrents?locale=en&contentLocale=en`;
+        ? `${PROXY_URL}https://fusme.link/show/${imdbId}?locale=en`
+        : `${PROXY_URL}https://fusme.link/movie/${imdbId}/torrents?locale=en&contentLocale=en`;
       
       const torrentsResponse = await fetch(apiEndpoint, {
         method: 'GET',
