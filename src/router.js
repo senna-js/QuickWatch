@@ -12,39 +12,8 @@ export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 export const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/';
 
-export function initRouter() {
-  const appContainer = document.querySelector('#app');
-  if (!appContainer) return;
-  
-  document.addEventListener('click', (e) => {
-    const link = e.target.closest('a');
-    if (!link) return;
-    
-    const href = link.getAttribute('href');
-    if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#')) {
-      return;
-    }
-    
-    e.preventDefault();
-    navigateTo(href);
-  });
-  
-  window.addEventListener('popstate', () => {
-    handleRoute();
-  });
-  
-  handleRoute();
-}
-
-export function navigateTo(path) {
-  history.pushState(null, null, path);
-  handleRoute();
-}
-
-// Add this near your router implementation
 let currentPagePromise = Promise.resolve();
 
-// Modify your route handling to store the promise
 export function initRouter() {
   const appContainer = document.querySelector('#app');
   if (!appContainer) return;
@@ -67,9 +36,19 @@ export function initRouter() {
   });
   
   handleRoute();
+  
+  return {
+    getCurrentPagePromise: () => currentPagePromise
+  };
 }
 
 export function navigateTo(path) {
+  if (path.match(/^\/dl\/movie\/[\d]+$/) || path.match(/^\/dl\/tv\/[\d]+$/)) {
+    if (window.splashScreen && !path.match(/^\/download/) && !path.match(/^\/search/) && !path.match(/^\/watchlist/)) {
+      window.splashScreen.show();
+    }
+  }
+  
   history.pushState(null, null, path);
   handleRoute();
 }
@@ -78,41 +57,49 @@ function handleRoute() {
   const path = window.location.pathname;
   const appContainer = document.querySelector('#app');
   
+  if (path === '/download' || path === '/search' || path === '/watchlist') {
+    if (window.splashScreen) {
+      window.splashScreen.hide();
+    }
+  }
+  
   if (path === '/') {
     document.title = 'QuickWatch';
-    renderHomePage(appContainer);
+    currentPagePromise = Promise.resolve(renderHomePage(appContainer));
   } 
   else if (path === '/watchlist') {
     document.title = 'QW Watchlist';
-    renderWatchlistPage(appContainer);
+    currentPagePromise = Promise.resolve(renderWatchlistPage(appContainer));
   } 
   else if (path === '/search') {
     document.title = 'QW Search';
-    renderSearchPage(appContainer);
+    currentPagePromise = Promise.resolve(renderSearchPage(appContainer));
   } 
   else if (path === '/download') {
     document.title = 'QW Download';
-    renderDownloadPage(appContainer);
+    currentPagePromise = Promise.resolve(renderDownloadPage(appContainer));
   }
   else if (path.match(/^\/movie\/[\d]+$/)) {
     document.title = 'QW Movie';
     const id = path.split('/')[2];
-    renderDetailsPage(appContainer, { type: 'movie', id });
+    currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'movie', id }));
   } 
   else if (path.match(/^\/tv\/[\d]+$/)) {
     document.title = 'QW TV';
     const id = path.split('/')[2];
-    renderDetailsPage(appContainer, { type: 'tv', id });
+    currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'tv', id }));
   } 
   else if (path.match(/^\/dl\/movie\/[\d]+$/) || path.match(/^\/dl\/tv\/[\d]+$/)) {
     document.title = 'QW Download';
     const parts = path.split('/');
     const type = parts[2];
     const id = parts[3];
-    renderDownloadDetailsPage(appContainer, { type, id });
+    currentPagePromise = renderDownloadDetailsPage(appContainer, { type, id });
   }
   else {
     document.title = 'QW 404';
-    render404Page(appContainer);
+    currentPagePromise = Promise.resolve(render404Page(appContainer));
   }
+  
+  return currentPagePromise;
 }

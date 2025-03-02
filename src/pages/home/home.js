@@ -46,7 +46,7 @@ export function renderHomePage(container) {
         
         <div class="absolute inset-0 z-20 flex flex-col justify-end p-12">
           <div class="flex items-center mb-4">
-            <img id="logo" class="mr-2">
+            <img id="logo" class="mr-2 max-h-40 max-w-2xl">
           </div>
           
           <div class="flex items-center space-x-4 mb-4">

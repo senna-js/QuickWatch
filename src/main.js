@@ -3,33 +3,52 @@ import './spinner.css'
 import './splash.css'
 import { initRouter } from './router.js'
 
+window.splashScreen = {
+  element: null,
+  show: function() {
+    if (!this.element) {
+      this.element = document.createElement('div');
+      this.element.className = 'splash-screen';
+      this.element.innerHTML = `
+        <div class="splash-container">
+          <img src="/src/logo_transparent.png" alt="QuickWatch" class="splash-logo">
+          <div class="splash-spinner"></div>
+        </div>
+      `;
+      document.body.appendChild(this.element);
+    } else {
+      this.element.classList.remove('hidden');
+    }
+  },
+  hide: function() {
+    if (this.element) {
+      this.element.classList.add('hidden');
+      setTimeout(() => {
+        if (this.element.classList.contains('hidden')) {
+          this.element.remove();
+          this.element = null;
+        }
+      }, 500);
+    }
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
-  const splashScreen = document.createElement('div');
-  splashScreen.className = 'splash-screen';
-  splashScreen.innerHTML = `
-    <div class="splash-container">
-      <img src="/src/logo_transparent.png" alt="QuickWatch" class="splash-logo">
-      <div class="splash-spinner"></div>
-    </div>
-  `;
-  document.body.appendChild(splashScreen);
+  const currentPath = window.location.pathname;
+  if (currentPath !== '/download' && currentPath !== '/search' && currentPath !== '/watchlist') {
+    window.splashScreen.show();
+  }
 
   const router = initRouter();
   window.addEventListener('load', async () => {
-    // Check if we're on the download details page
-    const isDownloadDetails = window.location.pathname.startsWith('/download/');
-    
-    if (isDownloadDetails) {
-      // Wait for the download details to finish loading
-      try {
-        await router.getCurrentPagePromise();
-      } catch (error) {
-        console.error('Error waiting for download details:', error);
-      }
+    try {
+      await router.getCurrentPagePromise();
+    } catch (error) {
+      console.error('Error waiting for page to load:', error);
     }
     
-    // Hide splash screen
-    splashScreen.classList.add('hidden');
-    setTimeout(() => splashScreen.remove(), 500);
+    if (currentPath !== '/download' && currentPath !== '/search' && currentPath !== '/watchlist') {
+      window.splashScreen.hide();
+    }
   });
 });

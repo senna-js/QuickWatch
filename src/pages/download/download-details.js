@@ -9,6 +9,10 @@ import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.j
 let currentLoadingPromise = null;
 
 export function renderDownloadDetailsPage(container, params) {
+  if (window.splashScreen) {
+    window.splashScreen.show();
+  }
+  
   container.innerHTML = `
     <div id="backdrop-bg" class="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20 z-0 blur-[1rem]"></div>
 
@@ -43,20 +47,7 @@ export function renderDownloadDetailsPage(container, params) {
     </div>
   
     <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12 relative z-10" id="details-container">
-      <div class="flex justify-center items-center h-screen">
-        <div class="spinner-container active">
-          <div class="ispinner ispinner-large">
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-          </div>
-        </div>
-      </div>
+      <!-- Content will be loaded dynamically -->
     </div>
   `;
   
@@ -95,7 +86,6 @@ async function loadMediaDetails(type, id) {
     
     let torrentsData = [];
     try {
-      // New API implementation
       const formData = new FormData();
       formData.append('title', data.title || data.name);
       formData.append('imdbid', imdbId);
@@ -220,6 +210,12 @@ async function loadMediaDetails(type, id) {
       </div>
     `;
     
+    if (window.splashScreen) {
+      window.splashScreen.hide();
+    }
+    
+    return Promise.resolve();
+    
   } catch (error) {
     console.error('Error loading media details:', error);
     document.getElementById('details-container').innerHTML = `
@@ -232,5 +228,11 @@ async function loadMediaDetails(type, id) {
         </button>
       </div>
     `;
+    
+    if (window.splashScreen) {
+      window.splashScreen.hide();
+    }
+    
+    return Promise.resolve();
   }
 }
