@@ -6,6 +6,8 @@ import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.j
  * @param {HTMLElement} container
  * @param {Object} params
  */
+let currentLoadingPromise = null;
+
 export function renderDownloadDetailsPage(container, params) {
   container.innerHTML = `
     <div id="backdrop-bg" class="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20 z-0 blur-[1rem]"></div>
@@ -58,7 +60,8 @@ export function renderDownloadDetailsPage(container, params) {
     </div>
   `;
   
-  loadMediaDetails(params.type, params.id);
+  currentLoadingPromise = loadMediaDetails(params.type, params.id);
+  return currentLoadingPromise;
 }
 
 /**
@@ -78,6 +81,8 @@ async function loadMediaDetails(type, id) {
     
     const response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?language=en-US`, options);
     const data = await response.json();
+
+    console.log(data)
     
     const externalIdsResponse = await fetch(`${TMDB_BASE_URL}/${type}/${id}/external_ids`, options);
     const externalIds = await externalIdsResponse.json();
@@ -90,53 +95,19 @@ async function loadMediaDetails(type, id) {
     
     let torrentsData = [];
     try {
-      const PROXY_URL = 'https://thingproxy.freeboard.io/fetch/';
+      // New API implementation
+      const formData = new FormData();
+      formData.append('title', data.title || data.name);
+      formData.append('imdbid', imdbId);
+      formData.append('type', type);
       
-      const apiEndpoint = type === 'tv' 
-        ? `${PROXY_URL}https://fusme.link/show/${imdbId}?locale=en`
-        : `${PROXY_URL}https://fusme.link/movie/${imdbId}/torrents?locale=en&contentLocale=en`;
-      
-      const torrentsResponse = await fetch(apiEndpoint, {
-        method: 'GET',
-        headers: {
-          'accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        }
+      const torrentsResponse = await fetch('https://varunaditya.xyz/api/get_torrents', {
+        method: 'POST',
+        body: formData
       });
       
       if (torrentsResponse.ok) {
-        const responseData = await torrentsResponse.json();
-        
-        if (type === 'tv') {
-          if (responseData.episodes && responseData.episodes.length > 0) {
-            const episodesBySeason = {};
-            responseData.episodes.forEach(episode => {
-              if (!episodesBySeason[episode.season]) {
-                episodesBySeason[episode.season] = [];
-              }
-              episodesBySeason[episode.season].push(episode);
-            });
-            
-            Object.keys(episodesBySeason).forEach(season => {
-              episodesBySeason[season].forEach(episode => {
-                if (episode.torrents) {
-                  Object.values(episode.torrents).forEach(torrent => {
-                    if (torrent.url && torrent.title) {
-                      torrentsData.push({
-                        title: `S${episode.season.toString().padStart(2, '0')}E${episode.episode.toString().padStart(2, '0')} - ${episode.title}`,
-                        quality: torrent.quality || 'Unknown',
-                        url: torrent.url,
-                        filesize: torrent.filesize || 'Unknown size'
-                      });
-                    }
-                  });
-                }
-              });
-            });
-          }
-        } else {
-          torrentsData = responseData;
-        }
+        torrentsData = await torrentsResponse.json();
       } else {
         console.warn('Torrent API returned non-OK status:', torrentsResponse.status);
       }
@@ -204,23 +175,27 @@ async function loadMediaDetails(type, id) {
                        return false;
                      }
                    })()">
-                <span class="text-white mb-2 md:mb-0">
-                  ${torrent.title} • ${torrent.quality}
-                </span>
-                <span 
-                   class="text-sm px-3 py-1 bg-zinc-600 rounded hover:bg-zinc-500 transition-colors select-none"
-                   target="_blank"
-                   onclick="event.stopPropagation()">
-                  ${torrent.filesize}
+                <div class="flex flex-col md:flex-row items-start md:items-center">
+                  <span class="text-white mb-2 md:mb-0 md:mr-4">
+                    ${torrent.title || data.title || data.name}
+                  </span>
+                  <div class="flex flex-wrap gap-2 mb-2 md:mb-0">
+                    ${torrent.tags.map(tag => `
+                      <span class="text-xs px-2 py-1 bg-zinc-600 rounded-full">${tag}</span>
+                    `).join('')}
+                  </div>
+                </div>
+                <span class="text-sm text-zinc-400">
+                  ${torrent.source}
                 </span>
               </div>
             `).join('')}
           </div>
         ` : `
-          <div class="text-center py-8 bg-zinc-800 rounded-lg">
+          <div class="text-center py-8 bg-zinc-800 rounded-lg px-2">
             <i class="fas fa-exclamation-circle text-4xl mb-4 text-zinc-500"></i>
             <h3 class="text-xl font-bold mb-2">No downloads found</h3>
-            <p class="text-zinc-400">We couldn't find any torrent sources for ${data.title || data.name}.<br>Try checking:
+            <p class="text-zinc-400">We couldn't find any torrent sources for ${data.title || data.name}. Try checking:
               <a href="https://torrentgalaxy.one/get-posts/keywords:${imdbId}/" class="text-blue-400 hover:underline" target="_blank">TorrentGalaxy</a>, 
               <a href="https://1337x.pro/search/?q=${encodeURIComponent(data.title || data.name)}" class="text-blue-400 hover:underline" target="_blank">1337x</a>, 
               <a href="https://nyaa.si/?f=0&c=0_0&q=${encodeURIComponent(data.title || data.name)}" class="text-blue-400 hover:underline" target="_blank">Nyaa.si</a> or 

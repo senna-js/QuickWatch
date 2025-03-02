@@ -41,6 +41,39 @@ export function navigateTo(path) {
   handleRoute();
 }
 
+// Add this near your router implementation
+let currentPagePromise = Promise.resolve();
+
+// Modify your route handling to store the promise
+export function initRouter() {
+  const appContainer = document.querySelector('#app');
+  if (!appContainer) return;
+  
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link) return;
+    
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('http') || href.startsWith('//') || href.startsWith('#')) {
+      return;
+    }
+    
+    e.preventDefault();
+    navigateTo(href);
+  });
+  
+  window.addEventListener('popstate', () => {
+    handleRoute();
+  });
+  
+  handleRoute();
+}
+
+export function navigateTo(path) {
+  history.pushState(null, null, path);
+  handleRoute();
+}
+
 function handleRoute() {
   const path = window.location.pathname;
   const appContainer = document.querySelector('#app');
