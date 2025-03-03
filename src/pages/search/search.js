@@ -1,5 +1,6 @@
 // Search Page
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
+import { renderHeader } from '../../components/header.js';
 
 /**
  * Renders the search page
@@ -7,35 +8,7 @@ import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.j
  */
 export function renderSearchPage(container) {
   container.innerHTML = `
-    <div class="fixed left-0 top-0 h-full w-16 bg-zinc-900 flex flex-col items-center py-8 space-y-8 hidden md:flex">
-      <a href="/" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-home text-2xl"></i>
-      </a>
-      <a href="/search" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-search text-2xl"></i>
-      </a>
-      <a href="/watchlist" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-bookmark text-2xl"></i>
-      </a>
-      <a href="/download" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-download text-2xl"></i>
-      </a>
-    </div>
-  
-    <div class="fixed bottom-0 left-0 w-full bg-zinc-900 flex justify-around items-center py-4 z-50 md:hidden">
-      <a href="/" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-home text-xl"></i>
-      </a>
-      <a href="/search" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-search text-xl"></i>
-      </a>
-      <a href="/watchlist" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-bookmark text-xl"></i>
-      </a>
-      <a href="/download" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-download text-xl"></i>
-      </a>
-    </div>
+    ${renderHeader()}
       
     <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12">
       <h1 class="text-3xl md:text-4xl font-bold mb-6 md:mb-8">Search</h1>

@@ -7,6 +7,7 @@ import { renderDetailsPage } from './pages/details/details.js';
 import { render404Page } from './pages/404.js';
 import { renderDownloadPage } from './pages/download/download.js';
 import { renderDownloadDetailsPage } from './pages/download/download-details.js';
+import { renderIOSAppPage } from './pages/iosapp.js';
 
 export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q';
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -95,6 +96,10 @@ function handleRoute() {
     const type = parts[2];
     const id = parts[3];
     currentPagePromise = renderDownloadDetailsPage(appContainer, { type, id });
+  }
+  else if (path === '/iosapp') {
+    document.title = 'QW iOS App';
+    currentPagePromise = Promise.resolve(renderIOSAppPage(appContainer));
   }
   else {
     document.title = 'QW 404';

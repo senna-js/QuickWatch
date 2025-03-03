@@ -1,5 +1,6 @@
 // Download Details
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
+import { renderHeader } from '../../components/header.js';
 
 /**
  * Renders the download details page for a movie or TV show
@@ -16,35 +17,7 @@ export function renderDownloadDetailsPage(container, params) {
   container.innerHTML = `
     <div id="backdrop-bg" class="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20 z-0 blur-[1rem]"></div>
 
-    <div class="fixed left-0 top-0 h-full w-16 bg-zinc-900 flex flex-col items-center py-8 space-y-8 z-10 hidden md:flex">
-      <a href="/" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-home text-2xl"></i>
-      </a>
-      <a href="/search" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-search text-2xl"></i>
-      </a>
-      <a href="/watchlist" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-bookmark text-2xl"></i>
-      </a>
-      <a href="/download" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-download text-2xl"></i>
-      </a>
-    </div>
-  
-    <div class="fixed bottom-0 left-0 w-full bg-zinc-900 flex justify-around items-center py-4 z-50 md:hidden">
-      <a href="/" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-home text-xl"></i>
-      </a>
-      <a href="/search" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-search text-xl"></i>
-      </a>
-      <a href="/watchlist" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-bookmark text-xl"></i>
-      </a>
-      <a href="/download" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-download text-xl"></i>
-      </a>
-    </div>
+    ${renderHeader()}
   
     <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12 relative z-10" id="details-container">
       <!-- Content will be loaded dynamically -->
@@ -129,6 +102,19 @@ async function loadMediaDetails(type, id) {
           </div>
         </div>
       </div>
+      ${/iPhone|iPad|iPod/i.test(navigator.userAgent || navigator.vendor || (window.opera && opera.toString() === `[object Opera]`)) ? `
+      <div class="bg-zinc-800 border-l-4 border-zinc-300 text-zinc-200 p-4 mb-8 rounded shadow-md">
+        <div class="flex items-start">
+          <div class="flex-shrink-0 mt-0.5">
+            <i class="fas fa-info-circle text-zinc-200 text-xl"></i>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-lg font-medium">You seem to be on an iPhone/iPad</h3>
+            <p class="mt-1 text-zinc-400">It's really hard to download torrents on iOS, as there aren't any apps that make it easy to do so. However, we will still show you the torrent sources if you have your own method.</p>
+          </div>
+        </div>
+      </div>
+      ` : ''}
 
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
         <div class="md:col-span-1">
@@ -151,7 +137,7 @@ async function loadMediaDetails(type, id) {
       </div>
 
       <div class="space-y-4">
-        <h2 class="text-2xl font-bold mb-4">Download Options</h2>
+        <h2 class="text-2xl font-bold mb-4">Torrent Sources</h2>
         ${torrentsData.length > 0 ? `
           <div class="space-y-3">
             ${torrentsData.map(torrent => `
@@ -167,7 +153,7 @@ async function loadMediaDetails(type, id) {
                       }
                     })(event)"
                     class="block no-underline">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors select-none">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-zinc-800 rounded-lg hover:bg-[#36363c] transition-colors select-none">
                   <div class="flex-grow flex flex-col md:flex-row items-start md:items-center">
                     <span class="text-white mb-2 md:mb-0 md:mr-4">
                       ${torrent.title || data.title || data.name}
@@ -182,14 +168,32 @@ async function loadMediaDetails(type, id) {
                     <span class="text-sm text-zinc-400 mr-3">
                       ${torrent.source}
                     </span>
-                    <button 
-                      class="text-zinc-400 hover:text-white p-2 focus:outline-none" 
-                      onclick="event.stopPropagation(); event.preventDefault(); navigator.clipboard.writeText('${torrent.url}'); alert('Magnet link copied to clipboard');"
-                      aria-label="Copy magnet link">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                      </svg>
-                    </button>
+                    <div class="flex space-x-2">
+                      <button 
+                        class="text-zinc-200 hover:text-white bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
+                        onclick="event.stopPropagation(); event.preventDefault(); navigator.clipboard.writeText('${torrent.url}'); alert('Magnet link copied to clipboard');"
+                        aria-label="Copy magnet link">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                      </button>
+                      <button
+                        class="text-zinc-200 hover:text-white bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
+                        onclick="event.stopPropagation(); event.preventDefault(); window.location.href='${torrent.url}';"
+                        aria-label="Open magnet link">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                      </button>
+                      <button
+                        class="text-zinc-200 hover:text-white bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
+                        onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/${type}/${id}';"
+                        aria-label="Watch media">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </a>
@@ -235,7 +239,7 @@ async function loadMediaDetails(type, id) {
     document.getElementById('details-container').innerHTML = `
       <div class="flex flex-col items-center justify-center h-screen">
         <h1 class="text-4xl font-bold mb-4">Error</h1>
-        <p class="text-xl mb-8">Failed to load download options</p>
+        <p class="text-xl mb-8">Failed to load torrent sources</p>
         <button onclick="window.history.pushState(null, null, '/download'); window.dispatchEvent(new PopStateEvent('popstate'))" 
             class="px-6 py-3 bg-white text-black rounded-md hover:bg-zinc-200 transition">
             Back to Download Search
