@@ -11,7 +11,7 @@ window.splashScreen = {
       this.element.className = 'splash-screen';
       this.element.innerHTML = `
         <div class="splash-container">
-          <img src="/src/logo_transparent.png" alt="QuickWatch" class="splash-logo">
+          <img src="/logo_transparent.png" alt="QuickWatch" class="splash-logo">
           <div class="splash-spinner"></div>
         </div>
       `;

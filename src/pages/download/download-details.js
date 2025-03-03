@@ -155,30 +155,44 @@ async function loadMediaDetails(type, id) {
         ${torrentsData.length > 0 ? `
           <div class="space-y-3">
             ${torrentsData.map(torrent => `
-              <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors cursor-pointer"
-                   onclick="(() => {
-                     try {
-                       window.location.href = '${torrent.url}';
-                       return true;
-                     } catch(e) {
-                       alert('You must have a torrenting client installed to download this file');
-                       return false;
-                     }
-                   })()">
-                <div class="flex flex-col md:flex-row items-start md:items-center">
-                  <span class="text-white mb-2 md:mb-0 md:mr-4">
-                    ${torrent.title || data.title || data.name}
-                  </span>
-                  <div class="flex flex-wrap gap-2 mb-2 md:mb-0">
-                    ${torrent.tags.map(tag => `
-                      <span class="text-xs px-2 py-1 bg-zinc-600 rounded-full">${tag}</span>
-                    `).join('')}
+              <a href="${torrent.url}"
+                    onclick="(e => {
+                      e.preventDefault();
+                      try {
+                        window.location.href = '${torrent.url}';
+                        return true;
+                      } catch(e) {
+                        alert('You must have a torrenting client installed to download this file');
+                        return false;
+                      }
+                    })(event)"
+                    class="block no-underline">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors select-none">
+                  <div class="flex-grow flex flex-col md:flex-row items-start md:items-center">
+                    <span class="text-white mb-2 md:mb-0 md:mr-4">
+                      ${torrent.title || data.title || data.name}
+                    </span>
+                    <div class="flex flex-wrap gap-2 mb-2 md:mb-0">
+                      ${torrent.tags.map(tag => `
+                        <span class="text-xs px-2 py-1 bg-zinc-600 rounded-full">${tag}</span>
+                      `).join('')}
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <span class="text-sm text-zinc-400 mr-3">
+                      ${torrent.source}
+                    </span>
+                    <button 
+                      class="text-zinc-400 hover:text-white p-2 focus:outline-none" 
+                      onclick="event.stopPropagation(); event.preventDefault(); navigator.clipboard.writeText('${torrent.url}'); alert('Magnet link copied to clipboard');"
+                      aria-label="Copy magnet link">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
-                <span class="text-sm text-zinc-400">
-                  ${torrent.source}
-                </span>
-              </div>
+              </a>
             `).join('')}
           </div>
         ` : `
