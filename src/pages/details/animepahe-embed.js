@@ -321,10 +321,9 @@ function initializeCustomPlayer(playerContainer, linksData) {
     updateBufferProgress();
   };
   
-  // Add click event listener to time display to toggle between current time and time remaining
   if (timeDisplay) {
     timeDisplay.addEventListener('click', (e) => {
-      e.stopPropagation(); // Prevent event from bubbling to progress container
+      e.stopPropagation();
       showTimeRemaining = !showTimeRemaining;
       updateProgress();
     });
@@ -406,25 +405,25 @@ function initializeCustomPlayer(playerContainer, linksData) {
   playPauseBtn.addEventListener('click', () => {
     if (player.paused) {
       player.play();
-      playPauseBtn.innerHTML = '<i class="fas fa-pause text-base"></i>';
-      playPauseBtn.style.backgroundColor = '#6366f1';
-      playPauseBtn.style.color = '#fff';
+      playPauseBtn.innerHTML = '<i class="fas fa-pause text-xl"></i>';
+      playPauseBtn.style.backgroundColor = '#fff';
+      playPauseBtn.style.color = '#000';
     } else {
       player.pause();
-      playPauseBtn.innerHTML = '<i class="fas fa-play text-base"></i>';
+      playPauseBtn.innerHTML = '<i class="fas fa-play text-xl"></i>';
       playPauseBtn.style.backgroundColor = '';
       playPauseBtn.style.color = '';
     }
   });
   
   player.addEventListener('play', () => {
-    playPauseBtn.innerHTML = '<i class="fas fa-pause text-base"></i>';
-    playPauseBtn.style.backgroundColor = '#6366f1';
-    playPauseBtn.style.color = '#fff';
+    playPauseBtn.innerHTML = '<i class="fas fa-pause text-xl"></i>';
+    playPauseBtn.style.backgroundColor = '#fff';
+    playPauseBtn.style.color = '#000';
   });
   
   player.addEventListener('pause', () => {
-    playPauseBtn.innerHTML = '<i class="fas fa-play text-base"></i>';
+    playPauseBtn.innerHTML = '<i class="fas fa-play text-xl"></i>';
     playPauseBtn.style.backgroundColor = '';
     playPauseBtn.style.color = '';
   });
@@ -433,12 +432,47 @@ function initializeCustomPlayer(playerContainer, linksData) {
     if (player.muted) {
       player.muted = false;
       volumeBtn.innerHTML = '<i class="icon-volume-2"></i>';
-      volumeLevel.style.width = `${player.volume * 100}%`;
+      volumeLevel.style.height = `${player.volume * 100}%`;
     } else {
       player.muted = true;
       volumeBtn.innerHTML = '<i class="icon-volume-x"></i>';
-      volumeLevel.style.width = '0%';
+      volumeLevel.style.height = '0%';
     }
+  });
+  
+  let volumeSliderTimeout;
+  const volumeContainer = playerContainer.querySelector('.volume-container');
+  
+  volumeContainer.addEventListener('mouseenter', () => {    
+    volumeSlider.classList.remove('hidden');
+    volumeSlider.style.width = '0';
+    void volumeSlider.offsetWidth; // Force reflow
+    volumeSlider.style.width = '5em';
+    volumeSlider.classList.remove('opacity-0');
+    
+    if (volumeSliderTimeout) {
+      clearTimeout(volumeSliderTimeout);
+      volumeSliderTimeout = null;
+    }
+  });
+  
+  volumeContainer.addEventListener('mouseleave', () => {
+    if (volumeSliderTimeout) {
+      clearTimeout(volumeSliderTimeout);
+    }
+    
+    volumeSliderTimeout = setTimeout(() => {
+      if (!isVolumeDragging) {
+        volumeSlider.style.width = '0';
+        volumeSlider.classList.add('opacity-0');
+        
+        setTimeout(() => {
+          if (!volumeContainer.matches(':hover')) {
+            volumeSlider.classList.add('hidden');
+          }
+        }, 300);
+      }
+    }, 500);
   });
   
   volumeSlider.addEventListener('click', (e) => {
@@ -471,8 +505,8 @@ function initializeCustomPlayer(playerContainer, linksData) {
   const updateVolumeIcon = () => {
     if (player.muted || player.volume === 0) {
       volumeBtn.innerHTML = '<i class="icon-volume-x"></i>';
-    } else if (player.volume < 0.5) {
-      volumeBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
+    } else if (player.volume < 0.6) {
+      volumeBtn.innerHTML = '<i class="icon-volume-1"></i>';
     } else {
       volumeBtn.innerHTML = '<i class="icon-volume-2"></i>';
     }
@@ -529,10 +563,13 @@ function initializeCustomPlayer(playerContainer, linksData) {
       fullscreenBtn.style.backgroundColor = '';
       fullscreenBtn.style.color = '';
     } else {
+      if (document.pictureInPictureElement === player) {
+        return;
+      }
       customPlayer.requestFullscreen();
       fullscreenBtn.innerHTML = '<i class="icon-minimize"></i>';
-      fullscreenBtn.style.backgroundColor = '#6366f1';
-      fullscreenBtn.style.color = '#fff';
+      fullscreenBtn.style.backgroundColor = '#fff';
+      fullscreenBtn.style.color = '#000';
     }
   });
   
@@ -546,19 +583,24 @@ function initializeCustomPlayer(playerContainer, linksData) {
     }
   });
   
-  // Add Picture-in-Picture functionality
   if (document.pictureInPictureEnabled) {
     pipBtn.addEventListener('click', () => {
       if (document.pictureInPictureElement) {
         document.exitPictureInPicture();
       } else {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+          fullscreenBtn.innerHTML = '<i class="icon-maximize"></i>';
+          fullscreenBtn.style.backgroundColor = '';
+          fullscreenBtn.style.color = '';
+        }
         player.requestPictureInPicture();
       }
     });
     
     player.addEventListener('enterpictureinpicture', () => {
-      pipBtn.style.backgroundColor = '#6366f1';
-      pipBtn.style.color = '#fff';
+      pipBtn.style.backgroundColor = '#fff';
+      pipBtn.style.color = '#000';
     });
     
     player.addEventListener('leavepictureinpicture', () => {
@@ -597,52 +639,52 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions) 
       </div>
       
       <div class="player-controls absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 p-3 transition-opacity duration-300 opacity-0">
-        <div class="flex items-center mb-3">
-          <div class="progress-container-hitbox flex-grow h-[20px] cursor-pointer relative">
-            <div class="progress-container w-full h-[6px] bg-zinc-700 rounded-full relative">
-              <div class="buffer-bar h-full bg-zinc-500 rounded-full" style="width: 0%"></div>
-              <div class="progress-bar h-full bg-indigo-500 rounded-full mt-[-6px]" style="width: 0%"></div>
+        <style>
+          .quality-selector {
+            transition: margin-left 0.3s ease;
+          }
+        </style>
+        <div class="flex items-center space-x-1">
+          <button class="play-pause-btn text-zinc-300 hover:text-white transition text-xl mr-3">
+            <i class="fas fa-play text-xl"></i>
+          </button>
+          
+          <div class="progress-container-hitbox flex-grow cursor-pointer relative mx-2 py-2.5">
+            <div class="progress-container w-full h-[6px] bg-zinc-800 rounded-full relative">
+              <div class="buffer-bar h-full bg-zinc-600 rounded-full" style="width: 0%"></div>
+              <div class="progress-bar h-full bg-white rounded-full mt-[-6px]" style="width: 0%"></div>
               <div class="progress-thumb absolute w-4 h-4 bg-white rounded-full mt-[-10px] hidden shadow-md" style="left: 0%"></div>
             </div>
           </div>
-          <div class="time-display text-white text-xs font-medium ml-2.5 cursor-pointer select-none">
+          
+          <div class="time-display text-white text-xs font-medium cursor-pointer select-none min-w-[40px] !ml-3">
             <span class="current-time">0:00</span>
           </div>
-        </div>
-        
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <button class="play-pause-btn text-white hover:text-indigo-400 transition text-xl">
-              <i class="fas fa-play text-base"></i>
+          
+          <div class="volume-container relative flex items-center">
+            <button class="volume-btn text-zinc-300 hover:text-white transition text-lg">
+              <i class="icon-volume-2"></i>
             </button>
-            
-            <div class="volume-container flex items-center space-x-2">
-              <button class="volume-btn text-white hover:text-indigo-400 transition text-lg">
-                <i class="icon-volume-2"></i>
-              </button>
-              <div class="volume-slider w-20 h-2 bg-zinc-700 rounded-full cursor-pointer hidden md:block">
-                <div class="volume-level h-full bg-indigo-500 rounded-full" style="width: 100%"></div>
-              </div>
+            <div class="volume-slider h-[6px] bg-zinc-800 rounded-full cursor-pointer hidden transition-all duration-300" style="width: 0">
+              <div class="volume-level h-full bg-white rounded-full" style="width: 100%"></div>
             </div>
           </div>
           
-          <div class="flex items-center space-x-3">
-            <div class="quality-selector relative">
-              <button class="quality-btn text-white hover:text-indigo-400 transition text-lg">
-                <i class="icon-sliders"></i></span>
-              </button>
-              <div class="quality-menu absolute bottom-10 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden">
-              </div>
+          <div class="quality-selector relative">
+            <button class="quality-btn text-zinc-300 hover:text-white transition text-lg">
+              <i class="icon-sliders"></i>
+            </button>
+            <div class="quality-menu absolute bottom-10 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden">
             </div>
-            
-            <button class="pip-btn text-white hover:text-indigo-400 transition text-lg" title="Picture in Picture">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" class="m-[0.4rem]" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-picture-in-picture-2"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg>
-            </button>
-            
-            <button class="fullscreen-btn text-white hover:text-indigo-400 transition text-lg">
-              <i class="icon-maximize"></i>
-            </button>
           </div>
+          
+          <button class="pip-btn text-zinc-300 hover:text-white transition text-lg" title="Picture in Picture">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" class="m-[0.4rem]" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-picture-in-picture-2"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg>
+          </button>
+          
+          <button class="fullscreen-btn text-zinc-300 hover:text-white transition text-lg">
+            <i class="icon-maximize"></i>
+          </button>
         </div>
       </div>
     </div>

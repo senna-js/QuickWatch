@@ -81,8 +81,8 @@ button:hover {
 
 /* video player styles */
 .custom-player {
-  --primary-color: #6366f1;
-  --hover-color: #818cf8;
+  --primary-color: #fff;
+  --hover-color: #d1d3d8;
 }
 
 .player-controls {
@@ -91,9 +91,9 @@ button:hover {
   transition: opacity 0.3s ease;
 }
 
-.progress-container, .volume-slider {
+.progress-container {
   cursor: pointer;
-  transition: height 0.2s ease;
+  transition: width 0.2s ease;
 }
 
 .progress-thumb {
@@ -111,13 +111,11 @@ button:hover {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.1);
   transition: background-color 0.2s ease, transform 0.2s ease;
+  border-radius: 0.3rem;
 }
 
 .play-pause-btn:hover, .volume-btn:hover, .fullscreen-btn:hover, .quality-btn:hover, .pip-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
 }
 
