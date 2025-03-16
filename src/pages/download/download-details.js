@@ -1,6 +1,7 @@
 // Download Details
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
+import { renderError, renderAlert } from '../../components/error.js';
 
 /**
  * Renders the download details page for a movie or TV show
@@ -91,17 +92,11 @@ async function loadMediaDetails(type, id) {
     }
     
     detailsContainer.innerHTML = `
-      <div class="bg-zinc-900 border-l-4 border-amber-500 text-amber-400 p-4 mb-8 rounded shadow-md">
-        <div class="flex items-start">
-          <div class="flex-shrink-0 mt-0.5">
-            <i class="fas fa-exclamation-triangle text-amber-400 text-xl"></i>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-lg font-medium">You must have a torrenting client installed to download</h3>
-            <p class="mt-1 text-zinc-400">To download from QuickWatch, you need to have a torrenting client installed. We recommend <a href="https://www.qbittorrent.org/download" class="underline hover:text-zinc-300" target="_blank">qBittorent</a>, as it has a clean interface and is easy to use, but you can use whichever one you like.</p>
-          </div>
-        </div>
-      </div>
+      ${renderAlert(
+        'You must have a torrenting client installed to download',
+        'To download from QuickWatch, you need to have a torrenting client installed. We recommend <a href="https://www.qbittorrent.org/download" class="underline hover:text-zinc-300" target="_blank">qBittorent</a>, as it has a clean interface and is easy to use, but you can use whichever one you like.',
+        'warning'
+      )}
       ${/iPhone|iPad|iPod/i.test(navigator.userAgent || navigator.vendor || (window.opera && opera.toString() === `[object Opera]`)) ? `
       <div class="bg-zinc-800 border-l-4 border-zinc-300 text-zinc-200 p-4 mb-8 rounded shadow-md">
         <div class="flex items-start">
@@ -236,16 +231,12 @@ async function loadMediaDetails(type, id) {
     
   } catch (error) {
     console.error('Error loading media details:', error);
-    document.getElementById('details-container').innerHTML = `
-      <div class="flex flex-col items-center justify-center h-screen">
-        <h1 class="text-4xl font-bold mb-4">Error</h1>
-        <p class="text-xl mb-8">Failed to load torrent sources</p>
-        <button onclick="window.history.pushState(null, null, '/download'); window.dispatchEvent(new PopStateEvent('popstate'))" 
-            class="px-6 py-3 bg-white text-black rounded-md hover:bg-zinc-200 transition">
-            Back to Download Search
-        </button>
-      </div>
-    `;
+    document.getElementById('details-container').innerHTML = renderError(
+      'Error', 
+      'Failed to load torrent sources', 
+      'Back to Download Search',
+      "window.history.pushState(null, null, '/download'); window.dispatchEvent(new PopStateEvent('popstate'))"
+    );
     
     if (window.splashScreen) {
       window.splashScreen.hide();

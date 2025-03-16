@@ -1,6 +1,8 @@
 // Details Page
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
+import { renderSpinner, renderFullPageSpinner } from '../../components/loading.js';
+import { renderError } from '../../components/error.js';
 
 /**
  * Renders the details page for a movie or TV show
@@ -13,20 +15,8 @@ export function renderDetailsPage(container, params) {
 
     ${renderHeader()}
   
-  <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12 relative z-10" id="details-container">
-    <div class="flex justify-center items-center h-screen">
-      <div class="spinner-container active">
-        <div class="ispinner ispinner-large">
-          <div class="ispinner-blade"></div>
-          <div class="ispinner-blade"></div>
-          <div class="ispinner-blade"></div>
-          <div class="ispinner-blade"></div>
-          <div class="ispinner-blade"></div>
-          <div class="ispinner-blade"></div>
-          <div class="ispinner-blade"></div>
-          <div class="ispinner-blade"></div>
-        </div>
-      </div>
+    <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12 relative z-10" id="details-container">
+      ${renderFullPageSpinner()}
     </div>
   `;
   
@@ -142,6 +132,11 @@ async function loadMediaDetails(type, id) {
         name: 'Superembed',
         movieUrl: `https://multiembed.mov/?video_id=${id}&tmdb=1`,
         tvUrl: `https://multiembed.mov/?video_id=${id}&tmdb=1&s={season}&e={episode}`
+      },
+      {
+        name: 'AnimePahe',
+        tvOnly: true,
+        tvUrl: `/embed/animepahe/${id}/{episode}`
       }
     ];
 
@@ -164,18 +159,7 @@ async function loadMediaDetails(type, id) {
             allowfullscreen
           ></iframe>
           <div class="iframe-loader">
-            <div class="spinner-container active">
-              <div class="ispinner ispinner-large">
-                <div class="ispinner-blade"></div>
-                <div class="ispinner-blade"></div>
-                <div class="ispinner-blade"></div>
-                <div class="ispinner-blade"></div>
-                <div class="ispinner-blade"></div>
-                <div class="ispinner-blade"></div>
-                <div class="ispinner-blade"></div>
-                <div class="ispinner-blade"></div>
-              </div>
-            </div>
+            ${renderSpinner('large')}
           </div>
         </div>
         
@@ -183,7 +167,10 @@ async function loadMediaDetails(type, id) {
           <div class="flex flex-col md:flex-row items-center justify-center gap-3">
             <div class="relative w-full md:w-auto">
               <select id="source-select" class="w-full md:w-auto bg-zinc-900 text-white py-2 px-4 rounded-full appearance-none border border-zinc-700 focus:border-zinc-500 focus:outline-none transition-colors text-sm min-w-[200px]">
-                ${sources.map((source, index) => `<option value="${index}">${source.name}</option>`).join('')}
+                ${sources
+                  .filter(source => type === 'movie' ? !source.tvOnly : true)
+                  .map((source, index) => `<option value="${index}">${source.name}</option>`)
+                  .join('')}
               </select>
               <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
                 <i class="fas fa-chevron-down text-zinc-400 text-xs"></i>
@@ -329,15 +316,11 @@ async function loadMediaDetails(type, id) {
     
   } catch (error) {
     console.error('Error loading media details:', error);
-    document.getElementById('details-container').innerHTML = `
-      <div class="flex flex-col items-center justify-center h-screen">
-        <h1 class="text-4xl font-bold mb-4">Error</h1>
-        <p class="text-xl mb-8">Failed to load details</p>
-        <button onclick="window.history.pushState(null, null, '/'); window.dispatchEvent(new PopStateEvent('popstate'))" 
-            class="px-6 py-3 bg-white text-black rounded-md hover:bg-zinc-200 transition">
-            Back to Home
-        </button>
-      </div>
-    `;
+    document.getElementById('details-container').innerHTML = renderError(
+      'Error', 
+      'Failed to load details', 
+      'Back to Home',
+      "window.history.pushState(null, null, '/'); window.dispatchEvent(new PopStateEvent('popstate'))"
+    );
   }
 }

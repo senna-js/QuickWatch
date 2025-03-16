@@ -1,6 +1,9 @@
 // Search Page
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
+import { renderSpinner } from '../../components/loading.js';
+import { renderSearchError } from '../../components/error.js';
+import { renderNoResults } from '../../components/empty.js';
 
 /**
  * Renders the search page
@@ -59,18 +62,7 @@ async function performSearch(query, resultsContainer) {
     
     resultsContainer.innerHTML = `
       <div class="flex items-center justify-center w-full">
-        <div class="spinner-container active text-center">
-          <div class="ispinner ispinner-medium mx-auto">
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-            <div class="ispinner-blade"></div>
-          </div>
-        </div>
+        ${renderSpinner('medium')}
       </div>
     `;
     const options = {
@@ -103,13 +95,7 @@ async function performSearch(query, resultsContainer) {
   } catch (error) {
     console.error('Error searching:', error);
     searchResults.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6';
-    resultsContainer.innerHTML = `
-      <div class="col-span-5 text-center py-12">
-        <i class="fas fa-exclamation-circle text-4xl mb-4 text-red-500"></i>
-        <h2 class="text-2xl font-bold mb-2">Search Error</h2>
-        <p class="text-zinc-400">Something went wrong. Please try again later.</p>
-      </div>
-    `;
+    resultsContainer.innerHTML = renderSearchError('Something went wrong. Please try again later.');
   }
 }
 
@@ -154,11 +140,5 @@ function displaySearchResults(results, container) {
  * @param {HTMLElement} container - The container to display the message in
  */
 function showNoResults(container) {
-  container.innerHTML = `
-    <div class="col-span-5 text-center py-12">
-      <i class="fas fa-search text-4xl mb-4 text-zinc-500"></i>
-      <h2 class="text-2xl font-bold mb-2">No results found</h2>
-      <p class="text-zinc-400">Try a different search term</p>
-    </div>
-  `;
+  container.innerHTML = renderNoResults('No results found', 'Please try a different search term', 'fa-search');
 }

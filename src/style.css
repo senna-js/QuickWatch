@@ -78,6 +78,70 @@ button:hover {
   z-index: 1;
 }
 
+
+/* video player styles */
+.custom-player {
+  --primary-color: #6366f1;
+  --hover-color: #818cf8;
+}
+
+.player-controls {
+  backdrop-filter: blur(8px);
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.3s ease;
+}
+
+.progress-container, .volume-slider {
+  cursor: pointer;
+  transition: height 0.2s ease;
+}
+
+.progress-thumb {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.progress-thumb:hover {
+  transform: scale(1.2);
+}
+
+.play-pause-btn, .volume-btn, .fullscreen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.quality-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.play-pause-btn:hover, .volume-btn:hover, .fullscreen-btn:hover, .quality-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.quality-menu {
+  width: 150px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 50;
+}
+
+.quality-option {
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
 .iframe-loader {
   position: absolute;
   top: 50%;
