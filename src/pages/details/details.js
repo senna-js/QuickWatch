@@ -132,11 +132,11 @@ async function loadMediaDetails(type, id) {
     
     detailsContainer.innerHTML = `
       <div class="mb-8">
-        <div class="iframe-container loading">
+        <div class="iframe-container loading rounded">
           <iframe 
             id="media-player"
             src="${iframeUrl}" 
-            class="w-full" 
+            class="w-full rounded-xl" 
             height="700" 
             frameborder="0" 
             allowfullscreen

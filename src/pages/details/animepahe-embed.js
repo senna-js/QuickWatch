@@ -97,7 +97,7 @@ async function loadAnimeContent(id, episode, container) {
     fetchVideoUrl(linksData[0].link)
       .then(videoUrl => {
         if (videoUrl) {
-          renderVideoPlayer(playerContainer, videoUrl, 'Auto', linksData);
+          renderVideoPlayer(playerContainer, videoUrl, 'Auto', linksData, id, episode);
         } else {
           playerContainer.innerHTML = `
             <div class="flex justify-center items-center h-full">
@@ -157,11 +157,14 @@ async function fetchVideoUrl(kwikLink) {
  * Initializes the custom video player controls
  * @param {HTMLElement} playerContainer - The player container element
  * @param {Array} linksData - The available video sources
+ * @param {string} showId - The show ID for saving timestamp
+ * @param {string} episodeNumber - The episode number
  */
-function initializeCustomPlayer(playerContainer, linksData) {
+function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber) {
   const player = playerContainer.querySelector('#custom-player');
   const customPlayer = playerContainer.querySelector('.custom-player');
   const playPauseBtn = playerContainer.querySelector('.play-pause-btn');
+  const centerPlayButton = playerContainer.querySelector('.center-play-button');
   const volumeBtn = playerContainer.querySelector('.volume-btn');
   const volumeSlider = playerContainer.querySelector('.volume-slider');
   const volumeLevel = playerContainer.querySelector('.volume-level');
@@ -178,11 +181,89 @@ function initializeCustomPlayer(playerContainer, linksData) {
   const videoPreview = playerContainer.querySelector('.video-preview');
   const previewTime = playerContainer.querySelector('.preview-time');
   const pipBtn = playerContainer.querySelector('.pip-btn');
+  const aspectToggleBtn = playerContainer.querySelector('.aspect-toggle-btn');
   
   if (!player) return;
   let previewReady = false;
   let showTimeRemaining = false;
+  let isFilledView = true;
+
+  const savedVolume = localStorage.getItem('quickwatch_player_volume');
+  if (savedVolume !== null) {
+    player.volume = parseFloat(savedVolume);
+    if (volumeLevel) {
+      volumeLevel.style.width = `${player.volume * 100}%`;
+    }
+  }
+
+  const timestampKey = `quickwatch_timestamp_${showId}_${episodeNumber}`;
+  const savedTimestamp = localStorage.getItem(timestampKey);
+  if (savedTimestamp !== null) {
+    const timestamp = parseFloat(savedTimestamp);
+    
+    player.addEventListener('loadedmetadata', () => {
+      if (timestamp > 0 && timestamp < player.duration - 10) {
+        player.currentTime = timestamp;
+      }
+    });
+  }
+
+  const saveTimestamp = () => {
+    if (player.currentTime > 0 && !player.paused) {
+      localStorage.setItem(timestampKey, player.currentTime.toString());
+    }
+  };
+
+  const cleanupPlayer = () => {
+    clearInterval(timestampInterval);
+    window.removeEventListener('beforeunload', saveTimestamp);
+  };
+
+  const timestampInterval = setInterval(saveTimestamp, 5000);
+  player.addEventListener('pause', saveTimestamp);
+  window.addEventListener('beforeunload', saveTimestamp);
+  window.addEventListener('unload', cleanupPlayer);
+
+  const saveVolume = () => {
+    localStorage.setItem('quickwatch_player_volume', player.volume.toString());
+  };
+
+  player.addEventListener('volumechange', saveVolume);
+
+  if (centerPlayButton) {
+    centerPlayButton.addEventListener('click', () => {
+      player.play();
+    });
+  }
+
+  if (aspectToggleBtn) {
+    aspectToggleBtn.addEventListener('click', () => {
+      isFilledView = !isFilledView;
+      
+      if (isFilledView) {
+        player.style.objectFit = 'cover';
+        aspectToggleBtn.innerHTML = '<i class="icon-shrink"></i>';
+      } else {
+        player.style.objectFit = 'contain';
+        aspectToggleBtn.innerHTML = '<i class="icon-expand"></i>';
+      }
+    });
+  }
   
+  customPlayer.addEventListener('mousemove', () => {
+    if (aspectToggleBtn) {
+      aspectToggleBtn.classList.remove('opacity-0');
+      
+      if (controlsTimeout) {
+        clearTimeout(controlsTimeout);
+      }
+      
+      controlsTimeout = setTimeout(() => {
+        aspectToggleBtn.classList.add('opacity-0');
+      }, 2000);
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
     if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'j', 'k', 'l', 'm'].includes(e.key)) {
       e.preventDefault();
@@ -475,12 +556,20 @@ function initializeCustomPlayer(playerContainer, linksData) {
     playPauseBtn.innerHTML = '<i class="fas fa-pause text-xl"></i>';
     playPauseBtn.style.backgroundColor = '#fff';
     playPauseBtn.style.color = '#000';
+    
+    if (centerPlayButton) {
+      centerPlayButton.classList.add('hidden');
+    }
   });
   
   player.addEventListener('pause', () => {
     playPauseBtn.innerHTML = '<i class="fas fa-play text-xl"></i>';
     playPauseBtn.style.backgroundColor = '';
     playPauseBtn.style.color = '';
+    
+    if (centerPlayButton) {
+      centerPlayButton.classList.remove('hidden');
+    }
   });
   
   volumeBtn.addEventListener('click', () => {
@@ -684,25 +773,38 @@ function initializeCustomPlayer(playerContainer, linksData) {
  * @param {string} videoUrl - The URL of the video to play
  * @param {string} initialQuality - The initial quality to display
  * @param {Array} qualityOptions - Array of quality options
+ * @param {string} showId - The show ID for saving timestamp
+ * @param {string} episodeNumber - The episode number
  * @returns {void}
  */
-function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions) {
+function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber) {
   container.innerHTML = `
     <div class="custom-player relative w-full h-full bg-black">
       <video 
         id="custom-player"
         src="${videoUrl}"
         class="w-full h-full" 
+        style="object-fit: cover; object-position: center"
         autoplay
         x-webkit-airplay="allow"
       ></video>
+
+      <div class="center-play-button absolute inset-0 flex items-center justify-center z-20 hidden">
+        <button class="w-16 h-16 bg-white bg-opacity-80 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-200 transform hover:scale-110">
+          <i class="fas fa-play text-black text-2xl ml-[2.5px]"></i>
+        </button>
+      </div>
+
+      <button class="aspect-toggle-btn absolute top-4 right-4 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full z-20 transition-opacity duration-300 opacity-0 w-8 h-8 flex items-center justify-center">
+        <i class="icon-shrink"></i>
+      </button>
       
       <div class="video-preview hidden opacity-0 absolute bg-black border border-gray-700 rounded shadow-lg z-20 transition-opacity duration-300 pointer-events-none" style="width: 160px; height: 90px; transform: translateX(-50%) translateY(-100%) translateY(-10px); bottom: 50px;">
         <canvas id="preview-canvas" width="160" height="90"></canvas>
         <div class="preview-time text-white text-xs text-center py-1 bg-black bg-opacity-75"></div>
       </div>
       
-      <div class="player-controls absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 p-3 transition-opacity duration-300 opacity-0">
+      <div class="player-controls absolute bottom-0 left-0 right-0 bg-black bg-opacity-90 m-2.5 p-2.5 rounded-[0.6rem] transition-opacity duration-300 opacity-0">
         <style>
           .quality-selector {
             transition: margin-left 0.3s ease;
@@ -754,5 +856,5 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions) 
     </div>
   `;
   
-  initializeCustomPlayer(container, qualityOptions);
+  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber);
 }
