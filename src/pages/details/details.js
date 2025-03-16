@@ -74,24 +74,9 @@ async function loadMediaDetails(type, id) {
     
     const sources = [
       {
-        name: 'Vidsrc.su',
-        movieUrl: `https://vidsrc.su/embed/movie/${id}`,
-        tvUrl: `https://vidsrc.su/embed/tv/${id}/{season}/{episode}`
-      },
-      {
-        name: 'Uira',
-        movieUrl: `https://6x3d4pm9r7k2v8h1q5.uira.live/embed/movie/${id}`,
-        tvUrl: `https://6x3d4pm9r7k2v8h1q5.uira.live/embed/show/${id}/{season}/{episode}`
-      },
-      {
-        name: 'Vidjoy',
-        movieUrl: `https://vidjoy.pro/embed/movie/${id}`,
-        tvUrl: `https://vidjoy.pro/embed/tv/${id}/{season}/{episode}`
-      },
-      {
-        name: 'Vidsrc.cc v3',
-        movieUrl: `https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false`,
-        tvUrl: `https://vidsrc.cc/v3/embed/tv/${id}/{season}/{episode}?autoPlay=false`
+        name: 'VidLink',
+        movieUrl: `https://vidlink.pro/movie/${id}`,
+        tvUrl: `https://vidlink.pro/tv/${id}/{season}/{episode}`
       },
       {
         name: 'Vidsrc.xyz',
@@ -99,29 +84,19 @@ async function loadMediaDetails(type, id) {
         tvUrl: `https://vidsrc.xyz/embed/tv/${id}/{season}-{episode}`
       },
       {
-        name: 'VidLink',
-        movieUrl: `https://vidlink.pro/movie/${id}`,
-        tvUrl: `https://vidlink.pro/tv/${id}/{season}/{episode}`
+        name: 'Vidjoy',
+        movieUrl: `https://vidjoy.pro/embed/movie/${id}`,
+        tvUrl: `https://vidjoy.pro/embed/tv/${id}/{season}/{episode}`
       },
       {
-        name: 'Vidsrc.rip',
-        movieUrl: `https://vidsrc.rip/embed/movie/${id}`,
-        tvUrl: `https://vidsrc.rip/embed/tv/${id}/{season}/{episode}`
+        name: 'VidsrcSU',
+        movieUrl: `https://vidsrc.su/embed/movie/${id}`,
+        tvUrl: `https://vidsrc.su/embed/tv/${id}/{season}/{episode}`
       },
       {
-        name: 'VidBinge',
-        movieUrl: `https://vidsrc.dev/embed/movie/${id}`,
-        tvUrl: `https://vidsrc.dev/embed/tv/${id}/{season}/{episode}`
-      },
-      {
-        name: 'Vidsrc.cc v2',
-        movieUrl: `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=false`,
-        tvUrl: `https://vidsrc.cc/v2/embed/tv/${id}/{season}/{episode}?autoPlay=false`
-      },
-      {
-        name: 'Embed.su',
-        movieUrl: `https://embed.su/embed/movie/${id}`,
-        tvUrl: `https://embed.su/embed/tv/${id}/{season}/{episode}`
+        name: 'VidsrcCC',
+        movieUrl: `https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false`,
+        tvUrl: `https://vidsrc.cc/v3/embed/tv/${id}/{season}/{episode}?autoPlay=false`
       },
       {
         name: '111Movies',
@@ -129,12 +104,7 @@ async function loadMediaDetails(type, id) {
         tvUrl: `https://111movies.com/tv/${id}/{season}/{episode}`
       },
       {
-        name: 'Superembed',
-        movieUrl: `https://multiembed.mov/?video_id=${id}&tmdb=1`,
-        tvUrl: `https://multiembed.mov/?video_id=${id}&tmdb=1&s={season}&e={episode}`
-      },
-      {
-        name: 'AnimePahe',
+        name: '🤩 AnimePahe',
         tvOnly: true,
         tvUrl: `/embed/animepahe/${id}/{episode}`
       }
@@ -198,9 +168,9 @@ async function loadMediaDetails(type, id) {
                 <i class="fas fa-chevron-down text-zinc-400 text-xs"></i>
               </div>
             </div>
+            ` : ''}
           </div>
         </div>
-        ` : ''}
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
