@@ -45,13 +45,13 @@ function loadWatchlist() {
   
   watchlist.forEach(item => {
     const watchlistItem = document.createElement('div');
-    watchlistItem.className = 'movie-card p-3 rounded-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800 hover:border-zinc-700 border-2 border-transparent';
+    watchlistItem.className = 'movie-card p-3 rounded-lg overflow-hidden transition-all duration-200 hover:bg-zinc-800 hover:border-zinc-700 border-2 border-transparent';
     
     watchlistItem.innerHTML = `
       <div class="relative">
         <img src="${item.posterPath}" alt="${item.title}" class="w-full object-cover rounded-lg">
-        <button class="absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 text-white hover:text-red-500 remove-btn">
-          <i class="fas fa-times"></i>
+        <button class="absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 pb-1 text-white hover:text-red-500 hover:scale-105 focus:scale-90 remove-btn">
+          <i class="icon-x text-2xl"></i>
         </button>
       </div>
       <div class="mt-3">

@@ -170,16 +170,18 @@ function initializeCustomPlayer(playerContainer, linksData) {
   const progressBar = playerContainer.querySelector('.progress-bar');
   const progressThumb = playerContainer.querySelector('.progress-thumb');
   const currentTimeEl = playerContainer.querySelector('.current-time');
-  const totalTimeEl = playerContainer.querySelector('.total-time');
+  const timeDisplay = playerContainer.querySelector('.time-display');
   const fullscreenBtn = playerContainer.querySelector('.fullscreen-btn');
   const qualityBtn = playerContainer.querySelector('.quality-btn');
   const qualityMenu = playerContainer.querySelector('.quality-menu');
   const bufferBar = playerContainer.querySelector('.buffer-bar');
   const videoPreview = playerContainer.querySelector('.video-preview');
   const previewTime = playerContainer.querySelector('.preview-time');
+  const pipBtn = playerContainer.querySelector('.pip-btn');
   
   if (!player) return;
   let previewReady = false;
+  let showTimeRemaining = false;
   
   const previewVideo = document.createElement('video');
   previewVideo.muted = true;
@@ -308,10 +310,25 @@ function initializeCustomPlayer(playerContainer, linksData) {
     const progress = (player.currentTime / player.duration) * 100;
     progressBar.style.width = `${progress}%`;
     progressThumb.style.left = `${progress}%`;
-    currentTimeEl.textContent = formatTime(player.currentTime);
+    
+    if (showTimeRemaining) {
+      const timeLeft = player.duration - player.currentTime;
+      currentTimeEl.textContent = `-${formatTime(timeLeft)}`;
+    } else {
+      currentTimeEl.textContent = formatTime(player.currentTime);
+    }
     
     updateBufferProgress();
   };
+  
+  // Add click event listener to time display to toggle between current time and time remaining
+  if (timeDisplay) {
+    timeDisplay.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent event from bubbling to progress container
+      showTimeRemaining = !showTimeRemaining;
+      updateProgress();
+    });
+  }
   
   const setupQualityOptions = () => {
     if (linksData && linksData.length > 0) {
@@ -345,11 +362,6 @@ function initializeCustomPlayer(playerContainer, linksData) {
             
             if (videoUrl) {
               player.src = videoUrl;
-              
-              const qualityText = playerContainer.querySelector('.quality-text');
-              if (qualityText) {
-                qualityText.textContent = cleanedName;
-              }
               
               player.addEventListener('canplay', function onCanPlay() {
                 if (loadingOverlay.parentNode) {
@@ -394,29 +406,37 @@ function initializeCustomPlayer(playerContainer, linksData) {
   playPauseBtn.addEventListener('click', () => {
     if (player.paused) {
       player.play();
-      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      playPauseBtn.innerHTML = '<i class="fas fa-pause text-base"></i>';
+      playPauseBtn.style.backgroundColor = '#6366f1';
+      playPauseBtn.style.color = '#fff';
     } else {
       player.pause();
-      playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+      playPauseBtn.innerHTML = '<i class="fas fa-play text-base"></i>';
+      playPauseBtn.style.backgroundColor = '';
+      playPauseBtn.style.color = '';
     }
   });
   
   player.addEventListener('play', () => {
-    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    playPauseBtn.innerHTML = '<i class="fas fa-pause text-base"></i>';
+    playPauseBtn.style.backgroundColor = '#6366f1';
+    playPauseBtn.style.color = '#fff';
   });
   
   player.addEventListener('pause', () => {
-    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+    playPauseBtn.innerHTML = '<i class="fas fa-play text-base"></i>';
+    playPauseBtn.style.backgroundColor = '';
+    playPauseBtn.style.color = '';
   });
   
   volumeBtn.addEventListener('click', () => {
     if (player.muted) {
       player.muted = false;
-      volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+      volumeBtn.innerHTML = '<i class="icon-volume-2"></i>';
       volumeLevel.style.width = `${player.volume * 100}%`;
     } else {
       player.muted = true;
-      volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+      volumeBtn.innerHTML = '<i class="icon-volume-x"></i>';
       volumeLevel.style.width = '0%';
     }
   });
@@ -450,11 +470,11 @@ function initializeCustomPlayer(playerContainer, linksData) {
   
   const updateVolumeIcon = () => {
     if (player.muted || player.volume === 0) {
-      volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+      volumeBtn.innerHTML = '<i class="icon-volume-x"></i>';
     } else if (player.volume < 0.5) {
       volumeBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
     } else {
-      volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+      volumeBtn.innerHTML = '<i class="icon-volume-2"></i>';
     }
   };
   
@@ -502,17 +522,17 @@ function initializeCustomPlayer(playerContainer, linksData) {
   
   player.addEventListener('timeupdate', updateProgress);
   
-  player.addEventListener('loadedmetadata', () => {
-    totalTimeEl.textContent = formatTime(player.duration);
-  });
-  
   fullscreenBtn.addEventListener('click', () => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
-      fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i>';
+      fullscreenBtn.innerHTML = '<i class="icon-maximize"></i>';
+      fullscreenBtn.style.backgroundColor = '';
+      fullscreenBtn.style.color = '';
     } else {
       customPlayer.requestFullscreen();
-      fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i>';
+      fullscreenBtn.innerHTML = '<i class="icon-minimize"></i>';
+      fullscreenBtn.style.backgroundColor = '#6366f1';
+      fullscreenBtn.style.color = '#fff';
     }
   });
   
@@ -525,6 +545,29 @@ function initializeCustomPlayer(playerContainer, linksData) {
       qualityMenu.classList.add('hidden');
     }
   });
+  
+  // Add Picture-in-Picture functionality
+  if (document.pictureInPictureEnabled) {
+    pipBtn.addEventListener('click', () => {
+      if (document.pictureInPictureElement) {
+        document.exitPictureInPicture();
+      } else {
+        player.requestPictureInPicture();
+      }
+    });
+    
+    player.addEventListener('enterpictureinpicture', () => {
+      pipBtn.style.backgroundColor = '#6366f1';
+      pipBtn.style.color = '#fff';
+    });
+    
+    player.addEventListener('leavepictureinpicture', () => {
+      pipBtn.style.backgroundColor = '';
+      pipBtn.style.color = '';
+    });
+  } else {
+    pipBtn.classList.add('hidden');
+  }
   
   setupQualityOptions();
 }
@@ -545,6 +588,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions) 
         src="${videoUrl}"
         class="w-full h-full" 
         autoplay
+        x-webkit-airplay="allow"
       ></video>
       
       <div class="video-preview hidden opacity-0 absolute bg-black border border-gray-700 rounded shadow-lg z-20 transition-opacity duration-300 pointer-events-none" style="width: 160px; height: 90px; transform: translateX(-50%) translateY(-100%) translateY(-10px); bottom: 50px;">
@@ -553,47 +597,50 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions) 
       </div>
       
       <div class="player-controls absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 p-3 transition-opacity duration-300 opacity-0">
-        <div class="progress-container-hitbox w-full h-[20px] cursor-pointer mb-3 flex items-center">
-          <div class="progress-container w-full h-[6px] bg-zinc-700 rounded-full relative">
-            <div class="buffer-bar h-full bg-zinc-500 rounded-full" style="width: 0%"></div>
-            <div class="progress-bar h-full bg-indigo-500 rounded-full mt-[-6px]" style="width: 0%"></div>
-            <div class="progress-thumb absolute w-4 h-4 bg-white rounded-full mt-[-10px] hidden shadow-md" style="left: 0%"></div>
+        <div class="flex items-center mb-3">
+          <div class="progress-container-hitbox flex-grow h-[20px] cursor-pointer relative">
+            <div class="progress-container w-full h-[6px] bg-zinc-700 rounded-full relative">
+              <div class="buffer-bar h-full bg-zinc-500 rounded-full" style="width: 0%"></div>
+              <div class="progress-bar h-full bg-indigo-500 rounded-full mt-[-6px]" style="width: 0%"></div>
+              <div class="progress-thumb absolute w-4 h-4 bg-white rounded-full mt-[-10px] hidden shadow-md" style="left: 0%"></div>
+            </div>
+          </div>
+          <div class="time-display text-white text-xs font-medium ml-2.5 cursor-pointer select-none">
+            <span class="current-time">0:00</span>
           </div>
         </div>
         
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-3">
             <button class="play-pause-btn text-white hover:text-indigo-400 transition text-xl">
-              <i class="fas fa-play"></i>
+              <i class="fas fa-play text-base"></i>
             </button>
             
             <div class="volume-container flex items-center space-x-2">
               <button class="volume-btn text-white hover:text-indigo-400 transition text-lg">
-                <i class="fas fa-volume-up"></i>
+                <i class="icon-volume-2"></i>
               </button>
               <div class="volume-slider w-20 h-2 bg-zinc-700 rounded-full cursor-pointer hidden md:block">
                 <div class="volume-level h-full bg-indigo-500 rounded-full" style="width: 100%"></div>
               </div>
             </div>
-            
-            <div class="time-display text-white text-sm font-medium">
-              <span class="current-time">0:00</span>
-              <span>/</span>
-              <span class="total-time">0:00</span>
-            </div>
           </div>
           
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-3">
             <div class="quality-selector relative">
-              <button class="quality-btn text-white hover:text-indigo-400 transition text-sm font-medium flex items-center px-4 rounded-full w-full">
-                <i class="fas fa-cog mr-2 text-lg"></i><span class="quality-text">${initialQuality}</span>
+              <button class="quality-btn text-white hover:text-indigo-400 transition text-lg">
+                <i class="icon-sliders"></i></span>
               </button>
               <div class="quality-menu absolute bottom-10 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden">
               </div>
             </div>
             
+            <button class="pip-btn text-white hover:text-indigo-400 transition text-lg" title="Picture in Picture">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" class="m-[0.4rem]" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-picture-in-picture-2"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg>
+            </button>
+            
             <button class="fullscreen-btn text-white hover:text-indigo-400 transition text-lg">
-              <i class="fas fa-expand"></i>
+              <i class="icon-maximize"></i>
             </button>
           </div>
         </div>

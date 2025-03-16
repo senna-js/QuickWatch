@@ -156,7 +156,7 @@ async function loadMediaDetails(type, id) {
                   .join('')}
               </select>
               <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <i class="fas fa-chevron-down text-zinc-400 text-xs"></i>
+                <i class="icon-chevron-down text-zinc-400 text-xs mr-1"></i>
               </div>
             </div>
 
@@ -168,7 +168,7 @@ async function loadMediaDetails(type, id) {
                 ).join('')}
               </select>
               <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <i class="fas fa-chevron-down text-zinc-400 text-xs"></i>
+                <i class="icon-chevron-down text-zinc-400 text-xs mr-1"></i>
               </div>
             </div>
             <div class="relative w-full md:w-auto">
@@ -178,7 +178,7 @@ async function loadMediaDetails(type, id) {
                 ).join('') || ''}
               </select>
               <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <i class="fas fa-chevron-down text-zinc-400 text-xs"></i>
+                <i class="icon-chevron-down text-zinc-400 text-xs mr-1"></i>
               </div>
             </div>
             ` : ''}
