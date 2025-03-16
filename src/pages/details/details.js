@@ -110,7 +110,20 @@ async function loadMediaDetails(type, id) {
       }
     ];
 
-    const defaultSource = sources[0];
+    let initialSourceIndex = 0;
+    if (type === 'tv') {
+      const savedProgress = JSON.parse(localStorage.getItem(`tv-progress-${id}`) || '{}');
+      if (savedProgress.sourceIndex !== undefined && savedProgress.sourceIndex >= 0 && savedProgress.sourceIndex < sources.length) {
+        initialSourceIndex = savedProgress.sourceIndex;
+      }
+    } else {
+      const savedSourcePref = JSON.parse(localStorage.getItem(`source-pref-${type}-${id}`) || 'null');
+      if (savedSourcePref !== null && savedSourcePref >= 0 && savedSourcePref < sources.length) {
+        initialSourceIndex = savedSourcePref;
+      }
+    }
+
+    const defaultSource = sources[initialSourceIndex];
     const iframeUrl = type === 'movie' 
       ? defaultSource.movieUrl 
       : defaultSource.tvUrl
@@ -139,7 +152,7 @@ async function loadMediaDetails(type, id) {
               <select id="source-select" class="w-full md:w-auto bg-zinc-900 text-white py-2 px-4 rounded-full appearance-none border border-zinc-700 focus:border-zinc-500 focus:outline-none transition-colors text-sm min-w-[200px]">
                 ${sources
                   .filter(source => type === 'movie' ? !source.tvOnly : true)
-                  .map((source, index) => `<option value="${index}">${source.name}</option>`)
+                  .map((source, index) => `<option value="${index}" ${index === initialSourceIndex ? 'selected' : ''}>${source.name}</option>`)
                   .join('')}
               </select>
               <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
@@ -234,6 +247,8 @@ async function loadMediaDetails(type, id) {
     const updatePlayerSource = () => {
       let selectedSeason = '1';
       let selectedEpisode = '1';
+      const sourceSelect = document.getElementById('source-select');
+      const selectedSourceIndex = parseInt(sourceSelect.value);
       
       if (type === 'tv') {
         const seasonSelect = document.getElementById('season-select');
@@ -244,11 +259,14 @@ async function loadMediaDetails(type, id) {
         localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
           season: parseInt(selectedSeason),
           episode: parseInt(selectedEpisode),
+          sourceIndex: selectedSourceIndex,
           timestamp: new Date().toISOString()
         }));
+      } else {
+        localStorage.setItem(`source-pref-${type}-${id}`, JSON.stringify(selectedSourceIndex));
       }
 
-      const selectedSource = sources[sourceSelect.value];
+      const selectedSource = sources[selectedSourceIndex];
       const newUrl = type === 'movie' 
         ? selectedSource.movieUrl 
         : selectedSource.tvUrl
