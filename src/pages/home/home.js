@@ -12,14 +12,15 @@ export function renderHomePage(container) {
     
     <div class="md:ml-16 pb-20 md:pb-0">
       <div id="hero-section" class="relative h-screen md:h-[80vh]">
-        <div class="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10"></div>
+        <img src="/logo_long.png" class="w-[60%] absolute top-2 left-1/2 -translate-x-1/2 md:hidden z-20">
+        <div class="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-black to-transparent z-10"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
         
         <img id="herobk" class="w-full h-full object-cover">
         
         <div class="absolute inset-0 z-20 flex flex-col justify-end p-12">
           <div class="flex items-center mb-4">
-            <img id="logo" class="mr-2 max-h-40 max-w-2xl">
+            <img id="logo" class="mr-2 max-h-40 w-full md:max-w-2xl">
           </div>
           
           <div class="flex items-center space-x-4 mb-4">

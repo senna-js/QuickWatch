@@ -161,6 +161,7 @@ async function fetchVideoUrl(kwikLink) {
  * @param {string} episodeNumber - The episode number
  */
 function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber) {
+  const isIPhone = /iPhone/i.test(navigator.userAgent);
   const player = playerContainer.querySelector('#custom-player');
   const customPlayer = playerContainer.querySelector('.custom-player');
   const playPauseBtn = playerContainer.querySelector('.play-pause-btn');
@@ -175,6 +176,8 @@ function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumbe
   const currentTimeEl = playerContainer.querySelector('.current-time');
   const timeDisplay = playerContainer.querySelector('.time-display');
   const fullscreenBtn = playerContainer.querySelector('.fullscreen-btn');
+  const qualityToggleBtn = playerContainer.querySelector('.quality-toggle-btn');
+  const iphoneQualityMenu = playerContainer.querySelector('.iphone-quality-menu');
   const qualityBtn = playerContainer.querySelector('.quality-btn');
   const qualityMenu = playerContainer.querySelector('.quality-menu');
   const bufferBar = playerContainer.querySelector('.buffer-bar');
@@ -182,11 +185,40 @@ function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumbe
   const previewTime = playerContainer.querySelector('.preview-time');
   const pipBtn = playerContainer.querySelector('.pip-btn');
   const aspectToggleBtn = playerContainer.querySelector('.aspect-toggle-btn');
+  const topControls = playerContainer.querySelector('.top-controls');
   
   if (!player) return;
   let previewReady = false;
   let showTimeRemaining = false;
   let isFilledView = true;
+
+  if (isIPhone) {
+    player.addEventListener('click', () => {
+      if (player.paused) {
+        player.play();
+      } else {
+        player.pause();
+      }
+    });
+    
+    customPlayer.addEventListener('click', () => {
+      if (topControls) {
+        topControls.querySelectorAll('button').forEach(btn => {
+          btn.classList.remove('opacity-0');
+        });
+        
+        if (controlsTimeout) {
+          clearTimeout(controlsTimeout);
+        }
+        
+        controlsTimeout = setTimeout(() => {
+          topControls.querySelectorAll('button').forEach(btn => {
+            btn.classList.add('opacity-0');
+          });
+        }, 2000);
+      }
+    });
+  }
 
   const savedVolume = localStorage.getItem('quickwatch_player_volume');
   if (savedVolume !== null) {
@@ -251,15 +283,19 @@ function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumbe
   }
   
   customPlayer.addEventListener('mousemove', () => {
-    if (aspectToggleBtn) {
-      aspectToggleBtn.classList.remove('opacity-0');
+    if (topControls) {
+      topControls.querySelectorAll('button').forEach(btn => {
+        btn.classList.remove('opacity-0');
+      });
       
       if (controlsTimeout) {
         clearTimeout(controlsTimeout);
       }
       
       controlsTimeout = setTimeout(() => {
-        aspectToggleBtn.classList.add('opacity-0');
+        topControls.querySelectorAll('button').forEach(btn => {
+          btn.classList.add('opacity-0');
+        });
       }, 2000);
     }
   });
@@ -455,7 +491,7 @@ function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumbe
   
   const setupQualityOptions = () => {
     if (linksData && linksData.length > 0) {
-      qualityMenu.innerHTML = linksData.map((link, index) => {
+      const qualityOptionsHTML = linksData.map((link, index) => {
         const cleanedName = link.name.replace(/\s*\([^)]*\)/g, '');
         
         return `
@@ -467,64 +503,101 @@ function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumbe
           ${cleanedName}
         </button>
       `}).join('');
-      const qualityOptions = qualityMenu.querySelectorAll('.quality-option');
-      qualityOptions.forEach(option => {
-        option.addEventListener('click', async () => {
-          const currentTime = player.currentTime;
-          const isPaused = player.paused;
-          const link = linksData[option.dataset.index];
-          const cleanedName = link.name.replace(/\s*\([^)]*\)/g, '');
-          
-          const loadingOverlay = document.createElement('div');
-          loadingOverlay.className = 'absolute inset-0 flex justify-center items-center bg-black bg-opacity-70 z-10';
-          loadingOverlay.innerHTML = renderSpinner('large');
-          customPlayer.appendChild(loadingOverlay);
-          
-          try {
-            const videoUrl = await fetchVideoUrl(link.link);
-            
-            if (videoUrl) {
-              player.src = videoUrl;
-              
-              player.addEventListener('canplay', function onCanPlay() {
-                if (loadingOverlay.parentNode) {
-                  loadingOverlay.parentNode.removeChild(loadingOverlay);
-                }
-                
-                player.currentTime = currentTime;
-                
-                if (!isPaused) {
-                  player.play();
-                }
-                
-                player.removeEventListener('canplay', onCanPlay);
-              }, { once: true });
-            } else {
-              throw new Error('Failed to load video URL');
-            }
-          } catch (error) {
-            console.error('Error changing quality:', error);
-            if (loadingOverlay.parentNode) {
-              loadingOverlay.parentNode.removeChild(loadingOverlay);
-            }
-            
-            const errorOverlay = document.createElement('div');
-            errorOverlay.className = 'absolute top-0 left-0 right-0 bg-red-500 text-white p-2 text-center';
-            errorOverlay.textContent = 'Failed to load video. Please try another quality.';
-            customPlayer.appendChild(errorOverlay);
-            
-            setTimeout(() => {
-              if (errorOverlay.parentNode) {
-                errorOverlay.parentNode.removeChild(errorOverlay);
-              }
-            }, 3000);
-          }
-          
-          qualityMenu.classList.add('hidden');
-        });
-      });
+      
+      if (qualityMenu) {
+        qualityMenu.innerHTML = qualityOptionsHTML;
+        setupQualityOptionEvents(qualityMenu);
+      }
+      
+      if (isIPhone && iphoneQualityMenu) {
+        iphoneQualityMenu.innerHTML = qualityOptionsHTML;
+        setupQualityOptionEvents(iphoneQualityMenu);
+      }
     }
   };
+  
+  const setupQualityOptionEvents = (menuElement) => {
+    const qualityOptions = menuElement.querySelectorAll('.quality-option');
+    qualityOptions.forEach(option => {
+      option.addEventListener('click', async () => {
+        const currentTime = player.currentTime;
+        const isPaused = player.paused;
+        const link = linksData[option.dataset.index];
+        
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'absolute inset-0 flex justify-center items-center bg-black bg-opacity-70 z-10';
+        loadingOverlay.innerHTML = renderSpinner('large');
+        customPlayer.appendChild(loadingOverlay);
+        
+        try {
+          const videoUrl = await fetchVideoUrl(link.link);
+          
+          if (videoUrl) {
+            player.src = videoUrl;
+            
+            player.addEventListener('canplay', function onCanPlay() {
+              if (loadingOverlay.parentNode) {
+                loadingOverlay.parentNode.removeChild(loadingOverlay);
+              }
+              
+              player.currentTime = currentTime;
+              
+              if (!isPaused) {
+                player.play();
+              }
+              
+              player.removeEventListener('canplay', onCanPlay);
+            }, { once: true });
+          } else {
+            throw new Error('Failed to load video URL');
+          }
+        } catch (error) {
+          console.error('Error changing quality:', error);
+          if (loadingOverlay.parentNode) {
+            loadingOverlay.parentNode.removeChild(loadingOverlay);
+          }
+          
+          const errorOverlay = document.createElement('div');
+          errorOverlay.className = 'absolute top-0 left-0 right-0 bg-red-500 text-white p-2 text-center';
+          errorOverlay.textContent = 'Failed to load video. Please try another quality.';
+          customPlayer.appendChild(errorOverlay);
+          
+          setTimeout(() => {
+            if (errorOverlay.parentNode) {
+              errorOverlay.parentNode.removeChild(errorOverlay);
+            }
+          }, 3000);
+        }
+        
+        if (qualityMenu) qualityMenu.classList.add('hidden');
+        if (iphoneQualityMenu) iphoneQualityMenu.classList.add('hidden');
+      });
+    });
+  };
+
+  if (qualityBtn) {
+    qualityBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      qualityMenu.classList.toggle('hidden');
+    });
+  }
+  
+  if (qualityToggleBtn) {
+    qualityToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      iphoneQualityMenu.classList.toggle('hidden');
+    });
+  }
+  
+  document.addEventListener('click', (e) => {
+    if (qualityBtn && !qualityBtn.contains(e.target) && !qualityMenu.contains(e.target)) {
+      qualityMenu.classList.add('hidden');
+    }
+    
+    if (qualityToggleBtn && !qualityToggleBtn.contains(e.target) && !iphoneQualityMenu.contains(e.target)) {
+      iphoneQualityMenu.classList.add('hidden');
+    }
+  });
 
   const mute = () => {
     if (player.muted) {
@@ -730,12 +803,6 @@ function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumbe
     qualityMenu.classList.toggle('hidden');
   });
   
-  document.addEventListener('click', (e) => {
-    if (!qualityBtn.contains(e.target) && !qualityMenu.contains(e.target)) {
-      qualityMenu.classList.add('hidden');
-    }
-  });
-  
   if (document.pictureInPictureEnabled) {
     pipBtn.addEventListener('click', () => {
       if (document.pictureInPictureElement) {
@@ -778,6 +845,7 @@ function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumbe
  * @returns {void}
  */
 function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber) {
+  const isIPhone = /iPhone/i.test(navigator.userAgent);
   container.innerHTML = `
     <div class="custom-player relative w-full h-full bg-black">
       <video 
@@ -789,22 +857,31 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
         x-webkit-airplay="allow"
       ></video>
 
-      <div class="center-play-button absolute inset-0 flex items-center justify-center z-20 hidden">
+      <div class="center-play-button absolute inset-0 flex items-center justify-center z-20 ${isIPhone ? 'hidden' : 'hidden'}">
         <button class="w-16 h-16 bg-white bg-opacity-80 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-200 transform hover:scale-110">
           <i class="fas fa-play text-black text-2xl ml-[2.5px]"></i>
         </button>
       </div>
 
-      <button class="aspect-toggle-btn absolute top-4 right-4 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full z-20 transition-opacity duration-300 opacity-0 w-8 h-8 flex items-center justify-center">
-        <i class="icon-shrink"></i>
-      </button>
+      <div class="top-controls absolute top-4 right-4 flex space-x-2 z-20">
+        ${isIPhone ? `
+        <button class="quality-toggle-btn bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-opacity duration-300 opacity-0 w-8 h-8 flex items-center justify-center">
+          <i class="icon-sliders"></i>
+        </button>
+        <div class="iphone-quality-menu absolute top-10 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden z-30">
+        </div>
+        ` : ''}
+        <button class="aspect-toggle-btn bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-opacity duration-300 opacity-0 w-8 h-8 flex items-center justify-center">
+          <i class="icon-shrink"></i>
+        </button>
+      </div>
       
       <div class="video-preview hidden opacity-0 absolute bg-black border border-gray-700 rounded shadow-lg z-20 transition-opacity duration-300 pointer-events-none" style="width: 160px; height: 90px; transform: translateX(-50%) translateY(-100%) translateY(-10px); bottom: 50px;">
         <canvas id="preview-canvas" width="160" height="90"></canvas>
         <div class="preview-time text-white text-xs text-center py-1 bg-black bg-opacity-75"></div>
       </div>
       
-      <div class="player-controls absolute bottom-0 left-0 right-0 bg-black bg-opacity-90 m-2.5 p-2.5 rounded-[0.6rem] transition-opacity duration-300 opacity-0">
+      <div class="player-controls absolute bottom-0 left-0 right-0 bg-black bg-opacity-90 m-2.5 p-2.5 rounded-[0.6rem] transition-opacity duration-300 ${isIPhone ? 'hidden' : 'opacity-0'}">
         <style>
           .quality-selector {
             transition: margin-left 0.3s ease;
@@ -840,7 +917,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
             <button class="quality-btn text-zinc-300 hover:text-white transition text-lg">
               <i class="icon-sliders"></i>
             </button>
-            <div class="quality-menu absolute bottom-10 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden">
+            <div class="quality-menu absolute bottom-12 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden">
             </div>
           </div>
           

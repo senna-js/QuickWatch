@@ -30,18 +30,18 @@ export function renderHeader() {
       ` : ''}
     </div>
   
-    <div class="fixed bottom-0 left-0 w-full bg-zinc-900 flex justify-around items-center py-4 z-50 md:hidden">
+    <div class="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 pb-8 z-50 md:hidden bg-zinc-950">
       <a href="/" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-home text-xl"></i>
+        <i class="icon-home text-2xl"></i>
       </a>
       <a href="/search" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-search text-xl"></i>
+        <i class="icon-search text-2xl"></i>
       </a>
       <a href="/watchlist" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-bookmark text-xl"></i>
+        <i class="icon-bookmark text-2xl"></i>
       </a>
       <a href="/download" class="text-zinc-400 hover:text-white">
-        <i class="fas fa-download text-xl"></i>
+        <i class="icon-download text-2xl"></i>
       </a>
       ${showIOSInstall ? `
       <a href="/iosapp" class="text-zinc-400 hover:text-white">
