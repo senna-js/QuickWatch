@@ -41,11 +41,31 @@ async function loadMediaDetails(type, id) {
     const response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?language=en-US`, options);
     const data = await response.json();
     
-    let seasonData = null;
-    if (type === 'tv') {
-      const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/1?language=en-US`, options);
-      seasonData = await seasonResponse.json();
+    const recents = JSON.parse(localStorage.getItem('quickwatch-recents') || '[]');
+    
+    const existingIndex = recents.findIndex(item => item.id === id && item.mediaType === type);
+    if (existingIndex !== -1) {
+      recents.splice(existingIndex, 1);
     }
+    
+    recents.unshift({
+      id,
+      mediaType: type,
+      title: data.title || data.name,
+      posterPath: data.poster_path ? `${TMDB_IMAGE_BASE_URL}w500${data.poster_path}` : null,
+      year: new Date(data.release_date || data.first_air_date).getFullYear() || 'N/A',
+      dateViewed: new Date().toISOString()
+    });
+    
+    if (recents.length > 10) {
+      recents.pop();
+    }
+    
+    localStorage.setItem('quickwatch-recents', JSON.stringify(recents));
+    
+    let seasonData = null;
+    const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/1?language=en-US`, options);
+    seasonData = await seasonResponse.json();
     
     let initialSeason = 1;
     let initialEpisode = 1;
