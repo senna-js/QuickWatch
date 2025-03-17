@@ -10,6 +10,10 @@ import { renderError } from '../../components/error.js';
 export async function renderAnimePaheEmbed(container, params) {
   const { id, episode } = params;
 
+  if (window.splashScreen) {
+    window.splashScreen.show();
+  }
+
   container.innerHTML = `
     <div class="flex flex-col h-screen bg-black">
       <div id="player-container" class="flex-grow relative overflow-hidden">
@@ -30,6 +34,10 @@ export async function renderAnimePaheEmbed(container, params) {
       'Close',
       'window.close()'
     );
+    
+    if (window.splashScreen) {
+      window.splashScreen.hide();
+    }
   }
 }
 
@@ -40,6 +48,8 @@ export async function renderAnimePaheEmbed(container, params) {
  * @param {HTMLElement} container - The container element
  */
 async function loadAnimeContent(id, episode, container) {
+  const tmdbStep = window.splashScreen?.addStep('Loading anime details...');
+  
   const tmdbResponse = await fetch(`https://api.themoviedb.org/3/tv/${id}?language=en-US`, {
     method: 'GET',
     headers: {
@@ -51,11 +61,15 @@ async function loadAnimeContent(id, episode, container) {
   const tmdbData = await tmdbResponse.json();
   const animeName = tmdbData.name;
   const releaseYear = new Date(tmdbData.first_air_date).getFullYear();
+  
+  window.splashScreen?.completeStep(tmdbStep);
+  const searchStep = window.splashScreen?.addStep('Searching for anime sources...');
 
   const searchResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=search&query=${encodeURIComponent(animeName)}`);
   const searchData = await searchResponse.json();
 
   if (!searchData.data || searchData.data.length === 0) {
+    window.splashScreen?.hide();
     throw new Error('Anime not found');
   }
 
@@ -66,11 +80,15 @@ async function loadAnimeContent(id, episode, container) {
       break;
     }
   }
+  
+  window.splashScreen?.completeStep(searchStep);
+  const episodesStep = window.splashScreen?.addStep('Loading episode list...');
 
   const seriesResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=series&session=${bestMatch.session}&page=1`);
   const seriesData = await seriesResponse.json();
 
   if (!seriesData.episodes || seriesData.episodes.length === 0) {
+    window.splashScreen?.hide();
     throw new Error('No episodes found');
   }
 
@@ -799,10 +817,6 @@ function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumbe
     }
   });
   
-  qualityBtn.addEventListener('click', () => {
-    qualityMenu.classList.toggle('hidden');
-  });
-  
   if (document.pictureInPictureEnabled) {
     pipBtn.addEventListener('click', () => {
       if (document.pictureInPictureElement) {
@@ -857,7 +871,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
         x-webkit-airplay="allow"
       ></video>
 
-      <div class="center-play-button absolute inset-0 flex items-center justify-center z-20 ${isIPhone ? 'hidden' : 'hidden'}">
+      <div class="center-play-button absolute inset-0 flex items-center justify-center z-10 ${isIPhone ? 'hidden' : 'hidden'}">
         <button class="w-16 h-16 bg-white bg-opacity-80 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-200 transform hover:scale-110">
           <i class="fas fa-play text-black text-2xl ml-[2.5px]"></i>
         </button>
@@ -881,7 +895,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
         <div class="preview-time text-white text-xs text-center py-1 bg-black bg-opacity-75"></div>
       </div>
       
-      <div class="player-controls absolute bottom-0 left-0 right-0 bg-black bg-opacity-90 m-2.5 p-2.5 rounded-[0.6rem] transition-opacity duration-300 ${isIPhone ? 'hidden' : 'opacity-0'}">
+      <div class="player-controls absolute bottom-0 left-0 right-0 bg-black bg-opacity-90 m-2.5 p-2.5 rounded-[0.6rem] transition-opacity duration-300 z-20 ${isIPhone ? 'hidden' : 'opacity-0'}">
         <style>
           .quality-selector {
             transition: margin-left 0.3s ease;

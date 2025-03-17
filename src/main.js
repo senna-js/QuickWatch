@@ -5,6 +5,8 @@ import { initRouter } from './router.js'
 
 window.splashScreen = {
   element: null,
+  stepsContainer: null,
+  steps: [],
   show: function() {
     if (!this.element) {
       this.element = document.createElement('div');
@@ -13,9 +15,11 @@ window.splashScreen = {
         <div class="splash-container">
           <img src="/logo_transparent.png" alt="QuickWatch" class="splash-logo">
           <div class="splash-spinner"></div>
+          <div class="splash-steps"></div>
         </div>
       `;
       document.body.appendChild(this.element);
+      this.stepsContainer = this.element.querySelector('.splash-steps');
     } else {
       this.element.classList.remove('hidden');
     }
@@ -27,8 +31,44 @@ window.splashScreen = {
         if (this.element.classList.contains('hidden')) {
           this.element.remove();
           this.element = null;
+          this.stepsContainer = null;
+          this.steps = [];
         }
       }, 500);
+    }
+  },
+  addStep: function(stepText) {
+    if (!this.stepsContainer) return;
+    
+    const stepId = `step-${this.steps.length}`;
+    const stepElement = document.createElement('div');
+    stepElement.className = 'splash-step';
+    stepElement.id = stepId;
+    stepElement.innerHTML = `
+      <div class="step-loader"></div>
+      <span>${stepText}</span>
+    `;
+    
+    this.stepsContainer.appendChild(stepElement);
+    this.steps.push({ id: stepId, text: stepText, completed: false });
+    
+    return stepId;
+  },
+  completeStep: function(stepId) {
+    if (!this.stepsContainer) return;
+    
+    const stepElement = document.getElementById(stepId);
+    if (stepElement) {
+      const loader = stepElement.querySelector('.step-loader');
+      if (loader) {
+        loader.innerHTML = '<i class="fas fa-check"></i>';
+        loader.classList.add('completed');
+      }
+      
+      const stepIndex = this.steps.findIndex(step => step.id === stepId);
+      if (stepIndex !== -1) {
+        this.steps[stepIndex].completed = true;
+      }
     }
   }
 };

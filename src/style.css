@@ -48,10 +48,6 @@ button {
   transition: all 0.3s ease;
 }
 
-button:hover {
-  transform: translateY(-2px);
-}
-
 .hero-gradient {
   background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.1) 80%, rgba(0,0,0,0) 100%);
 }
@@ -115,7 +111,11 @@ button:hover {
 }
 
 .play-pause-btn:hover, .volume-btn:hover, .fullscreen-btn:hover, .quality-btn:hover, .pip-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+}
+
+.play-pause-btn:active, .volume-btn:active, .fullscreen-btn:active, .quality-btn:active, .pip-btn:active {
+  transform: scale(0.9);
 }
 
 .quality-menu {

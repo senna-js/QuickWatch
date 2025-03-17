@@ -20,9 +20,6 @@ export function renderHeader() {
       <a href="/watchlist" class="text-zinc-400 hover:text-white">
         <i class="icon-bookmark text-2xl"></i>
       </a>
-      <a href="/download" class="text-zinc-400 hover:text-white">
-        <i class="icon-download text-2xl"></i>
-      </a>
       ${showIOSInstall ? `
       <a href="/iosapp" class="text-zinc-400 hover:text-white">
         <i class="fab fa-apple text-2xl"></i>
@@ -39,9 +36,6 @@ export function renderHeader() {
       </a>
       <a href="/watchlist" class="text-zinc-400 hover:text-white">
         <i class="icon-bookmark text-2xl"></i>
-      </a>
-      <a href="/download" class="text-zinc-400 hover:text-white">
-        <i class="icon-download text-2xl"></i>
       </a>
       ${showIOSInstall ? `
       <a href="/iosapp" class="text-zinc-400 hover:text-white">

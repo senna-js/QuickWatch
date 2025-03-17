@@ -5,7 +5,6 @@ import { renderWatchlistPage } from './pages/watchlist/watchlist.js';
 import { renderSearchPage } from './pages/search/search.js';
 import { renderDetailsPage } from './pages/details/details.js';
 import { render404Page } from './pages/404.js';
-import { renderDownloadPage } from './pages/download/download.js';
 import { renderDownloadDetailsPage } from './pages/download/download-details.js';
 import { renderIOSAppPage } from './pages/iosapp.js';
 import { renderAnimePaheEmbed } from './pages/details/animepahe-embed.js';
@@ -59,7 +58,7 @@ function handleRoute() {
   const path = window.location.pathname;
   const appContainer = document.querySelector('#app');
   
-  if (path === '/download' || path === '/search' || path === '/watchlist') {
+  if (path === '/search' || path === '/watchlist') {
     if (window.splashScreen) {
       window.splashScreen.hide();
     }
@@ -76,10 +75,6 @@ function handleRoute() {
   else if (path === '/search') {
     document.title = 'QW Search';
     currentPagePromise = Promise.resolve(renderSearchPage(appContainer));
-  } 
-  else if (path === '/download') {
-    document.title = 'QW Download';
-    currentPagePromise = Promise.resolve(renderDownloadPage(appContainer));
   }
   else if (path.match(/^\/movie\/[\d]+$/)) {
     document.title = 'QW Movie';

@@ -36,6 +36,8 @@ export function renderDownloadDetailsPage(container, params) {
  */
 async function loadMediaDetails(type, id) {
   try {
+    const mediaDetailsStep = window.splashScreen?.addStep('Loading media details...');
+    
     const options = {
       method: 'GET',
       headers: {
@@ -46,17 +48,24 @@ async function loadMediaDetails(type, id) {
     
     const response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?language=en-US`, options);
     const data = await response.json();
+    
+    window.splashScreen?.completeStep(mediaDetailsStep);
+    const externalIdsStep = window.splashScreen?.addStep('Fetching external IDs...');
 
-    console.log(data)
+    console.log(data);
     
     const externalIdsResponse = await fetch(`${TMDB_BASE_URL}/${type}/${id}/external_ids`, options);
     const externalIds = await externalIdsResponse.json();
+    
+    window.splashScreen?.completeStep(externalIdsStep);
     
     const imdbId = externalIds.imdb_id;
     
     if (!imdbId) {
       throw new Error('IMDB ID not found for this media');
     }
+    
+    const torrentsStep = window.splashScreen?.addStep('Searching for download sources...');
     
     let torrentsData = [];
     try {
@@ -78,6 +87,9 @@ async function loadMediaDetails(type, id) {
     } catch (torrentsError) {
       console.warn('Failed to fetch torrent data:', torrentsError);
     }
+    
+    window.splashScreen?.completeStep(torrentsStep);
+    const renderStep = window.splashScreen?.addStep('Rendering page...');
 
     console.log(torrentsData);
     
@@ -224,7 +236,10 @@ async function loadMediaDetails(type, id) {
     `;
     
     if (window.splashScreen) {
-      window.splashScreen.hide();
+      // Give a moment to see the completed steps before hiding
+      setTimeout(() => {
+        window.splashScreen.hide();
+      }, 800);
     }
     
     return Promise.resolve();

@@ -10,6 +10,10 @@ import { renderError } from '../../components/error.js';
  * @param {Object} params
  */
 export function renderDetailsPage(container, params) {
+  if (window.splashScreen) {
+    window.splashScreen.show();
+  }
+  
   container.innerHTML = `
     <div id="backdrop-bg" class="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20 z-0 blur-[1rem]"></div>
 
@@ -30,6 +34,8 @@ export function renderDetailsPage(container, params) {
  */
 async function loadMediaDetails(type, id) {
   try {
+    const mediaDetailsStep = window.splashScreen?.addStep('Loading media details...');
+    
     const options = {
       method: 'GET',
       headers: {
@@ -40,6 +46,10 @@ async function loadMediaDetails(type, id) {
     
     const response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?language=en-US`, options);
     const data = await response.json();
+    
+    window.splashScreen?.completeStep(mediaDetailsStep);
+    
+    const recentsStep = window.splashScreen?.addStep('Updating recently viewed...');
     
     const recents = JSON.parse(localStorage.getItem('quickwatch-recents') || '[]');
     
@@ -63,6 +73,10 @@ async function loadMediaDetails(type, id) {
     
     localStorage.setItem('quickwatch-recents', JSON.stringify(recents));
     
+    window.splashScreen?.completeStep(recentsStep);
+    
+    const seasonStep = window.splashScreen?.addStep('Fetching season data...');
+    
     let seasonData = null;
     const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/1?language=en-US`, options);
     seasonData = await seasonResponse.json();
@@ -81,6 +95,10 @@ async function loadMediaDetails(type, id) {
         }
       }
     }
+    
+    window.splashScreen?.completeStep(seasonStep);
+    
+    const renderStep = window.splashScreen?.addStep('Rendering page...');
 
     const detailsContainer = document.getElementById('details-container');
     if (!detailsContainer) return;
@@ -202,6 +220,10 @@ async function loadMediaDetails(type, id) {
               </div>
             </div>
             ` : ''}
+            <a href="http://localhost:5173/dl/${type}/${id}" class="w-full md:w-auto bg-zinc-900 text-white py-1 px-5 rounded-full border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 transition-colors text-sm flex items-center justify-center gap-2">
+              <i class="icon-download text-lg"></i>
+              <span>Download</span>
+            </a>
           </div>
         </div>
       </div>
@@ -322,6 +344,13 @@ async function loadMediaDetails(type, id) {
       episodeSelect.addEventListener('change', updatePlayerSource);
     }
     
+    if (window.splashScreen) {
+      // Give a moment to see the completed steps before hiding
+      setTimeout(() => {
+        window.splashScreen.hide();
+      }, 800);
+    }
+    
   } catch (error) {
     console.error('Error loading media details:', error);
     document.getElementById('details-container').innerHTML = renderError(
@@ -330,5 +359,9 @@ async function loadMediaDetails(type, id) {
       'Back to Home',
       "window.history.pushState(null, null, '/'); window.dispatchEvent(new PopStateEvent('popstate'))"
     );
+    
+    if (window.splashScreen) {
+      window.splashScreen.hide();
+    }
   }
 }
