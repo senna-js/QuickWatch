@@ -97,12 +97,13 @@ function handleRoute() {
     document.title = 'QW iOS App';
     currentPagePromise = Promise.resolve(renderIOSAppPage(appContainer));
   }
-  else if (path.match(/^\/embed\/animepahe\/[\d]+\/[\d]+$/)) {
+  else if (path.match(/^\/embed\/animepahe\/[\d]+\/[\d]+\/[\d]+$/)) {
     document.title = 'AnimePahe Embed';
     const parts = path.split('/');
     const id = parts[3];
-    const episode = parts[4];
-    currentPagePromise = Promise.resolve(renderAnimePaheEmbed(appContainer, { id, episode }));
+    const episode = parts[5];
+    const season = parts[4];
+    currentPagePromise = Promise.resolve(renderAnimePaheEmbed(appContainer, { id, episode, season }));
   }
   else {
     document.title = 'QW 404';

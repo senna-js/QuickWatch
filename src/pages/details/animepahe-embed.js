@@ -8,7 +8,7 @@ import { renderError } from '../../components/error.js';
  * @param {Object} params - The parameters object containing id and episode
  */
 export async function renderAnimePaheEmbed(container, params) {
-  const { id, episode } = params;
+  const { id, episode , season } = params;
 
   if (window.splashScreen) {
     window.splashScreen.show();
@@ -25,7 +25,7 @@ export async function renderAnimePaheEmbed(container, params) {
   `;
 
   try {
-    await loadAnimeContent(id, episode, container);
+    await loadAnimeContent(id, episode, container, params); // Pass params here
   } catch (error) {
     console.error('Error loading anime content:', error);
     container.innerHTML = renderError(
@@ -46,8 +46,9 @@ export async function renderAnimePaheEmbed(container, params) {
  * @param {string} id - The TMDB ID
  * @param {string} episode - The episode number
  * @param {HTMLElement} container - The container element
+ * @param {Object} params - The parameters object containing season
  */
-async function loadAnimeContent(id, episode, container) {
+async function loadAnimeContent(id, episode, container, params) {
   const tmdbStep = window.splashScreen?.addStep('Loading anime details...');
   
   const tmdbResponse = await fetch(`https://api.themoviedb.org/3/tv/${id}?language=en-US`, {
@@ -64,8 +65,11 @@ async function loadAnimeContent(id, episode, container) {
   
   window.splashScreen?.completeStep(tmdbStep);
   const searchStep = window.splashScreen?.addStep('Searching for anime sources...');
+  
+  const seasonNumber = params.season || '1';
+  const searchQuery = seasonNumber === '1' ? animeName : `${animeName} Season ${seasonNumber}`;
 
-  const searchResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=search&query=${encodeURIComponent(animeName)}`);
+  const searchResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=search&query=${encodeURIComponent(searchQuery)}`);
   const searchData = await searchResponse.json();
 
   if (!searchData.data || searchData.data.length === 0) {

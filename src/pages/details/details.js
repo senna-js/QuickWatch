@@ -144,7 +144,7 @@ async function loadMediaDetails(type, id) {
       {
         name: '🤩 AnimePahe',
         tvOnly: true,
-        tvUrl: `/embed/animepahe/${id}/{episode}`
+        tvUrl: `/embed/animepahe/${id}/{season}/{episode}`
       }
     ];
 
