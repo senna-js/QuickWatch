@@ -220,7 +220,7 @@ async function loadMediaDetails(type, id) {
               </div>
             </div>
             ` : ''}
-            <a href="http://localhost:5173/dl/${type}/${id}" class="w-full md:w-auto bg-zinc-900 text-white py-1 px-5 rounded-full border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 transition-colors text-sm flex items-center justify-center gap-2">
+            <a href="/dl/${type}/${id}" class="w-full md:w-auto bg-zinc-900 text-white py-1 px-5 rounded-full border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 transition-colors text-sm flex items-center justify-center gap-2">
               <i class="icon-download text-lg"></i>
               <span>Download</span>
             </a>
