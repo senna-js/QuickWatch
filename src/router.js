@@ -8,6 +8,7 @@ import { render404Page } from './pages/404.js';
 import { renderDownloadDetailsPage } from './pages/download/download-details.js';
 import { renderIOSAppPage } from './pages/iosapp.js';
 import { renderAnimePaheEmbed } from './pages/details/animepahe-embed.js';
+import { renderVidSrcEmbed } from './pages/details/vidsrc-embed.js';
 
 export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q';
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -105,10 +106,20 @@ function handleRoute() {
     const season = parts[4];
     currentPagePromise = Promise.resolve(renderAnimePaheEmbed(appContainer, { id, episode, season }));
   }
+  else if (path.match(/^\/embed\/vidsrc\/[^\/]+\/[\d]+\/[\d]+\/[\d]+$/)) {
+    document.title = 'VidSrc Embed';
+    const parts = path.split('/');
+    const type = parts[3];
+    const id = parts[4];
+    const season = parts[5];
+    const episode = parts[6];
+    currentPagePromise = Promise.resolve(renderVidSrcEmbed(appContainer, { id, episode, season, type }));
+  }
   else {
     document.title = 'QW 404';
     currentPagePromise = Promise.resolve(render404Page(appContainer));
   }
   
   return currentPagePromise;
+  
 }

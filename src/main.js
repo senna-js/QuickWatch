@@ -25,10 +25,11 @@ window.splashScreen = {
     }
   },
   hide: function() {
-    if (this.element) {
+    if (this.element && document.body.contains(this.element)) {
       this.element.classList.add('hidden');
       setTimeout(() => {
-        if (this.element.classList.contains('hidden')) {
+        if (this.element && document.body.contains(this.element) && 
+            this.element.classList.contains('hidden')) {
           this.element.remove();
           this.element = null;
           this.stepsContainer = null;
