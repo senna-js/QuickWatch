@@ -51,8 +51,6 @@ async function loadMediaDetails(type, id) {
     
     window.splashScreen?.completeStep(mediaDetailsStep);
     const externalIdsStep = window.splashScreen?.addStep('Fetching external IDs...');
-
-    console.log(data);
     
     const externalIdsResponse = await fetch(`${TMDB_BASE_URL}/${type}/${id}/external_ids`, options);
     const externalIds = await externalIdsResponse.json();
@@ -64,33 +62,193 @@ async function loadMediaDetails(type, id) {
     if (!imdbId) {
       throw new Error('IMDB ID not found for this media');
     }
-    
-    const torrentsStep = window.splashScreen?.addStep('Searching for download sources...');
-    
+        
     let torrentsData = [];
     try {
-      const formData = new FormData();
-      formData.append('title', data.title || data.name);
-      formData.append('imdbid', imdbId);
-      formData.append('type', type);
+      const parser = new DOMParser();
       
-      const torrentsResponse = await fetch('https://varunaditya.xyz/api/qw/get_torrents', {
-        method: 'POST',
-        body: formData
-      });
+      const animeCheckStep = window.splashScreen?.addStep('Checking if media is anime...');
+      const animeCheckResponse = await fetch(`https://raw.githubusercontent.com/Fribb/anime-lists/refs/heads/master/anime-list-full.json`);
+      const animeList = await animeCheckResponse.json();
       
-      if (torrentsResponse.ok) {
-        torrentsData = await torrentsResponse.json();
-      } else {
-        console.warn('Torrent API returned non-OK status:', torrentsResponse.status);
+      let isAnime = false;
+      let anilistId = null;
+      
+      for (const item of animeList) {
+        if (item.imdb_id === imdbId) {
+          isAnime = true;
+          anilistId = item.anilist_id;
+          break;
+        }
       }
+      window.splashScreen?.completeStep(animeCheckStep);
+
+      if (isAnime && anilistId) {
+        const nyaaStep = window.splashScreen?.addStep('Searching Nyaa.si for anime torrents...');
+        try {
+          const nyaaResponse = await fetch(`https://releases.moe/api/collections/entries/records?filter=alID=${anilistId}&expand=trs`);
+          const nyaaData = await nyaaResponse.json();
+          
+          if (nyaaData.items?.[0]?.expand?.trs) {
+            for (const result of nyaaData.items[0].expand.trs) {
+              if (result.url.includes('nyaa.si')) {
+                const tags = [];
+                tags.push(`${result.files.length} Episodes`);
+                tags.push(result.updated.split(' ')[0]);
+                if (result.dualAudio) tags.push("DualAudio");
+                
+                const baseTrackers = "tr=http%3A%2F%2F125.227.35.196%3A6969%2Fannounce&tr=http%3A%2F%2F210.244.71.25%3A6969%2Fannounce&..."; // Add all trackers
+                const magnetUrl = `magnet:?xt=urn:btih:${result.infoHash}&dn=${encodeURIComponent(`${data.title || data.name} (${result.releaseGroup})`)}&${baseTrackers}`;
+                
+                torrentsData.push({
+                  url: magnetUrl,
+                  tags,
+                  source: "Nyaa.si"
+                });
+              }
+            }
+          }
+        } catch (nyaaError) {
+          console.warn('Failed to fetch Nyaa.si data:', nyaaError);
+        }
+        window.splashScreen?.completeStep(nyaaStep);
+      }
+    
+      if (type === 'movie') {
+        const ytsStep = window.splashScreen?.addStep('Searching Yts.mx for movie torrents...');
+        try {
+          const ytsResponse = await fetch(`https://yts.mx/api/v2/movie_details.json?imdb_id=${imdbId}`);
+          const ytsData = await ytsResponse.json();
+          
+          if (ytsData.data?.movie?.torrents) {
+            const baseTrackers = "tr=http%3A%2F%2F125.227.35.196%3A6969%2Fannounce&tr=http%3A%2F%2F210.244.71.25%3A6969%2Fannounce&tr=http%3A%2F%2F210.244.71.26%3A6969%2Fannounce&tr=http%3A%2F%2F213.159.215.198%3A6970%2Fannounce&tr=http%3A%2F%2F37.19.5.139%3A6969%2Fannounce&tr=http%3A%2F%2F37.19.5.155%3A6881%2Fannounce&tr=http%3A%2F%2F46.4.109.148%3A6969%2Fannounce&tr=http%3A%2F%2F87.248.186.252%3A8080%2Fannounce&tr=http%3A%2F%2Fasmlocator.ru%3A34000%2F1hfZS1k4jh%2Fannounce&tr=http%3A%2F%2Fbt.evrl.to%2Fannounce&tr=http%3A%2F%2Fbt.rutracker.org%2Fann&tr=https%3A%2F%2Fwww.artikelplanet.nl&tr=http%3A%2F%2Fmgtracker.org%3A6969%2Fannounce&tr=http%3A%2F%2Fpubt.net%3A2710%2Fannounce&tr=http%3A%2F%2Ftracker.baravik.org%3A6970%2Fannounce&tr=http%3A%2F%2Ftracker.dler.org%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.filetracker.pl%3A8089%2Fannounce&tr=http%3A%2F%2Ftracker.grepler.com%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.mg64.net%3A6881%2Fannounce&tr=http%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.torrentyorg.pl%2Fannounce&tr=https%3A%2F%2Finternet.sitelio.me%2F&tr=https%3A%2F%2Fcomputer1.sitelio.me%2F&tr=udp%3A%2F%2F168.235.67.63%3A6969&tr=udp%3A%2F%2F182.176.139.129%3A6969&tr=udp%3A%2F%2F37.19.5.155%3A2710&tr=udp%3A%2F%2F46.148.18.250%3A2710&tr=udp%3A%2F%2F46.4.109.148%3A6969&tr=udp%3A%2F%2Fcomputerbedrijven.bestelinks.nl%2F&tr=udp%3A%2F%2Fcomputerbedrijven.startsuper.nl%2F&tr=udp%3A%2F%2Fcomputershop.goedbegin.nl%2F&tr=udp%3A%2F%2Fc3t.org&tr=udp%3A%2F%2Fallerhandelenlaag.nl&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.tiny-vps.com%3A6969";
+            
+            for (const torrent of ytsData.data.movie.torrents) {
+              const magnetUrl = `magnet:?xt=urn:btih:${torrent.hash}&dn=${encodeURIComponent(ytsData.data.movie.title)}&${baseTrackers}`;
+              const formattedDate = torrent.date_uploaded.split(' ')[0];
+              
+              torrentsData.push({
+                url: magnetUrl,
+                tags: [
+                  torrent.quality,
+                  torrent.size,
+                  formattedDate
+                ],
+                source: "YTS.MX"
+              });
+            }
+          }
+        } catch (ytsError) {
+          console.warn('Failed to fetch YTS.MX data:', ytsError);
+        }
+        window.splashScreen?.completeStep(ytsStep);
+      }
+    
+      const pbStep = window.splashScreen?.addStep('Searching The Pirate Bay for torrents...');
+      const pbCategories = type === 'tv' ? ['205', '208'] : ['201', '207'];
+      const qualities = ['SD', 'HD'];
+      
+      for (let i = 0; i < pbCategories.length; i++) {
+        const pbResponse = await fetch('https://varunaditya.xyz/api/proxy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            url: `https://1.piratebays.to/s/?q=${encodeURIComponent(data.title || data.name)}&video=on&category=${pbCategories[i]}`,
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+            }
+          })
+        });
+        const pbHtml = await pbResponse.text();
+        const doc = parser.parseFromString(pbHtml, 'text/html');
+        const rows = doc.querySelectorAll('#searchResult > tbody > tr');
+        
+        rows.forEach(row => {
+          try {
+            const magnetLink = row.querySelector('td a[href^="magnet:"]')?.href;
+            const titleElem = row.querySelector('td .detLink');
+            const dateElem = row.querySelector('td:nth-of-type(3)');
+            const sizeElem = row.querySelector('td:nth-of-type(5)');
+            
+            if (magnetLink && titleElem && dateElem && sizeElem) {
+              torrentsData.push({
+                url: magnetLink,
+                tags: [ qualities[i], dateElem.textContent.trim(), sizeElem.textContent.trim() ],
+                source: "The Pirate Bay"
+              });
+            }
+          } catch (error) { console.error('Error processing Pirate Bay row:', error); }
+        });
+      }
+      window.splashScreen?.completeStep(pbStep);
+
+      const tgStep = window.splashScreen?.addStep('Searching TorrentGalaxy for torrents...');
+      const tgResponse = await fetch(`https://torrentgalaxy.one/get-posts/keywords:${imdbId}/`);
+      const tgHtml = await tgResponse.text();
+      const tgDoc = parser.parseFromString(tgHtml, 'text/html');
+
+      tgDoc.querySelectorAll('div.tgxtablerow').forEach(row => {
+        try {
+          const magnetElement = row.querySelector('a i.glyphicon-magnet');
+          if (!magnetElement) return;
+
+          const magnetLink = magnetElement.closest('a')?.getAttribute('href');
+          const size = row.querySelector('div.tgxtablecell span.badge-secondary')?.textContent?.trim().replace('\xa0', ' ');
+          
+          const dateCells = row.querySelectorAll('div.tgxtablecell');
+          const dateCell = dateCells[dateCells.length - 1];
+          let dateText = dateCell?.textContent?.trim() || '';
+          
+          if (dateText.includes('Added')) { dateText = dateText.split('Added')[1].trim(); }
+
+          const today = new Date();
+          let estimatedDate = new Date(today);
+
+          if (dateText.includes('year')) {
+            const yearsMatch = dateText.match(/(\d+)\s*year/);
+            if (yearsMatch) { estimatedDate.setFullYear(estimatedDate.getFullYear() - parseInt(yearsMatch[1])); }
+          }
+          if (dateText.includes('month')) {
+            const monthsMatch = dateText.match(/(\d+)\s*month/);
+            if (monthsMatch) { estimatedDate.setMonth(estimatedDate.getMonth() - parseInt(monthsMatch[1])); }
+          }
+          if (dateText.includes('week')) {
+            const weeksMatch = dateText.match(/(\d+)\s*week/);
+            if (weeksMatch) { estimatedDate.setDate(estimatedDate.getDate() - (parseInt(weeksMatch[1]) * 7)); }
+          }
+          if (dateText.includes('day')) {
+            const daysMatch = dateText.match(/(\d+)\s*day/);
+            if (daysMatch) { estimatedDate.setDate(estimatedDate.getDate() - parseInt(daysMatch[1])); }
+          }
+          if (dateText.includes('hour')) {
+            const hoursMatch = dateText.match(/(\d+)\s*hour/);
+            if (hoursMatch) { estimatedDate.setHours(estimatedDate.getHours() - parseInt(hoursMatch[1])); }
+          }
+
+          const formattedDate = estimatedDate.toISOString().split('T')[0];
+
+          if (magnetLink) {
+            const finalUrl = `https://torrentgalaxy.one${magnetLink}`;
+            torrentsData.push({
+              url: finalUrl,
+              tags: [formattedDate, size].filter(Boolean),
+              source: "TorrentGalaxy"
+            });
+          }
+        } catch (error) {
+          console.warn('Error processing TorrentGalaxy row:', error);
+        }
+      });
+      window.splashScreen?.completeStep(tgStep);
     } catch (torrentsError) {
       console.warn('Failed to fetch torrent data:', torrentsError);
     }
     
-    window.splashScreen?.completeStep(torrentsStep);
-    const renderStep = window.splashScreen?.addStep('Rendering page...');
-
     console.log(torrentsData);
     
     const detailsContainer = document.getElementById('details-container');
