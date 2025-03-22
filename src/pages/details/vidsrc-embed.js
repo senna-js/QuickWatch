@@ -65,7 +65,7 @@ async function loadContent(id, episode, season, type, container) {
   
   try {
     // Get available providers
-    const providersResponse = await fetch('http://api.varunaditya.xyz/api/qw/whvx/status');
+    const providersResponse = await fetch('http://varunaditya.xyz/api/qw/whvx/status');
     const { providers } = await providersResponse.json();
     if (!providers?.length) {
       throw new Error('No providers available');
@@ -78,7 +78,7 @@ async function loadContent(id, episode, season, type, container) {
       (async () => {
         const tokenFormData = new FormData();
         tokenFormData.append('id', id);
-        const tokenResponse = await fetch('http://api.varunaditya.xyz/api/qw/whvx/token', {
+        const tokenResponse = await fetch('http://varunaditya.xyz/api/qw/whvx/token', {
           method: 'POST',
           body: tokenFormData
         });
@@ -117,7 +117,7 @@ async function loadContent(id, episode, season, type, container) {
 
     const sourcesStep = window.splashScreen?.addStep('Getting stream sources...');
     // Get stream sources
-    const streamResponse = await fetch('http://api.varunaditya.xyz/api/qw/whvx/getstream', {
+    const streamResponse = await fetch('http://varunaditya.xyz/api/qw/whvx/getstream', {
       method: 'POST',
       body: streamFormData
     });
@@ -127,7 +127,7 @@ async function loadContent(id, episode, season, type, container) {
 
     const sourceStep = window.splashScreen?.addStep('Processing stream data...');
     // Get final stream URL
-    const sourceResponse = await fetch(`http://api.varunaditya.xyz/api/qw/whvx/getsource?source=${encodeURIComponent(sourceUrl)}&provider=${providers[0]}`);
+    const sourceResponse = await fetch(`http://varunaditya.xyz/api/qw/whvx/getsource?source=${encodeURIComponent(sourceUrl)}&provider=${providers[0]}`);
     const sourceData = await sourceResponse.json();
     window.splashScreen?.completeStep(sourceStep);
 

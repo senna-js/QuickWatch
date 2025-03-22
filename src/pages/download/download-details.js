@@ -74,7 +74,7 @@ async function loadMediaDetails(type, id) {
       formData.append('imdbid', imdbId);
       formData.append('type', type);
       
-      const torrentsResponse = await fetch('https://varunaditya.xyz/api/get_torrents', {
+      const torrentsResponse = await fetch('https://varunaditya.xyz/api/qw/get_torrents', {
         method: 'POST',
         body: formData
       });
