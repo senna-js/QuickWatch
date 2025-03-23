@@ -61,146 +61,76 @@ async function loadContent(id, episode, season, type, container) {
     console.error('Failed to load HLS.js:', error);
   }
 
-  const providersStep = window.splashScreen?.addStep('Checking available providers...');
+  const contentParams = { id, episode, season, type };
+  
+  await loadContentWithSource('all', contentParams, container);
+}
+
+async function loadContentWithSource(source, contentParams, container) {
+  const { id, episode, season, type } = contentParams;
+  const streamStep = window.splashScreen?.addStep(`Getting ${source} stream data...`);
   
   try {
-    // Get available providers
-    const providersResponse = await fetch('http://varunaditya.xyz/api/qw/whvx/status');
-    const { providers } = await providersResponse.json();
-    if (!providers?.length) {
-      throw new Error('No providers available');
+    const formData = new FormData();
+    formData.append('type', type);
+    formData.append('source', source);
+    formData.append('id', id);
+    
+    if (type === 'movie') {
+      formData.append('season', '0');
+      formData.append('episode', '0');
+    } else {
+      formData.append('season', season);
+      formData.append('episode', episode);
     }
-    window.splashScreen?.completeStep(providersStep);
 
-    const mediaStep = window.splashScreen?.addStep('Loading media information...');
-    // Get token and media details
-    const [token, mediaDetails] = await Promise.all([
-      (async () => {
-        const tokenFormData = new FormData();
-        tokenFormData.append('id', id);
-        const tokenResponse = await fetch('http://varunaditya.xyz/api/qw/whvx/token', {
-          method: 'POST',
-          body: tokenFormData
-        });
-        return tokenResponse.text();
-      })(),
-      (async () => {
-        const tmdbResponse = await fetch(`https://api.themoviedb.org/3/${type}/${id}?append_to_response=external_ids`, {
-          method: 'GET',
-          headers: {
-            'accept': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q'
-          }
-        });
-        return tmdbResponse.json();
-      })()
-    ]);
-    window.splashScreen?.completeStep(mediaStep);
-
-    // Prepare stream request payload
-    const streamQuery = {
-      title: mediaDetails.title || mediaDetails.name,
-      releaseYear: new Date(mediaDetails.release_date || mediaDetails.first_air_date).getFullYear(),
-      tmdbId: mediaDetails.id.toString(),
-      imdbId: mediaDetails.external_ids.imdb_id,
-      type: type === 'movie' ? 'movie' : 'show',
-      season: type === 'movie' ? '' : season,
-      episode: type === 'movie' ? '' : episode
-    };
-
-    // Create form data for stream request
-    const streamFormData = new FormData();
-    streamFormData.append('query', JSON.stringify(streamQuery));
-    streamFormData.append('provider', providers[0]);
-    // Remove quotes from token before appending
-    streamFormData.append('token', token.replace(/"/g, ''));
-
-    const sourcesStep = window.splashScreen?.addStep('Getting stream sources...');
-    // Get stream sources
-    const streamResponse = await fetch('http://varunaditya.xyz/api/qw/whvx/getstream', {
-      method: 'POST',
-      body: streamFormData
+    console.log('Sending request with params:', {
+      type, id, season: type === 'movie' ? '0' : season, 
+      episode: type === 'movie' ? '0' : episode,
+      source
     });
-    const streamData = await streamResponse.json();
-    const sourceUrl = streamData.url;
-    window.splashScreen?.completeStep(sourcesStep);
 
-    const sourceStep = window.splashScreen?.addStep('Processing stream data...');
-    // Get final stream URL
-    const sourceResponse = await fetch(`http://varunaditya.xyz/api/qw/whvx/getsource?source=${encodeURIComponent(sourceUrl)}&provider=${providers[0]}`);
-    const sourceData = await sourceResponse.json();
-    window.splashScreen?.completeStep(sourceStep);
-
-    let streamUrl = sourceData?.stream?.[0]?.playlist;
-    let subtitles = sourceData?.stream?.[0]?.captions || [];
-
-    const playlistStep = window.splashScreen?.addStep('Verifying stream...');
-    // Verify if the playlist URL works
-    if (streamUrl) {
-      try {
-        const playlistResponse = await fetch(streamUrl);
-        if (!playlistResponse.ok || !playlistResponse.headers.get('content-type')?.includes('application/vnd.apple.mpegurl')) {
-          streamUrl = null;
-        }
-      } catch (error) {
-        console.error('Playlist verification failed:', error);
-        streamUrl = null;
-      }
+    const response = await fetch('https://api.varunaditya.xyz/api/uira', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API responded with status: ${response.status}`);
     }
-    window.splashScreen?.completeStep(playlistStep);
-
-    // If primary stream doesn't work, try mirrors
+    
+    const data = await response.json();
+    console.log('API response:', data);
+    
+    window.splashScreen?.completeStep(streamStep);
+    
+    if (!data) {
+      throw new Error('Empty response from API');
+    }
+    
+    let streamUrl = null;
+    let subtitles = data.captions || [];
+    
+    if (data.sources && Array.isArray(data.sources) && data.sources.length > 0) {
+      const sortedSources = [...data.sources].sort((a, b) => 
+        (a.priority || 999) - (b.priority || 999)
+      );
+      
+      streamUrl = sortedSources[0].url;
+    } 
+    else if (data.stream && data.stream.playlist) {
+      streamUrl = data.stream.playlist;
+      subtitles = data.stream.captions || subtitles;
+    }
+    else if (data.stream && Array.isArray(data.stream) && data.stream[0]?.playlist) {
+      streamUrl = data.stream[0].playlist;
+      subtitles = data.stream[0].captions || subtitles;
+    }
+    
     if (!streamUrl) {
-      const mirrorStep = window.splashScreen?.addStep('Trying Amazon mirror...');
-      try {
-        // Try Amazon first
-        const amznResponse = await fetch(amznUrl);
-        const amznData = await amznResponse.json();
-        
-        if (amznData?.stream?.[0]?.playlist) {
-          window.splashScreen?.updateStep(mirrorStep, 'Verifying Amazon stream...');
-          // Verify Amazon playlist URL
-          const amznPlaylistResponse = await fetch(amznData.stream[0].playlist);
-          if (amznPlaylistResponse.ok && amznPlaylistResponse.headers.get('content-type')?.includes('application/vnd.apple.mpegurl')) {
-            streamUrl = amznData.stream[0].playlist;
-            subtitles = amznData.stream[0].captions || [];
-          }
-        }
-        window.splashScreen?.completeStep(mirrorStep);
-      } catch (error) {
-        console.error('Amazon mirror failed:', error);
-        window.splashScreen?.completeStep(mirrorStep);
-      }
-
-      // Only try Netflix if Amazon failed
-      if (!streamUrl) {
-        const netflixStep = window.splashScreen?.addStep('Trying Netflix mirror...');
-        try {
-          const ntflxResponse = await fetch(ntflxUrl);
-          const ntflxData = await ntflxResponse.json();
-          
-          if (ntflxData?.stream?.[0]?.playlist) {
-            window.splashScreen?.updateStep(netflixStep, 'Verifying Netflix stream...');
-            const ntflxPlaylistResponse = await fetch(ntflxData.stream[0].playlist);
-            if (ntflxPlaylistResponse.ok && ntflxPlaylistResponse.headers.get('content-type')?.includes('application/vnd.apple.mpegurl')) {
-              streamUrl = ntflxData.stream[0].playlist;
-              subtitles = ntflxData.stream[0].captions || [];
-            }
-          }
-          window.splashScreen?.completeStep(netflixStep);
-        } catch (error) {
-          console.error('Netflix mirror failed:', error);
-          window.splashScreen?.completeStep(netflixStep);
-        }
-      }
+      throw new Error('No stream URL found in response');
     }
-
-    if (!streamUrl) {
-      throw new Error('No stream URL found');
-    }
-
-    window.splashScreen?.completeStep(sourcesStep);
-
+    
     const playerContainer = container.querySelector('#player-container');
     if (!playerContainer) return;
 
@@ -211,16 +141,31 @@ async function loadContent(id, episode, season, type, container) {
       [],
       id,
       episode,
-      subtitles
+      subtitles,
+      source,
+      contentParams,
+      container
     );
+    
+    if (window.splashScreen) {
+      window.splashScreen.hide();
+    }
+    
   } catch (error) {
     console.error('Error loading stream:', error);
     throw new Error('Failed to load stream');
   }
 }
 
-function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber, subtitles) {
+function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber, subtitles, currentSource, contentParams, mainContainer) {
   const isIPhone = /iPhone/i.test(navigator.userAgent);
+  const isMP4 = videoUrl.toLowerCase().endsWith('.mp4');
+  
+  const sources = [
+    { id: 'all', name: 'Source 1' },
+    { id: '4k', name: 'Source 2' },
+    { id: 'moviebox', name: 'Source 3' }
+  ];
 
   container.innerHTML = `
     <div class="custom-player relative w-full h-full bg-black">
@@ -276,6 +221,20 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
             </div>
           </div>
           
+          <div class="source-selector relative">
+            <button class="source-btn text-zinc-300 hover:text-white transition text-lg">
+              <i class="icon-layers"></i>
+            </button>
+            <div class="source-menu absolute bottom-12 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden">
+              ${sources.map(source => `
+                <div class="source-option py-1 px-2 text-sm text-white hover:bg-zinc-700 rounded cursor-pointer ${source.id === currentSource ? 'bg-zinc-700' : ''}" 
+                     data-source="${source.id}">
+                  ${source.name}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
           <button class="pip-btn text-zinc-300 hover:text-white transition text-lg" title="Picture in Picture">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" class="m-[0.4rem]" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-picture-in-picture-2"><path d="M21 9V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v10c0 1.1.9 2 2 2h4"/><rect width="10" height="7" x="12" y="13" rx="2"/></svg>
           </button>
@@ -290,14 +249,132 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
   
   const player = container.querySelector('#custom-player');
   
-  if (Hls.isSupported()) {
+  if (isMP4) {
+    console.log('Setting up MP4 with partial content requests');
+    
+    const customFetch = async (url, start, end) => {
+      const headers = new Headers();
+      if (start !== undefined && end !== undefined) {
+        headers.append('Range', `bytes=${start}-${end}`);
+      }
+      
+      try {
+        const response = await fetch(url, { headers });
+        if (!response.ok && response.status !== 206) {
+          throw new Error(`Failed to fetch video segment: ${response.status}`);
+        }
+        return response;
+      } catch (error) {
+        console.error('Error fetching video segment:', error);
+        throw error;
+      }
+    };
+    
+    const mediaSource = new MediaSource();
+    player.src = URL.createObjectURL(mediaSource);
+    
+    mediaSource.addEventListener('sourceopen', async () => {
+      try {
+        const headResponse = await customFetch(videoUrl);
+        const contentLength = headResponse.headers.get('Content-Length');
+        console.log(`Total content length: ${contentLength} bytes`);
+        
+        const mimeType = 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+        const sourceBuffer = mediaSource.addSourceBuffer(mimeType);
+        
+        const initialSegmentSize = 1024 * 1024;
+        const initialResponse = await customFetch(videoUrl, 0, initialSegmentSize - 1);
+        const initialData = await initialResponse.arrayBuffer();
+        sourceBuffer.appendBuffer(initialData);
+        
+        player.addEventListener('seeking', async () => {
+          const currentTime = player.currentTime;
+          console.log(`Seeking to ${currentTime}`);
+          
+          const estimatedByteOffset = Math.floor(currentTime / player.duration * contentLength);
+          const segmentSize = 2 * 1024 * 1024;
+          
+          try {
+            const seekResponse = await customFetch(
+              videoUrl, 
+              estimatedByteOffset, 
+              estimatedByteOffset + segmentSize - 1
+            );
+            const seekData = await seekResponse.arrayBuffer();
+            
+            if (sourceBuffer.updating) {
+              await new Promise(resolve => {
+                sourceBuffer.addEventListener('updateend', resolve, { once: true });
+              });
+            }
+            
+            sourceBuffer.remove(0, player.duration);
+            sourceBuffer.appendBuffer(seekData);
+          } catch (error) {
+            console.error('Error during seek operation:', error);
+          }
+        });
+        
+        sourceBuffer.addEventListener('updateend', () => {
+          if (!player.paused && player.readyState < 3) {
+            player.play().catch(err => console.error('Error playing video:', err));
+          }
+        });
+      } catch (error) {
+        console.error('Error setting up MediaSource:', error);
+        
+        player.src = videoUrl;
+        player.setAttribute('preload', 'metadata');
+        player.load();
+        player.play().catch(err => console.error('Error playing video:', err));
+      }
+    });
+  } else if (Hls.isSupported()) {
     const hls = new Hls();
     hls.loadSource(videoUrl);
     hls.attachMedia(player);
-  }
-  else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+  } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
     player.src = videoUrl;
   }
   
-  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber);
+  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, subtitles);
+  
+  const sourceBtn = container.querySelector('.source-btn');
+  const sourceMenu = container.querySelector('.source-menu');
+  const sourceOptions = container.querySelectorAll('.source-option');
+  
+  sourceBtn.addEventListener('click', () => {
+    sourceMenu.classList.toggle('hidden');
+  });
+  
+  document.addEventListener('click', (event) => {
+    if (!sourceBtn.contains(event.target) && !sourceMenu.contains(event.target)) {
+      sourceMenu.classList.add('hidden');
+    }
+  });
+  
+  sourceOptions.forEach(option => {
+    option.addEventListener('click', async () => {
+      const selectedSource = option.getAttribute('data-source');
+      sourceMenu.classList.add('hidden');
+      
+      if (selectedSource !== currentSource) {
+        container.innerHTML = `
+          <div class="flex justify-center items-center h-full">
+            ${renderFullPageSpinner()}
+          </div>
+        `;
+        
+        try {
+          await loadContentWithSource(selectedSource, contentParams, mainContainer);
+        } catch (error) {
+          console.error('Error switching source:', error);
+          container.innerHTML = renderError(
+            'Error',
+            'Failed to load source',
+          );
+        }
+      }
+    });
+  });
 }
