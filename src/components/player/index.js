@@ -8,6 +8,7 @@ import { setupQualityOptions } from './qualityOptions.js';
 import { setupVolumeControls } from './volume.js';
 import { setupPlayPause } from './playPause.js';
 import { setupFullscreenPiP } from './fullscreenPiP.js';
+import { setupDownloadVideo } from './downloadVideo.js';
 
 /**
  * Initializes the custom video player with all components
@@ -84,7 +85,9 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
     player, customPlayer, linksData, isIPhone
   );
   
-  // show controls with correct timeout
+  const downloadBtn = playerContainer.querySelector('.download-btn');
+  setupDownloadVideo(downloadBtn, player, linksData);
+  
   let controlsTimeout;
   
   const showControls = () => {
