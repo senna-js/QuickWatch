@@ -24,8 +24,7 @@ export function renderSearchPage(container) {
                   background-size: 100% 100%, 24px 24px;">
       </div>
       
-      <div class="relative md:ml-16 p-4 md:p-12 pb-20 md:pb-12">
-        <h1 class="text-3xl md:text-4xl font-normal mt-2 mb-4 md:mb-6 md:mt-0">Find your next favorite series, movie, or anime...</h1>
+      <div class="relative md:px-[4.4rem] p-4 md:py-12 pb-20 md:pb-12 mt-10">
         <div class="mb-6 md:mb-8">
           <input type="text" id="search-input" placeholder="Enter your search query..." 
             class="w-full p-3 md:p-4 bg-zinc-900 rounded-lg text-white outline-none focus:ring-2 focus:ring-zinc-800">
@@ -68,7 +67,7 @@ function initSearch() {
  * Displays recently viewed shows
  * @param {HTMLElement} container - The container to display results in
  */
-function displayRecentShows(container) {
+async function displayRecentShows(container) {
   const recents = JSON.parse(localStorage.getItem('quickwatch-recents') || '[]');
   
   if (recents.length === 0) {
@@ -79,42 +78,89 @@ function displayRecentShows(container) {
   container.className = 'flex flex-col gap-4 md:gap-6 pb-4';
   container.innerHTML = `
     <h2 class="text-3xl md:text-4xl font-normal mt-6 md:mt-4">You recently watched...</h2>
-    <div class="flex flex-row overflow-x-auto gap-4 md:gap-6 pb-4" style="scrollbar-width: none;" id="recent-results">
+    <div class="flex flex-row overflow-x-auto gap-4 md:gap-6 pb-4 mx-[-4.4rem]" style="scrollbar-width: none;" id="recent-results">
   `;
 
   const recentResults = document.getElementById('recent-results');
+  const options = {
+    method: 'GET',
+    headers: { 'accept': 'application/json', 'Authorization': TMDB_API_KEY }
+  };
   
-  recents.forEach(item => {
-    const resultCard = document.createElement('div');
-    resultCard.className = 'movie-card p-3 w-32 md:w-48 rounded-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800 hover:border-zinc-700 border-2 border-transparent flex-shrink-0';
-    
-    resultCard.innerHTML = `
-      <div class="transition-transform duration-300 hover:scale-95 active:scale-90">
-        ${item.posterPath ? 
-          `<img src="${item.posterPath}" 
-                alt="${item.title}" 
-                class="w-full object-cover rounded-lg">` : 
-          `<div class="w-full h-64 bg-zinc-800 rounded-lg flex items-center justify-center">
-             <span class="text-zinc-500">No Image</span>
-           </div>`
-        }
-        <div class="mt-3">
-          <h3 class="text-white font-semibold text-sm">${item.title}</h3>
-          <p class="text-zinc-400 text-xs mt-1">
-            ${item.mediaType === 'movie' ? 'Movie' : 'TV Show'} • 
-            ${item.year}
-          </p>
-        </div>
-      </div>
-    `;
-    
-    resultCard.addEventListener('click', () => {
-      window.history.pushState(null, null, `/${item.mediaType}/${item.id}`);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-    
-    recentResults.appendChild(resultCard);
-  });
+  for (const item of recents) {
+    try {
+      const detailUrl = `${TMDB_BASE_URL}/${item.mediaType}/${item.id}?append_to_response=images&language=en-US&include_image_language=en`;
+      const detailResponse = await fetch(detailUrl, options);
+      const detailData = await detailResponse.json();
+      
+      let backdropPath = '';
+      if (detailData.images && detailData.images.backdrops && detailData.images.backdrops.length > 0) {
+        backdropPath = `${TMDB_IMAGE_BASE_URL}w500${detailData.images.backdrops[0].file_path}`;
+      } else if (detailData.backdrop_path) {
+        backdropPath = `${TMDB_IMAGE_BASE_URL}w500${detailData.backdrop_path}`;
+      } else {
+        backdropPath = item.posterPath;
+      }
+      
+      const resultCard = document.createElement('div');
+      resultCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg';
+      
+      if (recentResults.children.length === 0) {
+        resultCard.className += ' ml-[4.4rem]';
+      }
+      
+      resultCard.style.backgroundImage = `url(${backdropPath})`;
+      resultCard.style.backgroundSize = 'cover';
+      resultCard.style.backgroundPosition = 'center';
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'w-full h-full flex items-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300';
+      
+      const title = document.createElement('h3');
+      title.className = 'text-white font-semibold';
+      title.textContent = detailData.title || detailData.name || item.title;
+      
+      overlay.appendChild(title);
+      resultCard.appendChild(overlay);
+      
+      resultCard.addEventListener('click', () => {
+        window.history.pushState(null, null, `/${item.mediaType}/${item.id}`);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+      
+      recentResults.appendChild(resultCard);
+    } catch (error) {
+      console.error(`Error loading recent item ${item.id}:`, error);
+      
+      const resultCard = document.createElement('div');
+      resultCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg';
+      
+      if (recentResults.children.length === 0) {
+        resultCard.className += ' ml-[4.4rem]';
+      }
+      
+      resultCard.style.backgroundImage = `url(${item.posterPath})`;
+      resultCard.style.backgroundSize = 'cover';
+      resultCard.style.backgroundPosition = 'center';
+      
+      const overlay = document.createElement('div');
+      overlay.className = 'w-full h-full flex items-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300';
+      
+      const title = document.createElement('h3');
+      title.className = 'text-white font-semibold';
+      title.textContent = item.title;
+      
+      overlay.appendChild(title);
+      resultCard.appendChild(overlay);
+      
+      resultCard.addEventListener('click', () => {
+        window.history.pushState(null, null, `/${item.mediaType}/${item.id}`);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+      
+      recentResults.appendChild(resultCard);
+    }
+  }
 }
 
 /**
@@ -145,14 +191,25 @@ async function performSearch(query, resultsContainer) {
     
     if (data.results && data.results.length > 0) {
       const filteredResults = data.results.filter(item => 
-        (item.media_type === 'movie' || item.media_type === 'tv') && 
-        item.poster_path
+        (item.media_type === 'movie' || item.media_type === 'tv')
       );
 
-      searchResults.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6';
       
       if (filteredResults.length > 0) {
-        displaySearchResults(filteredResults, resultsContainer);
+        const detailedResults = await Promise.all(
+          filteredResults.slice(0, 20).map(async (item) => {
+            try {
+              const detailUrl = `${TMDB_BASE_URL}/${item.media_type}/${item.id}?append_to_response=images&language=en-US&include_image_language=en`;
+              const detailResponse = await fetch(detailUrl, options);
+              return {...await detailResponse.json(), media_type: item.media_type};
+            } catch (error) {
+              console.error(`Error fetching details for ${item.id}:`, error);
+              return item;
+            }
+          })
+        );
+        
+        displaySearchResults(detailedResults, resultsContainer);
       } else {
         showNoResults(resultsContainer);
       }
@@ -161,7 +218,6 @@ async function performSearch(query, resultsContainer) {
     }
   } catch (error) {
     console.error('Error searching:', error);
-    searchResults.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6';
     resultsContainer.innerHTML = renderSearchError('Something went wrong. Please try again later.');
   }
 }
@@ -174,24 +230,34 @@ async function performSearch(query, resultsContainer) {
 function displaySearchResults(results, container) {
   container.innerHTML = '';
   
-  results.forEach(item => {
-    const resultCard = document.createElement('div');
-    resultCard.className = 'movie-card p-3 rounded-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800 hover:border-zinc-700 border-2 border-transparent';
+  container.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6';
+  
+  results.forEach((item) => {
+    let backdropPath = '';
+    if (item.images && item.images.backdrops && item.images.backdrops.length > 0) {
+      backdropPath = `${TMDB_IMAGE_BASE_URL}w500${item.images.backdrops[0].file_path}`;
+    } else if (item.backdrop_path) {
+      backdropPath = `${TMDB_IMAGE_BASE_URL}w500${item.backdrop_path}`;
+    }
     
-    resultCard.innerHTML = `
-      <div class="transition-transform duration-300 hover:scale-95 active:scale-90">
-        <img src="${TMDB_IMAGE_BASE_URL}w500${item.poster_path}" 
-             alt="${item.title || item.name}" 
-             class="w-full object-cover rounded-lg">
-        <div class="mt-3">
-          <h3 class="text-white font-semibold text-sm">${item.title || item.name}</h3>
-          <p class="text-zinc-400 text-xs mt-1">
-            ${item.media_type === 'movie' ? 'Movie' : 'TV Show'} • 
-            ${new Date(item.release_date || item.first_air_date).getFullYear() || 'N/A'}
-          </p>
-        </div>
-      </div>
-    `;
+    if (!backdropPath) return;
+    
+    const resultCard = document.createElement('div');
+    resultCard.className = 'aspect-video bg-[#32363D] rounded-lg w-full';
+    
+    resultCard.style.backgroundImage = `url(${backdropPath})`;
+    resultCard.style.backgroundSize = 'cover';
+    resultCard.style.backgroundPosition = 'center';
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'w-full h-full flex items-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300';
+    
+    const title = document.createElement('h3');
+    title.className = 'text-white font-semibold';
+    title.textContent = item.title || item.name;
+    
+    overlay.appendChild(title);
+    resultCard.appendChild(overlay);
     
     resultCard.addEventListener('click', () => {
       window.history.pushState(null, null, `/${item.media_type}/${item.id}`);

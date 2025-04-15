@@ -11,64 +11,52 @@ export function renderHomePage(container) {
     ${renderHeader()}
     
     <div class="md:ml-16 pb-20 md:pb-0">
-      <div id="hero-section" class="relative h-screen md:h-[80vh]">
-        <img src="/logo_long.png" class="w-[60%] absolute top-2 left-1/2 -translate-x-1/2 md:hidden z-20">
-        <div class="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-black to-transparent z-10"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10"></div>
-        
-        <img id="herobk" class="w-full h-full object-cover">
-        
-        <div class="absolute inset-0 z-20 flex flex-col justify-end p-12">
-          <div class="flex items-center mb-4">
-            <img id="logo" class="mr-2 max-h-40 w-full md:max-w-2xl">
-          </div>
-          
-          <div class="flex items-center space-x-4 mb-4">
-            <span class="flex items-center"><i class="fas fa-star text-yellow-500 mr-1"></i></span>
-            <span class="px-2 py-1 border border-zinc-500 text-sm">PG</span>
-            <span id="yr">2025</span>
-            <span class="text-zinc-300 text-sm">MOVIE</span>
-          </div>
-          
-          <p class="text-zinc-300 max-w-xl mb-6">
+      <div id="hero-section" class="h-[550px] w-full flex items-end justify-end relative">
+        <div class="absolute left-[4.4rem] text-white z-[6] flex flex-col">
+          <img id="logo" class="w-[400px]">
+          <span id="overview" class="text-[20px] mt-4 w-[37%] line-clamp-2" style="font-family: 'Amazon Ember Light';">
             Peter Parker is on his way to becoming a hero, but his path to get there is anything but ordinary.
-          </p>
-          
-          <div class="flex space-x-4 mb-12">
-            <button class="flex items-center px-6 py-3 bg-white text-black rounded-md hover:bg-zinc-200 transition">
-              <i class="fas fa-play mr-2"></i> Play
-            </button>
-            <button class="flex items-center px-6 py-3 bg-transparent border border-white rounded-md hover:bg-zinc-800 transition">
-              <i class="fas fa-plus mr-2"></i> Add to Watchlist
-            </button>
+          </span>
+          <div class="flex flex-row gap-4 mt-4 text-white">
+            <button id="watch-now-btn" class="px-6 py-4 rounded-lg bg-[#32363D] text-xl pagebtn" style="font-family: 'Amazon Ember Medium';">Watch now</button>
+            <button id="info-btn" class="w-[3.75rem] h-[3.75rem] rounded-full bg-[#32363D] text-3xl flex items-center justify-center pagebtn" style="font-family: 'Amazon Ember Medium';"><i class="icon-info"></i></button>
+            <button id="add-watchlist-btn" class="w-[3.75rem] h-[3.75rem] rounded-full bg-[#32363D] text-4xl flex items-center justify-center pagebtn" style="font-family: 'Amazon Ember Medium';"><i class="icon-plus"></i></button>
           </div>
         </div>
+        <div class="absolute inset-y-0 left-[30%] w-[40%] bg-gradient-to-r from-[#00050d] to-transparent z-[3]"></div>
+        <div class="absolute inset-x-0 bottom-0 h-[100px] bg-gradient-to-t from-[#00050d] to-transparent z-[3]"></div>
+        <img id="herobk" class="h-[550px] w-[70%] object-cover items-center">
       </div>
       
-      <div class="px-4 md:px-12 py-8 bg-black">
-        <div class="movie-section mb-8">
-          <h2 class="text-3xl font-bold mb-6">Trending Movies</h2>
-          <div class="movie-carousel flex space-x-4 overflow-x-auto pb-4" data-category="trending-movies"></div>
+      <div class="bg-[#00050d]">
+        <div class="mt-24">
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Continue watching</h2>
+          <div id="continue-watching" class="flex flex-row gap-4 overflow-x-auto pb-4"></div>
         </div>
         
-        <div class="movie-section mb-8">
-          <h2 class="text-3xl font-bold mb-6">Trending TV Shows</h2>
-          <div class="movie-carousel flex space-x-4 overflow-x-auto pb-4" data-category="trending-tv"></div>
+        <div class="mt-6">
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Trending Movies</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="trending-movies"></div>
         </div>
         
-        <div class="movie-section mb-8">
-          <h2 class="text-3xl font-bold mb-6">Top Rated Movies</h2>
-          <div class="movie-carousel flex space-x-4 overflow-x-auto pb-4" data-category="top-rated-movies"></div>
+        <div class="mt-6">
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Trending TV Shows</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="trending-tv"></div>
         </div>
         
-        <div class="movie-section mb-8">
-          <h2 class="text-3xl font-bold mb-6">Popular Movies</h2>
-          <div class="movie-carousel flex space-x-4 overflow-x-auto pb-4" data-category="popular-movies"></div>
+        <div class="mt-6">
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Top rated movies</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="top-rated-movies"></div>
         </div>
         
-        <div class="movie-section mb-8">
-          <h2 class="text-3xl font-bold mb-6">Popular TV Shows</h2>
-          <div class="movie-carousel flex space-x-4 overflow-x-auto pb-4" data-category="popular-tv"></div>
+        <div class="mt-6">
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Popular movies</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="popular-movies"></div>
+        </div>
+        
+        <div class="mt-6">
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Popular TV shows</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="popular-tv"></div>
         </div>
       </div>
     </div>
@@ -82,24 +70,24 @@ async function fetchAllCategories() {
   try {
     const categories = [
       {
-        url: `${TMDB_BASE_URL}/trending/movie/week?language=en-US`,
+        url: `${TMDB_BASE_URL}/trending/movie/week?language=en-US&append_to_response=images&include_image_language=en`,
         selector: '[data-category="trending-movies"]',
         updateHero: true
       },
       {
-        url: `${TMDB_BASE_URL}/trending/tv/week?language=en-US`,
+        url: `${TMDB_BASE_URL}/trending/tv/week?language=en-US&append_to_response=images&include_image_language=en`,
         selector: '[data-category="trending-tv"]'
       },
       {
-        url: `${TMDB_BASE_URL}/movie/top_rated?language=en-US&page=1`,
+        url: `${TMDB_BASE_URL}/movie/top_rated?language=en-US&page=1&append_to_response=images&include_image_language=en`,
         selector: '[data-category="top-rated-movies"]'
       },
       {
-        url: `${TMDB_BASE_URL}/movie/popular?language=en-US&page=1`,
+        url: `${TMDB_BASE_URL}/movie/popular?language=en-US&page=1&append_to_response=images&include_image_language=en`,
         selector: '[data-category="popular-movies"]'
       },
       {
-        url: `${TMDB_BASE_URL}/tv/popular?language=en-US&page=1`,
+        url: `${TMDB_BASE_URL}/tv/popular?language=en-US&page=1&append_to_response=images&include_image_language=en`,
         selector: '[data-category="popular-tv"]'
       }
     ];
@@ -118,12 +106,25 @@ async function fetchAllCategories() {
 
       if (data.results && data.results.length > 0) {
         if (category.updateHero) {
-          updateHeroSection({...data.results[0], media_type: 'movie'});
+          const detailUrl = `${TMDB_BASE_URL}/${data.results[0].media_type || 'movie'}/${data.results[0].id}?append_to_response=images&language=en-US&include_image_language=en`;
+          const detailResponse = await fetch(detailUrl, options);
+          const detailData = await detailResponse.json();
+          
+          updateHeroSection({...detailData, media_type: data.results[0].media_type || 'movie'});
         }
+        
+        const detailedResults = await Promise.all(
+          data.results.slice(0, 10).map(async (item) => {
+            const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
+            const detailUrl = `${TMDB_BASE_URL}/${mediaType}/${item.id}?append_to_response=images&language=en-US&include_image_language=en`;
+            const detailResponse = await fetch(detailUrl, options);
+            return {...await detailResponse.json(), media_type: mediaType};
+          })
+        );
         
         const carousel = document.querySelector(category.selector);
         if (carousel) {
-          updateMovieCarousel(data.results, carousel);
+          updateMovieCarousel(detailedResults, carousel);
         }
       }
     }
@@ -136,38 +137,32 @@ function updateMovieCarousel(items, carousel) {
   carousel.innerHTML = '';
   
   items.forEach(item => {
-    if (item.poster_path) {
+    const backdropPath = item.images && item.images.backdrops && item.images.backdrops.length > 0 
+      ? item.images.backdrops[0].file_path 
+      : item.backdrop_path;
+      
+    if (backdropPath) {
       const movieCard = document.createElement('div');
-      movieCard.className = 'movie-card flex-shrink-0 w-32 md:w-48 p-2 md:p-3 rounded-lg overflow-hidden transition-all duration-300 hover:bg-zinc-800 hover:border-zinc-700 border-2 border-transparent';
+      
+      if (carousel.children.length === 0) { movieCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg ml-[4.4rem]';
+      } else { movieCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg'; }
+      
       movieCard.dataset.id = item.id;
       movieCard.dataset.mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
       
-      const contentWrapper = document.createElement('div');
-      contentWrapper.className = 'transition-transform duration-300 hover:scale-95 active:scale-90';
+      movieCard.style.backgroundImage = `url(${TMDB_IMAGE_BASE_URL}w500${backdropPath})`;
+      movieCard.style.backgroundSize = 'cover';
+      movieCard.style.backgroundPosition = 'center';
       
-      const img = document.createElement('img');
-      img.src = `${TMDB_IMAGE_BASE_URL}w500${item.poster_path}`;
-      img.alt = item.title || item.name;
-      img.className = 'w-full object-cover rounded-lg';
-      
-      const titleDiv = document.createElement('div');
-      titleDiv.className = 'mt-3';
+      const overlay = document.createElement('div');
+      overlay.className = 'w-full h-full flex items-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300';
       
       const title = document.createElement('h3');
-      title.className = 'text-white font-semibold text-sm';
+      title.className = 'text-white font-semibold';
       title.textContent = item.title || item.name;
       
-      const info = document.createElement('p');
-      info.className = 'text-zinc-400 text-xs mt-1';
-      const mediaType = item.media_type || (item.first_air_date ? 'TV Show' : 'Movie');
-      const year = new Date(item.release_date || item.first_air_date).getFullYear();
-      info.textContent = `${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} • ${year}`;
-      
-      titleDiv.appendChild(title);
-      titleDiv.appendChild(info);
-      contentWrapper.appendChild(img);
-      contentWrapper.appendChild(titleDiv);
-      movieCard.appendChild(contentWrapper);
+      overlay.appendChild(title);
+      movieCard.appendChild(overlay);
       
       movieCard.addEventListener('click', () => {
         const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
@@ -182,64 +177,52 @@ function updateMovieCarousel(items, carousel) {
 
 async function updateHeroSection(item) {
   const heroBackground = document.querySelector('#herobk');
-  const description = document.querySelector('.text-zinc-300.max-w-xl');
-  const rating = document.querySelector('.fas.fa-star').parentNode;
-  const year = document.querySelector('#yr');
-  const mediaType = document.querySelector('.text-zinc-300.text-sm');
+  const overview = document.querySelector('#overview');
   const studioLogo = document.querySelector('#logo');
   const heroSection = document.querySelector('#hero-section');
   
   try {
-    const logoUrl = `${TMDB_BASE_URL}/${item.media_type}/${item.id}/images`;
-    const options = {
-      method: 'GET',
-      headers: {
-        'accept': 'application/json',
-        'Authorization': TMDB_API_KEY
-      }
-    };
-    
-    const response = await fetch(logoUrl, options);
-    const imageData = await response.json();
-    
-    if (imageData.logos && imageData.logos.length > 0) {
-      const logo = imageData.logos.find(l => l.height <= 160) || imageData.logos[0];
+    if (item.images && item.images.logos && item.images.logos.length > 0) {
+      const logo = item.images.logos.find(l => l.iso_639_1 === 'en') || item.images.logos[0];
       studioLogo.src = `${TMDB_IMAGE_BASE_URL}original${logo.file_path}`;
       studioLogo.style.display = 'block';
     } else {
       studioLogo.style.display = 'none';
+      
+      const titleElement = document.createElement('h1');
+      titleElement.className = 'text-4xl font-bold';
+      titleElement.textContent = item.title || item.name;
+      
+      studioLogo.parentNode.insertBefore(titleElement, studioLogo);
     }
-  } catch (error) {
-    console.error('Error fetching logo:', error);
-    studioLogo.style.display = 'none';
-  }
-
-  if (item.backdrop_path) {
-    heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.backdrop_path}`;
+    
+    if (item.images && item.images.backdrops && item.images.backdrops.length > 0) {
+      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.images.backdrops[0].file_path}`;
+    } else if (item.backdrop_path) {
+      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.backdrop_path}`;
+    }
+    
     heroBackground.alt = item.title || item.name;
+  } catch (error) {
+    console.error('Error updating hero section:', error);
+    studioLogo.style.display = 'none';
+    
+    if (item.backdrop_path) {
+      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.backdrop_path}`;
+      heroBackground.alt = item.title || item.name;
+    }
   }
       
-  description.textContent = item.overview || 'No description available';
-  
-  if (item.vote_average) {
-    rating.innerHTML = `<i class="fas fa-star text-yellow-500 mr-1"></i> ${item.vote_average.toFixed(1)}`;
-  }
-  
-  const releaseDate = item.release_date || item.first_air_date;
-  if (releaseDate) {
-    year.textContent = new Date(releaseDate).getFullYear();
-  }
-  
-  mediaType.textContent = item.media_type === 'movie' ? 'MOVIE' : 'TV SERIES';
+  overview.textContent = item.overview || 'No description available';
   
   heroSection.dataset.mediaType = item.media_type;
   heroSection.dataset.id = item.id;
 }
 
 function initButtonListeners() {
-  const playButton = document.querySelector('.flex.space-x-4.mb-12 button:first-child');
-  if (playButton) {
-    playButton.addEventListener('click', () => {
+  const watchNowButton = document.querySelector('#watch-now-btn');
+  if (watchNowButton) {
+    watchNowButton.addEventListener('click', () => {
       const heroSection = document.querySelector('#hero-section');
       const mediaType = heroSection.dataset.mediaType;
       const id = heroSection.dataset.id;
@@ -251,9 +234,23 @@ function initButtonListeners() {
     });
   }
   
-  const watchlistButton = document.querySelector('.flex.space-x-4.mb-12 button:last-child');
-  if (watchlistButton) {
-    watchlistButton.addEventListener('click', () => {
+  const infoButton = document.querySelector('#info-btn');
+  if (infoButton) {
+    infoButton.addEventListener('click', () => {
+      const heroSection = document.querySelector('#hero-section');
+      const mediaType = heroSection.dataset.mediaType;
+      const id = heroSection.dataset.id;
+      
+      if (mediaType && id) {
+        window.history.pushState(null, null, `/${mediaType}/${id}`);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
+    });
+  }
+  
+  const addWatchlistButton = document.querySelector('#add-watchlist-btn');
+  if (addWatchlistButton) {
+    addWatchlistButton.addEventListener('click', () => {
       const heroSection = document.querySelector('#hero-section');
       const mediaType = heroSection.dataset.mediaType;
       const id = heroSection.dataset.id;
@@ -265,7 +262,7 @@ function initButtonListeners() {
         
         if (!existingItem) {
           const heroBackground = document.querySelector('#herobk');
-          const title = document.querySelector('.text-zinc-300.max-w-xl').textContent;
+          const title = document.querySelector('#overview').textContent;
           
           watchlist.push({
             id,

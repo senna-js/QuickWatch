@@ -1,30 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,wght@0,100..900;1,100..900&display=swap');
+@font-face { font-family: 'Amazon Ember Medium'; src: url(Amazon-Ember-Medium.ttf); }
+@font-face { font-family: 'Amazon Ember Regular'; src: url(AmazonEmber_Rg.ttf); }
+@font-face { font-family: 'Amazon Ember Light'; src: url(AmazonEmber_Lt.ttf); }
+
 body {
   background-color: black;
   color: white;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Amazon Ember Regular', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 .movie-carousel {
-  scrollbar-width: thin;
-  scrollbar-color: #4b5563 #1f2937;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: 0.5rem;
-}
-
-.movie-carousel::-webkit-scrollbar {
-  height: 6px;
-  display: none;
-}
-
-.movie-carousel::-webkit-scrollbar-track {
-  background: #1f2937;
-  border-radius: 10px;
-}
-
-.movie-carousel::-webkit-scrollbar-thumb {
-  background-color: #4b5563;
-  border-radius: 10px;
 }
 
 .movie-card {
@@ -142,3 +130,9 @@ button {
 .iframe-container.loading .iframe-loader {
   display: block;
 }
+
+.pagebtn { transition: all .1s ease-in-out; }
+.pagebtn.active { background: radial-gradient(50% 50% at 50% 0,rgba(var(--action-background-color,255,255,255),.2) 0,transparent 100%),#353a42b7; }
+.pagebtn:hover { background: #e7eaee; color: #00050d; box-shadow: 0 0 30px #e7eaee50 }
+.logo:hover {filter: brightness(0) saturate(100%) invert(49%) sepia(64%) saturate(1103%) hue-rotate(191deg) brightness(94%) contrast(92%);}
+* { scrollbar-width: none; }

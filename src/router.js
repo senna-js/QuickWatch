@@ -9,6 +9,8 @@ import { renderDownloadDetailsPage } from './pages/download/download-details.js'
 import { renderIOSAppPage } from './pages/iosapp.js';
 import { renderAnimePaheEmbed } from './pages/details/animepahe-embed.js';
 import { renderVidSrcEmbed } from './pages/details/vidsrc-embed.js';
+import { renderMoviesPage } from './pages/movies/movies.js';
+import { renderTvPage } from './pages/tv/tv.js';
 
 export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q';
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -70,32 +72,32 @@ function handleRoute() {
     currentPagePromise = Promise.resolve(renderHomePage(appContainer));
   } 
   else if (path === '/watchlist') {
-    document.title = 'QW Watchlist';
+    document.title = 'Watchlist';
     currentPagePromise = Promise.resolve(renderWatchlistPage(appContainer));
   } 
   else if (path === '/search') {
-    document.title = 'QW Search';
+    document.title = 'Search';
     currentPagePromise = Promise.resolve(renderSearchPage(appContainer));
   }
   else if (path.match(/^\/movie\/[\d]+$/)) {
-    document.title = 'QW Movie';
+    document.title = 'QW Movie'; // make dynamic
     const id = path.split('/')[2];
     currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'movie', id }));
   } 
   else if (path.match(/^\/tv\/[\d]+$/)) {
-    document.title = 'QW TV';
+    document.title = 'QW TV'; // make dynamic
     const id = path.split('/')[2];
     currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'tv', id }));
   } 
   else if (path.match(/^\/dl\/movie\/[\d]+$/) || path.match(/^\/dl\/tv\/[\d]+$/)) {
-    document.title = 'QW Download';
+    document.title = 'QW Download'; // make dynamic
     const parts = path.split('/');
     const type = parts[2];
     const id = parts[3];
     currentPagePromise = renderDownloadDetailsPage(appContainer, { type, id });
   }
   else if (path === '/iosapp') {
-    document.title = 'QW iOS App';
+    document.title = 'QuickWatch iOS';
     currentPagePromise = Promise.resolve(renderIOSAppPage(appContainer));
   }
   else if (path.match(/^\/embed\/animepahe\/[\d]+\/[\d]+\/[\d]+$/)) {
@@ -115,8 +117,16 @@ function handleRoute() {
     const episode = parts[6];
     currentPagePromise = Promise.resolve(renderVidSrcEmbed(appContainer, { id, episode, season, type }));
   }
+  else if (path === '/movies') {
+    document.title = 'Movies';
+    currentPagePromise = Promise.resolve(renderMoviesPage(appContainer));
+  }
+  else if (path === '/tv') {
+    document.title = 'TV Shows';
+    currentPagePromise = Promise.resolve(renderTvPage(appContainer));
+  }
   else {
-    document.title = 'QW 404';
+    document.title = '404';
     currentPagePromise = Promise.resolve(render404Page(appContainer));
   }
   
