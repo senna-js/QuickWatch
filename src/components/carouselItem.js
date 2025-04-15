@@ -8,36 +8,51 @@ import { TMDB_IMAGE_BASE_URL } from '../router.js';
  * @param {boolean} isFirstItem - Whether this is the first item in the carousel
  * @param {string} context - The context where the item is used ('carousel' or 'grid')
  * @param {Function} onRemove - Optional callback when remove button is clicked
+ * @param {boolean} usePoster - Whether to use poster instead of backdrop
  * @returns {HTMLElement} - The carousel item element
  */
-export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null) {
+export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null, usePoster = false) {
   const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
   const title = item.title || item.name;
   const releaseDate = item.release_date || item.first_air_date;
   const formattedDate = releaseDate ? new Date(releaseDate).getFullYear() : '';
   const rating = item.vote_average ? Math.round(item.vote_average * 10) / 10 : '';
   
-  const backdropPath = item.images && item.images.backdrops && item.images.backdrops.length > 0 
-    ? item.images.backdrops[0].file_path 
-    : item.backdrop_path;
+  let imagePath;
+  
+  if (usePoster) {
+    imagePath = item.poster_path;
+  } else {
+    imagePath = item.images && item.images.backdrops && item.images.backdrops.length > 0 
+      ? item.images.backdrops[0].file_path 
+      : item.backdrop_path;
+  }
     
-  if (!backdropPath) return null;
+  if (!imagePath) return null;
   
   const card = document.createElement('div');
   
   if (context === 'grid') {
-    card.className = 'carousel-item w-full aspect-video bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
+    card.className = 'carousel-item w-full bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
   } else {
     card.className = isFirstItem 
-      ? 'carousel-item w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg ml-[4.4rem] transition-all duration-300 ease-in-out relative cursor-pointer' 
-      : 'carousel-item w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
+      ? 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg ml-2 md:ml-[4.4rem] transition-all duration-300 ease-in-out relative cursor-pointer' 
+      : 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
+  }
+  
+  if (usePoster) {
+    card.classList.add('w-[140px]');
+    card.style.aspectRatio = '2/3';
+  } else {
+    card.classList.add('w-[300px]');
+    card.classList.add('aspect-video');
   }
   
   card.dataset.id = item.id;
   card.dataset.mediaType = mediaType;
   
   // bg image
-  card.style.backgroundImage = `url(${TMDB_IMAGE_BASE_URL}w500${backdropPath})`;
+  card.style.backgroundImage = `url(${TMDB_IMAGE_BASE_URL}w500${imagePath})`;
   card.style.backgroundSize = 'cover';
   card.style.backgroundPosition = 'center';
   

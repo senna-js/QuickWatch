@@ -13,51 +13,51 @@ export function renderHomePage(container) {
     
     <div class="pb-20 md:pb-0">
       <div id="hero-section" class="h-[550px] w-full flex items-end justify-end relative">
-        <div class="absolute left-[4.4rem] text-white z-[6] flex flex-col">
-          <img id="logo" class="w-[400px]">
-          <span id="overview" class="text-[20px] mt-4 w-[37%] line-clamp-2 font-light";">
+        <div class="absolute inset-x-0 md:inset-x-auto md:left-[4.4rem] text-white z-[6] flex flex-col items-center md:items-start">
+          <img id="logo" class="w-[250px] md:w-[400px]">
+          <span id="overview" class="text-[14px] md:text-[18px] mt-4 w-[80%] md:w-[37%] line-clamp-3 md:line-clamp-2 font-light text-center md:text-left">
             Peter Parker is on his way to becoming a hero, but his path to get there is anything but ordinary.
           </span>
           <div class="flex flex-row gap-4 mt-4 text-white">
-            <button id="watch-now-btn" class="px-6 py-4 rounded-lg bg-[#32363D] text-xl pagebtn font-medium">Watch now</button>
-            <button id="info-btn" class="w-[3.75rem] h-[3.75rem] rounded-full bg-[#32363D] text-3xl flex items-center justify-center pagebtn font-medium"><i class="icon-info"></i></button>
-            <button id="add-watchlist-btn" class="w-[3.75rem] h-[3.75rem] rounded-full bg-[#32363D] text-4xl flex items-center justify-center pagebtn font-medium"><i class="icon-plus"></i></button>
+            <button id="watch-now-btn" class="px-4 py-2 md:px-6 md:py-4 rounded-lg bg-[#32363D] text-lg md:text-xl pagebtn font-medium">Watch now</button>
+            <button id="info-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-2xl md:text-3xl flex items-center justify-center pagebtn font-medium"><i class="icon-info"></i></button>
+            <button id="add-watchlist-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-3xl md:text-4xl flex items-center justify-center pagebtn font-medium"><i class="icon-plus"></i></button>
           </div>
         </div>
-        <div class="absolute inset-y-0 left-[30%] w-[40%] bg-gradient-to-r from-[#00050d] to-transparent z-[3]"></div>
+        <div class="absolute inset-y-0 left-0 md:left-[30%] w-full md:w-[40%] bg-gradient-to-r from-[#00050d] to-transparent z-[3]"></div>
         <div class="absolute inset-x-0 bottom-0 h-[100px] bg-gradient-to-t from-[#00050d] to-transparent z-[3]"></div>
-        <img id="herobk" class="h-[550px] w-[70%] object-cover items-center">
+        <img id="herobk" class="h-[550px] w-full md:w-[70%] object-cover items-center ml-auto">
       </div>
       
       <div class="bg-[#00050d]">
-        <div class="mt-24">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Continue watching</h2>
-          <div id="continue-watching" class="flex flex-row gap-4 overflow-x-auto pb-4"></div>
+        <div class="mt-12 md:mt-24">
+          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Continue watching</h2>
+          <div id="continue-watching" class="flex flex-row gap-4 overflow-x-auto pb-4 pl-2"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Trending Movies</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="trending-movies"></div>
+          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Trending Movies</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="trending-movies"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Trending TV Shows</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="trending-tv"></div>
+          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Trending TV Shows</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="trending-tv"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Top rated movies</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="top-rated-movies"></div>
+          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Top rated movies</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="top-rated-movies"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Popular movies</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="popular-movies"></div>
+          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Popular movies</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="popular-movies"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Popular TV shows</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="popular-tv"></div>
+          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Popular TV shows</h2>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="popular-tv"></div>
         </div>
       </div>
     </div>
@@ -70,6 +70,8 @@ export function renderHomePage(container) {
 async function fetchAllCategories() {
   try {
     await loadContinueWatching();
+    
+    const isMobile = window.innerWidth < 768;
     
     const categories = [
       {
@@ -127,7 +129,7 @@ async function fetchAllCategories() {
         
         const carousel = document.querySelector(category.selector);
         if (carousel) {
-          updateMovieCarousel(detailedResults, carousel);
+          updateMovieCarousel(detailedResults, carousel, isMobile);
         }
       }
     }
@@ -139,6 +141,8 @@ async function fetchAllCategories() {
 async function loadContinueWatching() {
   const continueWatchingContainer = document.querySelector('#continue-watching');
   if (!continueWatchingContainer) return;
+  
+  const isMobile = window.innerWidth < 768;
   
   const timestampKeys = Object.keys(localStorage).filter(key => 
     key.startsWith('quickwatch_timestamp_')
@@ -215,7 +219,7 @@ async function loadContinueWatching() {
           }
           continueWatchingContainer.style.display = 'none';
         }
-      });
+      }, isMobile);
       
       if (carouselItem) {
         continueWatchingContainer.appendChild(carouselItem);
@@ -239,11 +243,11 @@ function removeFromContinueWatching(id, mediaType) {
   });
 }
 
-function updateMovieCarousel(items, carousel) {
+function updateMovieCarousel(items, carousel, usePoster = false) {
   carousel.innerHTML = '';
   
   items.forEach((item, index) => {
-    const carouselItem = createCarouselItem(item, index === 0);
+    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, usePoster);
     if (carouselItem) {
       carousel.appendChild(carouselItem);
     }
@@ -255,6 +259,8 @@ async function updateHeroSection(item) {
   const overview = document.querySelector('#overview');
   const studioLogo = document.querySelector('#logo');
   const heroSection = document.querySelector('#hero-section');
+  
+  const isMobile = window.innerWidth < 768;
   
   try {
     if (item.images && item.images.logos && item.images.logos.length > 0) {
@@ -271,10 +277,19 @@ async function updateHeroSection(item) {
       studioLogo.parentNode.insertBefore(titleElement, studioLogo);
     }
     
-    if (item.images && item.images.backdrops && item.images.backdrops.length > 0) {
+    // Use poster for mobile and backdrop for desktop
+    if (isMobile && item.poster_path) {
+      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.poster_path}`;
+      heroBackground.classList.add('object-contain');
+    } else if (item.images && item.images.backdrops && item.images.backdrops.length > 0) {
       heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.images.backdrops[0].file_path}`;
+      heroBackground.classList.remove('object-contain');
     } else if (item.backdrop_path) {
       heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.backdrop_path}`;
+      heroBackground.classList.remove('object-contain');
+    } else if (item.poster_path) {
+      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.poster_path}`;
+      heroBackground.classList.add('object-contain');
     }
     
     heroBackground.alt = item.title || item.name;
@@ -282,9 +297,15 @@ async function updateHeroSection(item) {
     console.error('Error updating hero section:', error);
     studioLogo.style.display = 'none';
     
-    if (item.backdrop_path) {
+    if (isMobile && item.poster_path) {
+      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.poster_path}`;
+      heroBackground.classList.add('object-contain');
+    } else if (item.backdrop_path) {
       heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.backdrop_path}`;
-      heroBackground.alt = item.title || item.name;
+      heroBackground.classList.remove('object-contain');
+    } else if (item.poster_path) {
+      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.poster_path}`;
+      heroBackground.classList.add('object-contain');
     }
   }
       

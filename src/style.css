@@ -146,7 +146,7 @@ button {
 }
 
 .pagebtn { transition: all .1s ease-in-out; }
-.pagebtn.active { background: radial-gradient(50% 50% at 50% 0,rgba(var(--action-background-color,255,255,255),.2) 0,transparent 100%),#353a42b7; }
+.pagebtn.active { background: radial-gradient(50% 50% at 50% 0,rgba(var(--action-background-color,255,255,255),.2) 0,transparent 100%),#3c414a; }
 .pagebtn:hover { background: #e7eaee; color: #00050d; box-shadow: 0 0 30px #e7eaee50 }
 .logo:hover {filter: brightness(0) saturate(100%) invert(49%) sepia(64%) saturate(1103%) hue-rotate(191deg) brightness(94%) contrast(92%);}
 * { scrollbar-width: none; }
