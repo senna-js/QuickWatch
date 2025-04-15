@@ -21,9 +21,9 @@ export function renderWatchlistPage(container) {
                 background-size: 100% 100%, 24px 24px;">
     </div>
   
-    <div class="md:ml-16 p-4 md:p-12 md:pl-1 pb-20 md:pb-12 mt-10">
-      <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-4 md:mb-6 md:mt-0">Your Watchlist</h1>
-      <div id="watchlist-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
+    <div class="md:ml-16 p-4 md:p-12 md:pl-1 pb-20 md:pb-12 md:mt-10">
+      <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-4 md:mb-6 md:mt-0 text-center md:text-left">Your Watchlist</h1>
+      <div id="watchlist-container" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 mx-auto"></div>
     </div>
   `;
   
@@ -35,6 +35,7 @@ async function loadWatchlist() {
   if (!watchlistContainer) return;
   
   const watchlist = JSON.parse(localStorage.getItem('quickwatch-watchlist') || '[]');
+  const isMobile = window.innerWidth < 768;
   
   if (watchlist.length === 0) {
     watchlistContainer.innerHTML = `
@@ -73,6 +74,10 @@ async function loadWatchlist() {
       const carouselItem = createCarouselItem(detailData, false, 'grid');
       
       if (carouselItem) {
+        if (isMobile) {
+          carouselItem.classList.add('mx-auto', 'w-full', 'max-w-[300px]', 'mt-3');
+        }
+        
         const removeBtn = document.createElement('button');
         removeBtn.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 pb-1 text-white hover:text-red-500 hover:scale-105 focus:scale-90 z-20';
         removeBtn.innerHTML = '<i class="icon-x text-2xl"></i>';

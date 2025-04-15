@@ -25,11 +25,11 @@ export function renderSearchPage(container) {
                   background-size: 100% 100%, 24px 24px;">
       </div>
       
-      <div class="relative md:px-[4.4rem] p-4 md:py-12 pb-20 md:pb-12 mt-10">
+      <div class="relative md:px-[4.4rem] p-4 md:py-12 pb-20 md:pb-12 md:mt-10">
         <div class="mb-6 md:mb-8">
-          <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-4 md:mb-6 md:mt-0">What do you feel like watching?</h1>
+          <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-4 md:mb-6 md:mt-0 hidden md:block">What do you feel like watching?</h1>
           <input type="text" id="search-input" placeholder="Enter your search query..." 
-            class="w-full p-3 md:p-4 bg-zinc-900 rounded-lg text-white outline-none focus:ring-2 focus:ring-zinc-800">
+            class="w-full p-3 md:p-4 bg-gray-800 rounded-lg text-white outline-none focus:ring-2 focus:ring-gray-700">
         </div>
         <div id="search-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
       </div>
@@ -64,20 +64,80 @@ function initSearch() {
 }
 
 function displaySearchResults(results, container) {
-  container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6';
-  container.innerHTML = '';
+  const isMobile = window.innerWidth < 768;
   
-  if (results.length === 0) {
-    container.innerHTML = renderNoResults();
-    return;
-  }
-  
-  results.forEach(item => {
-    const carouselItem = createCarouselItem(item, false, 'grid');
-    if (carouselItem) {
-      container.appendChild(carouselItem);
+  if (isMobile) {
+    container.className = 'flex flex-col gap-4';
+    container.innerHTML = '';
+    
+    if (results.length === 0) {
+      container.innerHTML = renderNoResults();
+      return;
     }
-  });
+    
+    results.forEach(item => {
+      const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
+      const title = item.title || item.name;
+      const releaseDate = item.release_date || item.first_air_date;
+      const formattedDate = releaseDate ? new Date(releaseDate).getFullYear() : '';
+      const rating = item.vote_average ? Math.round(item.vote_average * 10) / 10 : '';
+      const seasons = item.number_of_seasons ? `${item.number_of_seasons} Season${item.number_of_seasons > 1 ? 's' : ''}` : '';
+      
+      let imagePath;
+      if (isMobile) {
+        imagePath = item.images && item.images.backdrops && item.images.backdrops.length > 0 
+          ? item.images.backdrops[0].file_path 
+          : item.backdrop_path;
+          
+        if (!imagePath) {
+          imagePath = item.poster_path;
+        }
+      } else {
+        imagePath = item.poster_path;
+      }
+      
+      if (!imagePath) return;
+      
+      const resultItem = document.createElement('div');
+      resultItem.className = 'flex flex-row overflow-hidden cursor-pointer h-24';
+      resultItem.dataset.id = item.id;
+      resultItem.dataset.mediaType = mediaType;
+      
+      resultItem.innerHTML = `
+        <div class="w-[10.67rem] h-full">
+          <img src="${TMDB_IMAGE_BASE_URL}w300${imagePath}" alt="${title}" class="w-full h-full object-cover rounded-lg">
+        </div>
+        <div class="flex flex-col justify-center p-3 flex-1">
+          <h3 class="text-white font-medium text-lg line-clamp-1">${title}</h3>
+          <p class="text-zinc-400 text-sm">
+            ${seasons ? `${seasons} • ` : ''}${formattedDate ? `${formattedDate} • ` : ''}${rating ? `★ ${rating}` : ''}
+          </p>
+        </div>
+      `;
+      
+      resultItem.addEventListener('click', () => {
+        window.history.pushState(null, null, `/${mediaType}/${item.id}`);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+      
+      container.appendChild(resultItem);
+    });
+  } else {
+    container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6';
+    container.innerHTML = '';
+    
+    if (results.length === 0) {
+      container.innerHTML = renderNoResults();
+      return;
+    }
+    
+    results.forEach(item => {
+      const carouselItem = createCarouselItem(item, false, 'grid');
+      if (carouselItem) {
+        container.appendChild(carouselItem);
+      }
+    });
+  }
 }
 
 /**
