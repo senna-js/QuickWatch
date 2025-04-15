@@ -202,7 +202,7 @@ async function loadContinueWatching() {
   
   let index = 0;
   for (const item of uniqueItems.values()) {
-    const response = await fetch(`${TMDB_BASE_URL}/${item.mediaType}/${item.id}?language=en-US`, options);
+    const response = await fetch(`${TMDB_BASE_URL}/${item.mediaType}/${item.id}?append_to_response=images&language=en-US&include_image_language=en`, options);
     
     if (response.ok) {
       const detailData = await response.json();
