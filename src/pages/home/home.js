@@ -8,6 +8,9 @@ import { createCarouselItem } from '../../components/carouselItem.js';
  * @param {HTMLElement} container
  */
 export function renderHomePage(container) {
+  window.splashScreen.show();
+  const loadingStep = window.splashScreen.addStep('Loading media content...');
+  
   container.innerHTML = `
     ${renderHeader()}
     
@@ -37,38 +40,41 @@ export function renderHomePage(container) {
         
         <div class="mt-6">
           <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Trending Movies</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="trending-movies"></div>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="trending-movies"></div>
         </div>
         
         <div class="mt-6">
           <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Trending TV Shows</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="trending-tv"></div>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="trending-tv"></div>
         </div>
         
         <div class="mt-6">
           <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Top rated movies</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="top-rated-movies"></div>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="top-rated-movies"></div>
         </div>
         
         <div class="mt-6">
           <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Popular movies</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="popular-movies"></div>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="popular-movies"></div>
         </div>
         
         <div class="mt-6">
           <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Popular TV shows</h2>
-          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4 md:pl-[4.4rem]" data-category="popular-tv"></div>
+          <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="popular-tv"></div>
         </div>
       </div>
     </div>
   `;
   
-  fetchAllCategories();
+  fetchAllCategories(loadingStep);
   initButtonListeners();
 }
 
-async function fetchAllCategories() {
+async function fetchAllCategories(loadingStep) {
   try {
+    let totalItemsToLoad = 0;
+    let loadedItems = 0;
+    
     await loadContinueWatching();
     
     const isMobile = window.innerWidth < 768;
@@ -118,6 +124,8 @@ async function fetchAllCategories() {
           updateHeroSection({...detailData, media_type: data.results[0].media_type || 'movie'});
         }
         
+        totalItemsToLoad += Math.min(data.results.length, 10);
+        
         const detailedResults = await Promise.all(
           data.results.slice(0, 10).map(async (item) => {
             const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
@@ -129,12 +137,24 @@ async function fetchAllCategories() {
         
         const carousel = document.querySelector(category.selector);
         if (carousel) {
-          updateMovieCarousel(detailedResults, carousel, isMobile);
+          updateMovieCarousel(detailedResults, carousel, isMobile, () => {
+            loadedItems++;
+            checkAllLoaded(loadedItems, totalItemsToLoad, loadingStep);
+          });
         }
       }
     }
   } catch (error) {
     console.error('Error fetching categories:', error);
+    window.splashScreen.completeStep(loadingStep);
+    window.splashScreen.hide();
+  }
+}
+
+function checkAllLoaded(loaded, total, loadingStep) {
+  if (loaded >= total) {
+    window.splashScreen.completeStep(loadingStep);
+    window.splashScreen.hide();
   }
 }
 
@@ -248,13 +268,15 @@ function removeFromContinueWatching(id, mediaType) {
   });
 }
 
-function updateMovieCarousel(items, carousel, usePoster = false) {
+function updateMovieCarousel(items, carousel, usePoster = false, onItemLoaded) {
   carousel.innerHTML = '';
   
   items.forEach((item, index) => {
-    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, usePoster);
+    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, usePoster, onItemLoaded);
     if (carouselItem) {
       carousel.appendChild(carouselItem);
+    } else {
+      if (onItemLoaded) onItemLoaded();
     }
   });
 }

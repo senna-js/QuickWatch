@@ -154,3 +154,10 @@ button {
 .carousel-item:active {
   scale: 90%;
 }
+
+@media (min-width: 768px) {
+  #continue-watching .carousel-item:first-child,
+  .movie-carousel .carousel-item:first-child {
+    margin-left: 4.4rem;
+  }
+}

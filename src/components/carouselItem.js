@@ -9,9 +9,10 @@ import { TMDB_IMAGE_BASE_URL } from '../router.js';
  * @param {string} context - The context where the item is used ('carousel' or 'grid')
  * @param {Function} onRemove - Optional callback when remove button is clicked
  * @param {boolean} usePoster - Whether to use poster instead of backdrop
+ * @param {Function} onLoaded - Optional callback when the image has loaded
  * @returns {HTMLElement} - The carousel item element
  */
-export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null, usePoster = false) {
+export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null, usePoster = false, onLoaded = null) {
   const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
   const title = item.title || item.name;
   const releaseDate = item.release_date || item.first_air_date;
@@ -28,7 +29,10 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
       : item.backdrop_path;
   }
     
-  if (!imagePath) return null;
+  if (!imagePath) {
+    if (onLoaded) onLoaded();
+    return null;
+  }
   
   const card = document.createElement('div');
   
@@ -53,8 +57,15 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   
   // bg image
   card.style.backgroundImage = `url(${TMDB_IMAGE_BASE_URL}w500${imagePath})`;
+  card.style.backgroundColor = '#1a1a1a';
   card.style.backgroundSize = 'cover';
   card.style.backgroundPosition = 'center';
+  
+  if (onLoaded) {
+    requestAnimationFrame(() => {
+      onLoaded();
+    });
+  }
   
   // overlay with details
   const overlay = document.createElement('div');

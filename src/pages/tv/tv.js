@@ -8,6 +8,9 @@ import { createCarouselItem } from '../../components/carouselItem.js';
  * @param {HTMLElement} container
  */
 export function renderTvPage(container) {
+  window.splashScreen.show();
+  const loadingStep = window.splashScreen.addStep('Loading TV show categories...');
+  
   container.innerHTML = `
     ${renderHeader()}
     
@@ -48,11 +51,14 @@ export function renderTvPage(container) {
     </div>
   `;
   
-  fetchTvGenres();
+  fetchTvGenres(loadingStep);
 }
 
-async function fetchTvGenres() {
+async function fetchTvGenres(loadingStep) {
   try {
+    let totalItemsToLoad = 0;
+    let loadedItems = 0;
+    
     const genres = [
       { id: 18, name: 'drama' },
       { id: 35, name: 'comedy' },
@@ -77,6 +83,8 @@ async function fetchTvGenres() {
       const data = await response.json();
 
       if (data.results && data.results.length > 0) {
+        totalItemsToLoad += Math.min(data.results.length, 10);
+        
         const detailedResults = await Promise.all(
           data.results.slice(0, 10).map(async (item) => {
             const detailUrl = `${TMDB_BASE_URL}/tv/${item.id}?append_to_response=images&language=en-US&include_image_language=en`;
@@ -87,22 +95,36 @@ async function fetchTvGenres() {
         
         const carousel = document.querySelector(`[data-category="${genre.name}"]`);
         if (carousel) {
-          updateTvCarousel(detailedResults, carousel);
+          updateTvCarousel(detailedResults, carousel, () => {
+            loadedItems++;
+            checkAllLoaded(loadedItems, totalItemsToLoad, loadingStep);
+          });
         }
       }
     }
   } catch (error) {
     console.error('Error fetching TV genres:', error);
+    window.splashScreen.completeStep(loadingStep);
+    window.splashScreen.hide();
   }
 }
 
-function updateTvCarousel(items, carousel) {
+function updateTvCarousel(items, carousel, onItemLoaded) {
   carousel.innerHTML = '';
   
   items.forEach((item, index) => {
-    const carouselItem = createCarouselItem(item, index === 0);
+    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, false, onItemLoaded);
     if (carouselItem) {
       carousel.appendChild(carouselItem);
+    } else {
+      if (onItemLoaded) onItemLoaded();
     }
   });
+}
+
+function checkAllLoaded(loaded, total, loadingStep) {
+  if (loaded >= total) {
+    window.splashScreen.completeStep(loadingStep);
+    window.splashScreen.hide();
+  }
 }
