@@ -13,36 +13,36 @@ export function renderMoviesPage(container) {
     
     <div class="pt-24 pb-20 md:pb-0 bg-[#00050d]">
       <div class="px-[4.4rem]">
-        <h1 class="text-4xl font-bold mb-8" style="font-family: 'Amazon Ember Medium';">Movies</h1>
+        <h1 class="text-4xl font-bold mb-8 font-medium">Movies</h1>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Action Movies</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Action Movies</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="action"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Comedy Movies</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Comedy Movies</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="comedy"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Drama Movies</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Drama Movies</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="drama"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Sci-Fi Movies</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Sci-Fi Movies</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="sci-fi"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Horror Movies</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Horror Movies</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="horror"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Animation Movies</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Animation Movies</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="animation"></div>
       </div>
     </div>

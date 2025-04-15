@@ -15,13 +15,13 @@ export function renderHomePage(container) {
       <div id="hero-section" class="h-[550px] w-full flex items-end justify-end relative">
         <div class="absolute left-[4.4rem] text-white z-[6] flex flex-col">
           <img id="logo" class="w-[400px]">
-          <span id="overview" class="text-[20px] mt-4 w-[37%] line-clamp-2" style="font-family: 'Amazon Ember Light';">
+          <span id="overview" class="text-[20px] mt-4 w-[37%] line-clamp-2 font-light";">
             Peter Parker is on his way to becoming a hero, but his path to get there is anything but ordinary.
           </span>
           <div class="flex flex-row gap-4 mt-4 text-white">
-            <button id="watch-now-btn" class="px-6 py-4 rounded-lg bg-[#32363D] text-xl pagebtn" style="font-family: 'Amazon Ember Medium';">Watch now</button>
-            <button id="info-btn" class="w-[3.75rem] h-[3.75rem] rounded-full bg-[#32363D] text-3xl flex items-center justify-center pagebtn" style="font-family: 'Amazon Ember Medium';"><i class="icon-info"></i></button>
-            <button id="add-watchlist-btn" class="w-[3.75rem] h-[3.75rem] rounded-full bg-[#32363D] text-4xl flex items-center justify-center pagebtn" style="font-family: 'Amazon Ember Medium';"><i class="icon-plus"></i></button>
+            <button id="watch-now-btn" class="px-6 py-4 rounded-lg bg-[#32363D] text-xl pagebtn font-medium">Watch now</button>
+            <button id="info-btn" class="w-[3.75rem] h-[3.75rem] rounded-full bg-[#32363D] text-3xl flex items-center justify-center pagebtn font-medium"><i class="icon-info"></i></button>
+            <button id="add-watchlist-btn" class="w-[3.75rem] h-[3.75rem] rounded-full bg-[#32363D] text-4xl flex items-center justify-center pagebtn font-medium"><i class="icon-plus"></i></button>
           </div>
         </div>
         <div class="absolute inset-y-0 left-[30%] w-[40%] bg-gradient-to-r from-[#00050d] to-transparent z-[3]"></div>
@@ -31,32 +31,32 @@ export function renderHomePage(container) {
       
       <div class="bg-[#00050d]">
         <div class="mt-24">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Continue watching</h2>
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Continue watching</h2>
           <div id="continue-watching" class="flex flex-row gap-4 overflow-x-auto pb-4"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Trending Movies</h2>
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Trending Movies</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="trending-movies"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Trending TV Shows</h2>
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Trending TV Shows</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="trending-tv"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Top rated movies</h2>
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Top rated movies</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="top-rated-movies"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Popular movies</h2>
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Popular movies</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="popular-movies"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Popular TV shows</h2>
+          <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-medium">Popular TV shows</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="popular-tv"></div>
         </div>
       </div>

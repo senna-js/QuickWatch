@@ -13,36 +13,36 @@ export function renderTvPage(container) {
     
     <div class="pt-24 pb-20 md:pb-0 bg-[#00050d]">
       <div class="px-[4.4rem]">
-        <h1 class="text-4xl font-bold mb-8" style="font-family: 'Amazon Ember Medium';">TV Shows</h1>
+        <h1 class="text-4xl font-bold mb-8 font-medium">TV Shows</h1>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Drama Series</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Drama Series</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="drama"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Comedy Series</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Comedy Series</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="comedy"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Crime Series</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Crime Series</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="crime"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Sci-Fi & Fantasy</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Sci-Fi & Fantasy</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="sci-fi-fantasy"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Action & Adventure</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Action & Adventure</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="action-adventure"></div>
       </div>
       
       <div class="mt-6">
-        <h2 class="text-2xl text-white mb-4 ml-[4.4rem]" style="font-family: 'Amazon Ember Medium';">Animation</h2>
+        <h2 class="text-2xl text-white mb-4 ml-[4.4rem] font-normal">Animation</h2>
         <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4" data-category="animation"></div>
       </div>
     </div>
