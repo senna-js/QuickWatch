@@ -1,16 +1,16 @@
 // Vite Router
 
-import { renderHomePage } from './pages/home/home.js';
+import { renderHomePage } from './pages/browse/home.js';
 import { renderWatchlistPage } from './pages/watchlist/watchlist.js';
 import { renderSearchPage } from './pages/search/search.js';
 import { renderDetailsPage } from './pages/details/details.js';
 import { render404Page } from './pages/404.js';
-import { renderDownloadDetailsPage } from './pages/download/download-details.js';
+import { renderDownloadDetailsPage } from './pages/details/download-details.js';
 import { renderIOSAppPage } from './pages/iosapp.js';
-import { renderAnimePaheEmbed } from './pages/details/animepahe-embed.js';
-import { renderVidSrcEmbed } from './pages/details/vidsrc-embed.js';
-import { renderMoviesPage } from './pages/movies/movies.js';
-import { renderTvPage } from './pages/tv/tv.js';
+import { renderAnimePaheEmbed } from './pages/embeds/animepahe-embed.js';
+import { renderVidSrcEmbed } from './pages/embeds/vidsrc-embed.js';
+import { renderMoviesPage } from './pages/browse/movies.js';
+import { renderTvPage } from './pages/browse/tv.js';
 
 export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q';
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';

@@ -1,4 +1,4 @@
-import { fetchVideoUrl } from '../../pages/details/animepahe-embed.js';
+import { fetchVideoUrl } from '../../pages/embeds/animepahe-embed.js';
 
 /**
  * Sets up video preview functionality

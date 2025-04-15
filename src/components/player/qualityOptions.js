@@ -1,5 +1,5 @@
 import { renderSpinner } from '../../components/loading.js';
-import { fetchVideoUrl } from '../../pages/details/animepahe-embed.js';
+import { fetchVideoUrl } from '../../pages/embeds/animepahe-embed.js';
 
 /**
  * Sets up quality options for the player
