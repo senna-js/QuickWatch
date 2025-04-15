@@ -19,7 +19,7 @@ export function renderDetailsPage(container, params) {
 
     ${renderHeader()}
   
-    <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12 relative z-10" id="details-container">
+    <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12 relative z-10 mt-10" id="details-container">
       ${renderFullPageSpinner()}
     </div>
   `;
@@ -49,31 +49,46 @@ async function loadMediaDetails(type, id) {
     
     window.splashScreen?.completeStep(mediaDetailsStep);
     
-    const recentsStep = window.splashScreen?.addStep('Updating recently viewed...');
+    const viewingStartTime = Date.now();
+    const currentMedia = { id, mediaType: type };
+    let addedToContinueWatching = false;
     
-    const recents = JSON.parse(localStorage.getItem('quickwatch-recents') || '[]');
+    const viewingTimer = setInterval(() => {
+      const viewingDuration = Date.now() - viewingStartTime;
+      const seconds = Math.floor(viewingDuration / 1000);
+      console.log(`${seconds}/30s`);
+      
+      if (!addedToContinueWatching && viewingDuration >= 30000) {
+        addedToContinueWatching = true;
+        const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+        
+        const existingIndex = continueWatching.findIndex(item => 
+          item.id === currentMedia.id && item.mediaType === currentMedia.mediaType
+        );
+        
+        if (existingIndex !== -1) {
+          continueWatching.splice(existingIndex, 1);
+        }
+        
+        continueWatching.unshift({
+          id: currentMedia.id,
+          mediaType: currentMedia.mediaType
+        });
+        
+        if (continueWatching.length > 10) {
+          continueWatching.pop();
+        }
+        
+        localStorage.setItem('quickwatch-continue', JSON.stringify(continueWatching));
+        console.log('Added to continue watching list after 30s of viewing');
+      }
+    }, 5000);
     
-    const existingIndex = recents.findIndex(item => item.id === id && item.mediaType === type);
-    if (existingIndex !== -1) {
-      recents.splice(existingIndex, 1);
-    }
-    
-    recents.unshift({
-      id,
-      mediaType: type,
-      title: data.title || data.name,
-      posterPath: data.poster_path ? `${TMDB_IMAGE_BASE_URL}w500${data.poster_path}` : null,
-      year: new Date(data.release_date || data.first_air_date).getFullYear() || 'N/A',
-      dateViewed: new Date().toISOString()
+    window.addEventListener('beforeunload', () => {
+      clearInterval(viewingTimer);
+      const viewingDuration = Date.now() - viewingStartTime;
+      console.log(`Final viewing time: ${Math.floor(viewingDuration / 1000)} seconds`);
     });
-    
-    if (recents.length > 10) {
-      recents.pop();
-    }
-    
-    localStorage.setItem('quickwatch-recents', JSON.stringify(recents));
-    
-    window.splashScreen?.completeStep(recentsStep);
     
     const seasonStep = window.splashScreen?.addStep('Fetching season data...');
     

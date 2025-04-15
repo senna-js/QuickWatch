@@ -4,7 +4,7 @@
 @font-face { font-family: 'Amazon Ember Light'; src: url(AmazonEmber_Lt.ttf); }
 
 body {
-  background-color: black;
+  background-color: #00050d;
   color: white;
   font-family: 'Amazon Ember Regular', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }

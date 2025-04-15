@@ -1,6 +1,7 @@
 // Home Page
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
+import { createCarouselItem } from '../../components/carouselItem.js';
 
 /**
  * Renders the home page
@@ -10,7 +11,7 @@ export function renderHomePage(container) {
   container.innerHTML = `
     ${renderHeader()}
     
-    <div class="md:ml-16 pb-20 md:pb-0">
+    <div class="pb-20 md:pb-0">
       <div id="hero-section" class="h-[550px] w-full flex items-end justify-end relative">
         <div class="absolute left-[4.4rem] text-white z-[6] flex flex-col">
           <img id="logo" class="w-[400px]">
@@ -68,6 +69,8 @@ export function renderHomePage(container) {
 
 async function fetchAllCategories() {
   try {
+    await loadContinueWatching();
+    
     const categories = [
       {
         url: `${TMDB_BASE_URL}/trending/movie/week?language=en-US&append_to_response=images&include_image_language=en`,
@@ -133,44 +136,90 @@ async function fetchAllCategories() {
   }
 }
 
+async function loadContinueWatching() {
+  const continueWatchingContainer = document.querySelector('#continue-watching');
+  if (!continueWatchingContainer) return;
+  
+  const timestampKeys = Object.keys(localStorage).filter(key => 
+    key.startsWith('quickwatch_timestamp_')
+  );
+  
+  const continueWatchingItems = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+  const uniqueItems = new Map();
+  
+  continueWatchingItems.forEach(item => {
+    uniqueItems.set(item.id, item);
+  });
+  
+  timestampKeys.forEach(key => {
+    // format: quickwatch_timestamp_ID_EPISODE
+    const parts = key.split('_');
+    if (parts.length >= 3) {
+      const id = parts[2];
+      
+      const timestampData = localStorage.getItem(key);
+      let mediaType = null;
+      
+      try {
+        const data = JSON.parse(timestampData);
+        mediaType = data.mediaType;
+      } catch (e) {
+        console.error('Error parsing timestamp data:', e);
+      }
+      
+      if (!uniqueItems.has(id)) {
+        uniqueItems.set(id, { id, mediaType });
+      }
+    }
+  });
+  
+  if (uniqueItems.size === 0) {
+    const sectionTitle = continueWatchingContainer.previousElementSibling;
+    if (sectionTitle) {
+      sectionTitle.style.display = 'none';
+    }
+    continueWatchingContainer.style.display = 'none';
+    return;
+  }
+  
+  const sectionTitle = continueWatchingContainer.previousElementSibling;
+  if (sectionTitle) {
+    sectionTitle.style.display = 'block';
+  }
+  continueWatchingContainer.style.display = 'flex';
+  
+  const options = {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      'Authorization': TMDB_API_KEY
+    }
+  };
+  
+  let index = 0;
+  for (const item of uniqueItems.values()) {
+    const response = await fetch(`${TMDB_BASE_URL}/${item.mediaType}/${item.id}?language=en-US`, options);
+    
+    if (response.ok) {
+      const detailData = await response.json();
+      detailData.media_type = item.mediaType;
+      
+      const carouselItem = createCarouselItem(detailData, index === 0);
+      if (carouselItem) {
+        continueWatchingContainer.appendChild(carouselItem);
+        index++;
+      }
+    }
+  }
+}
+
 function updateMovieCarousel(items, carousel) {
   carousel.innerHTML = '';
   
-  items.forEach(item => {
-    const backdropPath = item.images && item.images.backdrops && item.images.backdrops.length > 0 
-      ? item.images.backdrops[0].file_path 
-      : item.backdrop_path;
-      
-    if (backdropPath) {
-      const movieCard = document.createElement('div');
-      
-      if (carousel.children.length === 0) { movieCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg ml-[4.4rem]';
-      } else { movieCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg'; }
-      
-      movieCard.dataset.id = item.id;
-      movieCard.dataset.mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
-      
-      movieCard.style.backgroundImage = `url(${TMDB_IMAGE_BASE_URL}w500${backdropPath})`;
-      movieCard.style.backgroundSize = 'cover';
-      movieCard.style.backgroundPosition = 'center';
-      
-      const overlay = document.createElement('div');
-      overlay.className = 'w-full h-full flex items-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300';
-      
-      const title = document.createElement('h3');
-      title.className = 'text-white font-semibold';
-      title.textContent = item.title || item.name;
-      
-      overlay.appendChild(title);
-      movieCard.appendChild(overlay);
-      
-      movieCard.addEventListener('click', () => {
-        const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
-        window.history.pushState(null, null, `/${mediaType}/${item.id}`);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      });
-      
-      carousel.appendChild(movieCard);
+  items.forEach((item, index) => {
+    const carouselItem = createCarouselItem(item, index === 0);
+    if (carouselItem) {
+      carousel.appendChild(carouselItem);
     }
   });
 }

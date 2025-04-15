@@ -1,6 +1,7 @@
 // Movies Page
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
+import { createCarouselItem } from '../../components/carouselItem.js';
 
 /**
  * Renders the movies page
@@ -98,40 +99,10 @@ async function fetchMovieGenres() {
 function updateMovieCarousel(items, carousel) {
   carousel.innerHTML = '';
   
-  items.forEach(item => {
-    const backdropPath = item.images && item.images.backdrops && item.images.backdrops.length > 0 
-      ? item.images.backdrops[0].file_path 
-      : item.backdrop_path;
-      
-    if (backdropPath) {
-      const movieCard = document.createElement('div');
-      
-      if (carousel.children.length === 0) { movieCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg ml-[4.4rem]';
-      } else { movieCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg'; }
-      
-      movieCard.dataset.id = item.id;
-      movieCard.dataset.mediaType = 'movie';
-      
-      movieCard.style.backgroundImage = `url(${TMDB_IMAGE_BASE_URL}w500${backdropPath})`;
-      movieCard.style.backgroundSize = 'cover';
-      movieCard.style.backgroundPosition = 'center';
-      
-      const overlay = document.createElement('div');
-      overlay.className = 'w-full h-full flex items-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300';
-      
-      const title = document.createElement('h3');
-      title.className = 'text-white font-semibold';
-      title.textContent = item.title;
-      
-      overlay.appendChild(title);
-      movieCard.appendChild(overlay);
-      
-      movieCard.addEventListener('click', () => {
-        window.history.pushState(null, null, `/movie/${item.id}`);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      });
-      
-      carousel.appendChild(movieCard);
+  items.forEach((item, index) => {
+    const carouselItem = createCarouselItem(item, index === 0);
+    if (carouselItem) {
+      carousel.appendChild(carouselItem);
     }
   });
 }

@@ -1,6 +1,7 @@
 // TV Shows Page
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
+import { createCarouselItem } from '../../components/carouselItem.js';
 
 /**
  * Renders the TV shows page
@@ -98,43 +99,10 @@ async function fetchTvGenres() {
 function updateTvCarousel(items, carousel) {
   carousel.innerHTML = '';
   
-  items.forEach(item => {
-    const backdropPath = item.images && item.images.backdrops && item.images.backdrops.length > 0 
-      ? item.images.backdrops[0].file_path 
-      : item.backdrop_path;
-      
-    if (backdropPath) {
-      const tvCard = document.createElement('div');
-      
-      if (carousel.children.length === 0) {
-        tvCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg ml-[4.4rem]';
-      } else {
-        tvCard.className = 'w-[300px] aspect-video bg-[#32363D] flex-shrink-0 rounded-lg';
-      }
-      
-      tvCard.dataset.id = item.id;
-      tvCard.dataset.mediaType = 'tv';
-      
-      tvCard.style.backgroundImage = `url(${TMDB_IMAGE_BASE_URL}w500${backdropPath})`;
-      tvCard.style.backgroundSize = 'cover';
-      tvCard.style.backgroundPosition = 'center';
-      
-      const overlay = document.createElement('div');
-      overlay.className = 'w-full h-full flex items-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300';
-      
-      const title = document.createElement('h3');
-      title.className = 'text-white font-semibold';
-      title.textContent = item.name;
-      
-      overlay.appendChild(title);
-      tvCard.appendChild(overlay);
-      
-      tvCard.addEventListener('click', () => {
-        window.history.pushState(null, null, `/tv/${item.id}`);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      });
-      
-      carousel.appendChild(tvCard);
+  items.forEach((item, index) => {
+    const carouselItem = createCarouselItem(item, index === 0);
+    if (carouselItem) {
+      carousel.appendChild(carouselItem);
     }
   });
 }

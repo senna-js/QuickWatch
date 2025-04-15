@@ -21,20 +21,32 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
   player.addEventListener('volumechange', saveVolume);
 
   const timestampKey = `quickwatch_timestamp_${showId}_${episodeNumber}`;
-  const savedTimestamp = localStorage.getItem(timestampKey);
-  if (savedTimestamp !== null) {
-    const timestamp = parseFloat(savedTimestamp);
+  const savedTimestampData = localStorage.getItem(timestampKey);
     
-    player.addEventListener('loadedmetadata', () => {
-      if (timestamp > 0 && timestamp < player.duration - 10) {
-        player.currentTime = timestamp;
+  if (savedTimestampData !== null) {
+    try {
+      const timestampData = JSON.parse(savedTimestampData);
+      if (timestampData && typeof timestampData.current === 'number') {
+        player.addEventListener('loadedmetadata', () => {
+          if (timestampData.current > 0 && timestampData.current < player.duration - 10) {
+            player.currentTime = timestampData.current;
+          }
+        });
       }
-    });
+    } catch (e) {
+      console.error('Error parsing saved timestamp data:', e);
+    }
   }
 
   const saveTimestamp = () => {
-    if (player.currentTime > 0 && !player.paused) {
-      localStorage.setItem(timestampKey, player.currentTime.toString());
+    if (player.currentTime > 0 && !player.paused && player.duration) {
+      const timestampData = {
+        current: player.currentTime,
+        full: player.duration,
+        id: showId,
+        mediaType: 'tv'
+      };
+      localStorage.setItem(timestampKey, JSON.stringify(timestampData));
     }
   };
 

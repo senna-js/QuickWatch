@@ -17,13 +17,17 @@ export function renderHeader() {
   const isSearch = currentPath.startsWith('/search');
 
   return `
-    <header class="absolute top-0 left-0 w-full z-10 py-4 px-[4.4rem] text-white items-center text-md flex flex-row gap-2">
-      <a href="/" class="text-2xl mr-6 logo" style="font-family: 'Instrument Serif';">quickwatch</a>
-      <a href="/" class="px-4 py-2 rounded-lg pagebtn ${isHome ? 'active' : ''}">Home</a>
-      <a href="/movies" class="px-4 py-2 rounded-lg pagebtn ${isMovies ? 'active' : ''}">Movies</a>
-      <a href="/tv" class="px-4 py-2 rounded-lg pagebtn ${isTv ? 'active' : ''}">TV shows</a>
-      <a href="/watchlist" class="px-4 py-2 rounded-lg pagebtn ${isWatchlist ? 'active' : ''}">Watchlist</a>
-      <a href="/search" class="px-4 py-2 rounded-lg pagebtn ${isSearch ? 'active' : ''}">Search</a>
+    <header class="absolute top-0 left-0 w-full z-10 py-4 px-[4.4rem] text-white items-center text-md flex flex-row justify-between">
+      <div class="flex items-center flex-row gap-2">
+        <a href="/" class="text-2xl mr-6 logo" style="font-family: 'Instrument Serif';">quickwatch</a>
+        <a href="/" class="px-4 py-2 rounded-lg pagebtn ${isHome ? 'active' : ''}">Home</a>
+        <a href="/movies" class="px-4 py-2 rounded-lg pagebtn ${isMovies ? 'active' : ''}">Movies</a>
+        <a href="/tv" class="px-4 py-2 rounded-lg pagebtn ${isTv ? 'active' : ''}">TV shows</a>
+      </div>
+      <div class="flex items-center flex-row gap-2">
+        <a href="/watchlist" class="px-4 py-2 rounded-lg pagebtn ${isWatchlist ? 'active' : ''}">Watchlist</a>
+        <a href="/search" class="px-4 py-2 rounded-lg pagebtn ${isSearch ? 'active' : ''}">Search</a>
+      </div>
     </header>
     
     <div class="fixed bottom-0 left-0 w-full flex justify-around items-center py-4 pb-8 z-50 md:hidden bg-zinc-950">

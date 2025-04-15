@@ -10,7 +10,7 @@ export function renderWatchlistPage(container) {
   container.innerHTML = `
     ${renderHeader()}
     
-    <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12">
+    <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12 mt-10">
       <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-4 md:mb-6 md:mt-0">Your Watchlist</h1>
       <div id="watchlist-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
     </div>
