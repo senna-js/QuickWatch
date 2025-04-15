@@ -36,7 +36,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     card.className = 'carousel-item w-full bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
   } else {
     card.className = isFirstItem 
-      ? 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg ml-2 md:ml-[4.4rem] transition-all duration-300 ease-in-out relative cursor-pointer' 
+      ? 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg ml-2 transition-all duration-300 ease-in-out relative cursor-pointer' 
       : 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
   }
   

@@ -208,18 +208,23 @@ async function loadContinueWatching() {
       const detailData = await response.json();
       detailData.media_type = item.mediaType;
       
-      const carouselItem = createCarouselItem(detailData, index === 0, 'carousel', (id, mediaType) => {
+      const removeCallback = (id, mediaType) => {
         removeFromContinueWatching(id, mediaType);
-        carouselItem.remove();
         
-        if (continueWatchingContainer.children.length === 0) {
-          const sectionTitle = continueWatchingContainer.previousElementSibling;
-          if (sectionTitle) {
-            sectionTitle.style.display = 'none';
+        if (continueWatchingContainer.contains(carouselItem)) {
+          carouselItem.remove();
+          
+          if (continueWatchingContainer.children.length === 0) {
+            const sectionTitle = continueWatchingContainer.previousElementSibling;
+            if (sectionTitle) {
+              sectionTitle.style.display = 'none';
+            }
+            continueWatchingContainer.style.display = 'none';
           }
-          continueWatchingContainer.style.display = 'none';
         }
-      }, isMobile);
+      };
+      
+      const carouselItem = createCarouselItem(detailData, index === 0, 'carousel', removeCallback, isMobile);
       
       if (carouselItem) {
         continueWatchingContainer.appendChild(carouselItem);
@@ -231,11 +236,11 @@ async function loadContinueWatching() {
 
 function removeFromContinueWatching(id, mediaType) {
   const continueWatchingItems = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-  const updatedItems = continueWatchingItems.filter(item => !(item.id === id && item.mediaType === mediaType));
+  const updatedItems = continueWatchingItems.filter(item => { return !(String(item.id) === String(id) && item.mediaType === mediaType); });
   localStorage.setItem('quickwatch-continue', JSON.stringify(updatedItems));
   
   const timestampKeys = Object.keys(localStorage).filter(key => 
-    key.startsWith(`quickwatch_timestamp_${id}_`)
+    key.startsWith(`quickwatch_timestamp_${String(id)}_`)
   );
   
   timestampKeys.forEach(key => {
