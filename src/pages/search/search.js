@@ -134,6 +134,11 @@ function displaySearchResults(results, container) {
     results.forEach(item => {
       const carouselItem = createCarouselItem(item, false, 'grid');
       if (carouselItem) {
+        carouselItem.classList.remove('w-[300px]', 'w-[140px]');
+        carouselItem.classList.add('w-full');
+        if (carouselItem.style.aspectRatio) {
+        } else { carouselItem.classList.add('aspect-video'); }
+        
         container.appendChild(carouselItem);
       }
     });
