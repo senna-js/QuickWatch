@@ -204,13 +204,39 @@ async function loadContinueWatching() {
       const detailData = await response.json();
       detailData.media_type = item.mediaType;
       
-      const carouselItem = createCarouselItem(detailData, index === 0);
+      const carouselItem = createCarouselItem(detailData, index === 0, 'carousel', (id, mediaType) => {
+        removeFromContinueWatching(id, mediaType);
+        carouselItem.remove();
+        
+        if (continueWatchingContainer.children.length === 0) {
+          const sectionTitle = continueWatchingContainer.previousElementSibling;
+          if (sectionTitle) {
+            sectionTitle.style.display = 'none';
+          }
+          continueWatchingContainer.style.display = 'none';
+        }
+      });
+      
       if (carouselItem) {
         continueWatchingContainer.appendChild(carouselItem);
         index++;
       }
     }
   }
+}
+
+function removeFromContinueWatching(id, mediaType) {
+  const continueWatchingItems = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+  const updatedItems = continueWatchingItems.filter(item => !(item.id === id && item.mediaType === mediaType));
+  localStorage.setItem('quickwatch-continue', JSON.stringify(updatedItems));
+  
+  const timestampKeys = Object.keys(localStorage).filter(key => 
+    key.startsWith(`quickwatch_timestamp_${id}_`)
+  );
+  
+  timestampKeys.forEach(key => {
+    localStorage.removeItem(key);
+  });
 }
 
 function updateMovieCarousel(items, carousel) {

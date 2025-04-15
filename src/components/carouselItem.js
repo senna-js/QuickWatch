@@ -7,9 +7,10 @@ import { TMDB_IMAGE_BASE_URL } from '../router.js';
  * @param {Object} item - The movie or TV show data
  * @param {boolean} isFirstItem - Whether this is the first item in the carousel
  * @param {string} context - The context where the item is used ('carousel' or 'grid')
+ * @param {Function} onRemove - Optional callback when remove button is clicked
  * @returns {HTMLElement} - The carousel item element
  */
-export function createCarouselItem(item, isFirstItem = false, context = 'carousel') {
+export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null) {
   const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
   const title = item.title || item.name;
   const releaseDate = item.release_date || item.first_air_date;
@@ -124,25 +125,61 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   
   card.appendChild(overlay);
   
-  card.addEventListener('mouseenter', () => {
-    card.style.transform = 'scale(1.05)';
-    card.style.zIndex = '10';
-    card.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
-    overlay.classList.remove('opacity-0');
-    overlay.classList.add('opacity-100');
-  });
-  
-  card.addEventListener('mouseleave', () => {
-    card.style.transform = 'scale(1)';
-    card.style.zIndex = '1';
-    card.style.boxShadow = 'none';
-    overlay.classList.remove('opacity-100');
-    overlay.classList.add('opacity-0');
-  });
+  if (onRemove) {
+    const removeButton = document.createElement('button');
+    removeButton.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full w-6 h-6 flex items-center justify-center text-white z-20 opacity-0 transition-opacity duration-300';
+    removeButton.innerHTML = '×';
+    removeButton.style.fontSize = '18px';
+    
+    removeButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      onRemove(item.id, mediaType);
+    });
+    
+    card.appendChild(removeButton);
+    
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'scale(1.05)';
+      card.style.zIndex = '10';
+      card.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
+      overlay.classList.remove('opacity-0');
+      overlay.classList.add('opacity-100');
+      removeButton.classList.remove('opacity-0');
+      removeButton.classList.add('opacity-100');
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'scale(1)';
+      card.style.zIndex = '1';
+      card.style.boxShadow = 'none';
+      overlay.classList.remove('opacity-100');
+      overlay.classList.add('opacity-0');
+      removeButton.classList.remove('opacity-100');
+      removeButton.classList.add('opacity-0');
+    });
+  } else {
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'scale(1.05)';
+      card.style.zIndex = '10';
+      card.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
+      overlay.classList.remove('opacity-0');
+      overlay.classList.add('opacity-100');
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'scale(1)';
+      card.style.zIndex = '1';
+      card.style.boxShadow = 'none';
+      overlay.classList.remove('opacity-100');
+      overlay.classList.add('opacity-0');
+    });
+  }
   
   card.addEventListener('click', () => {
-    window.history.pushState(null, null, `/${mediaType}/${item.id}`);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    setTimeout(() => {
+      window.history.pushState(null, null, `/${mediaType}/${item.id}`);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }, 200);
   });
   
   return card;
