@@ -4,6 +4,7 @@ import { renderHomePage } from './pages/browse/home.js';
 import { renderWatchlistPage } from './pages/watchlist/watchlist.js';
 import { renderSearchPage } from './pages/search/search.js';
 import { renderDetailsPage } from './pages/details/details.js';
+import { renderDetailsMobilepage } from './pages/details/details_mobile.js';
 import { render404Page } from './pages/404.js';
 import { renderDownloadDetailsPage } from './pages/details/download-details.js';
 import { renderIOSAppPage } from './pages/iosapp.js';
@@ -82,13 +83,21 @@ function handleRoute() {
   else if (path.match(/^\/movie\/[\d]+$/)) {
     document.title = 'QW Movie'; // make dynamic
     const id = path.split('/')[2];
-    currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'movie', id }));
+    if (window.innerWidth <= 768) {
+      currentPagePromise = Promise.resolve(renderDetailsMobilepage(appContainer, { type: 'movie', id }));
+    } else {
+      currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'movie', id }));
+    }
   } 
   else if (path.match(/^\/tv\/[\d]+$/)) {
     document.title = 'QW TV'; // make dynamic
     const id = path.split('/')[2];
-    currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'tv', id }));
-  } 
+    if (window.innerWidth <= 768) {
+      currentPagePromise = Promise.resolve(renderDetailsMobilepage(appContainer, { type: 'tv', id }));
+    } else {
+      currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'tv', id }));
+    }
+  }
   else if (path.match(/^\/dl\/movie\/[\d]+$/) || path.match(/^\/dl\/tv\/[\d]+$/)) {
     document.title = 'QW Download'; // make dynamic
     const parts = path.split('/');

@@ -9,7 +9,7 @@ import { renderError } from '../../components/error.js';
  * @param {HTMLElement} container
  * @param {Object} params
  */
-export function renderDetailsPage(container, params) {
+export function renderDetailsMobilepage(container, params) {
   if (window.splashScreen) {
     window.splashScreen.show();
   }
@@ -185,117 +185,122 @@ async function loadMediaDetails(type, id) {
           .replace('{episode}', initialEpisode);
     
     // genres
-    const genresText = data.genres?.slice(0, 3).map(genre => genre.name).join(' • ') || '';
-    
+    const genresText = data.genres?.slice(0, 2).map(genre => genre.name.toUpperCase()).join('  ') || '';
     // release year
     const year = new Date(data.release_date || data.first_air_date).getFullYear() || 'N/A';
     
     // (white) network logo
     const networkLogo = data.networks && data.networks.length > 0 ? 
-      `<img src="${TMDB_IMAGE_BASE_URL}w500${data.networks[0].logo_path}" class="max-w-[6rem] mb-4" style="filter: invert(50%) brightness(10000%);">` : '';
+      `<img src="${TMDB_IMAGE_BASE_URL}w500${data.networks[0].logo_path}" class="max-w-[4rem] mb-3" style="filter: invert(50%) brightness(10000%);">` : '';
     
     // title logo with title fallback
     const titleDisplay = data.images?.logos && data.images.logos.length > 0 ?
-      `<img src="${TMDB_IMAGE_BASE_URL}w500${data.images.logos[0].file_path}" class="max-w-[26rem] max-h-[15rem] mb-8">` :
+      `<img src="${TMDB_IMAGE_BASE_URL}w500${data.images.logos[0].file_path}" class="max-w-[16rem] max-h-[15rem] mb-4">` :
       `<h1 class="text-4xl font-bold mb-8">${data.title || data.name}</h1>`;
     
     detailsContainer.innerHTML = `
-      <section class="w-full mt-16 relative" style="height: calc(100vh - 4rem);">
-        <img class="object-cover w-full h-full object-right-top" src="${TMDB_IMAGE_BASE_URL}original${data.backdrop_path}">
+      <section class="w-full relative h-[60vh]">
+        <img class="object-cover w-full h-full object-center" src="${TMDB_IMAGE_BASE_URL}original${data.backdrop_path}">
         
-        <div class="absolute inset-0 bg-gradient-to-t from-[#00050D] via-transparent to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-[#00050D] via-[#00050D80] to-transparent w-full">
-          <div class="absolute bottom-0 left-0 pl-16 pb-16 w-full">
-            
-            ${networkLogo}
+        <div class="absolute inset-0 bg-gradient-to-t from-[#00050d] via-[#00050d]/70 via-[#00050d]/40 via-transparent to-transparent bottom-[-2px]"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-[#00050d]/80 via-[#00050d]/60 via-[#00050d]/30 via-transparent to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#00050d]/30 via-transparent to-transparent"></div>
+        
+        <div class="absolute bottom-0 left-0 w-full px-5 py-4">
+          ${networkLogo ? `<div class="mb-2">${networkLogo}</div>` : ''}
+          <div class="mb-2">
             ${titleDisplay}
-            
-            ${type === 'tv' ? `
-            <div class="relative inline-block w-48 mb-4">
-              <div id="custom-select" class="w-full px-4 py-3 rounded-lg bg-[#32363D] text-lg md:text-xl font-medium cursor-pointer flex items-center justify-between">
-                <span id="selected-season">Season ${initialSeason}</span>
-                <i class="icon-chevron-down transition-transform duration-200"></i>
-              </div>
-              <div id="season-options" class="absolute w-full mt-2 bg-[#32363D] rounded-lg shadow-lg hidden z-10 max-h-60 overflow-y-auto">
-                ${data.seasons.map((season, i) => 
-                  `<div class="season-option px-4 py-2 hover:bg-[#454950] cursor-pointer transition-colors duration-150 ${i+1 === initialSeason ? 'bg-[#454950]' : ''}" data-value="${season.season_number}">${season.name}</div>`
-                ).join('')}
-              </div>
-            </div>
-            ` : ''}
-            
-            <p class="text-lg mb-3 max-w-3xl">
-              ${data.overview || 'No overview available'}
-            </p>
-            
-            <div class="flex items-center gap-4 mb-3 text-[0.95rem] text-zinc-400 font-bold">
-              <span>TMDB ${data.vote_average?.toFixed(1) || 'N/A'}</span>
-              <span>${year}</span>
-              ${type === 'tv' ? `<span>${data.number_of_episodes || 0} episodes</span>` : ''}
-              <button class="bg-[#32363D] px-2.5 py-0 rounded-[0.275rem] text-white">
-                ${contentRating}
-              </button>
-              ${type === 'tv' ? `
-              <button class="bg-[#32363D] px-2.5 py-0 rounded-[0.275rem] text-white">
-                ${data.status || 'Returning series'}
-              </button>
-              ` : ''}
-            </div>
-            
-            <div class="flex items-center text-[0.95rem] gap-2 mb-12">
-              ${genresText}
-            </div>
-            
-            <div class="flex items-center gap-4 mb-6">
-              <button class="px-6 py-3 rounded-lg bg-[#32363D] text-lg md:text-xl pagebtn font-medium flex flex-row items-center justify-center gap-4" id="play-button">
-                <i class="fas fa-play text-[1.65rem]"></i>
-                <div class="flex flex-col items-start justify-center text-lg leading-tight">
-                  ${type === 'tv' ? `
-                  <span class="mr-2">Episode ${initialEpisode}</span>
-                  <span class="mr-2">Continue watching</span>
-                  ` : `<span class="mr-2">Play movie</span>`}
-                </div>
-              </button>
-              
-              <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-film text-3xl"></i></button>
-              <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full add-to-watchlist"><i class="icon-plus text-4xl"></i></button>
-              <a href="/dl/${type}/${id}" class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full flex items-center justify-center"><i class="icon-download text-3xl"></i></a>
-              <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-share text-3xl"></i></button>
-            </div>
           </div>
+          
+          <div class="flex items-center gap-1 mb-1 text-[0.83rem] text-bold">
+            <span class="bg-[#3B54F6] px-1.5 pt-0.5 pb-[0.07rem] rounded text-white">${data.status.toUpperCase()}</span>
+            <span class="px-2 py-0.5 rounded text-white">TMDB ${data.vote_average?.toFixed(1) || 'N/A'}</span>
+          </div>
+          
+          <div class="flex items-center gap-3 text-[0.8rem] text-white/80 mb-4 ml-1 font-light">
+            ${year}
+            ${type === 'tv' ? `<span>${data.number_of_seasons || 0} SEASONS</span>` : ''}
+            ${contentRating}
+          </div>
+        </div>
+      </section>
+      
+      <section class="px-5 py-6 bg-[#00050d]">
+        <div class="flex flex-col w-full items-center justify-center mb-6">
+          <button class="flex-1 py-3 bg-white text-black rounded-lg font-medium flex items-center justify-center gap-2 w-full mb-3" id="play-button">
+            <i class="fas fa-play"></i>
+            ${type === 'tv' ? `
+              <span>Watch S1 E${initialEpisode}</span>
+              ` : `<span>Play movie</span>`}
+          </button>
+          
+          <div class="flex flex-row gap-8 ml-4 p-2 w-full items-center justify-start">
+            <button class="h-12 bg-[#00050d] flex flex-col items-center justify-center">
+              <i class="icon-plus text-3xl"></i>
+              <span class="text-xs font-light">My List</span>
+            </button>
+            <button class="h-12 bg-[#00050d] flex flex-col items-center justify-center">
+              <i class="icon-film text-2xl mb-1"></i>
+              <span class="text-xs font-light">Trailer</span>
+            </button>
+          </div>
+        </div>
+        
+        <p class="text-[1.07rem] text-white/80 mb-2 font-light leading-tight overflow-hidden line-clamp-4 text-ellipsis">
+          ${data.overview || 'No overview available'}
+        </p>
+        
+        <div class="flex items-center text-xs text-white/60 gap-2 mb-4 font-light">
+          ${genresText}
         </div>
       </section>
       
       ${type === 'tv' && seasonData?.episodes ? `
       <section class="w-full mb-16 relative">
-        <div class="flex flex-row gap-8 px-16 text-xl text-bold">
+        <div class="flex flex-row gap-8 px-5 text-xl text-bold">
           <span class="border-b-2 border-white pb-2">Episodes</span>
           <span class="text-zinc-400">Related</span>
           <span class="text-zinc-400">Details</span>
         </div>
 
-        <div class="px-16 mt-8">
-          <div class="flex flex-col gap-0" id="episodes-list">
+        <div class="mt-4 pb-16">
+          <div class="relative mb-3 mx-[1.3rem]">
+            <div id="custom-select" class="w-full px-4 py-3 rounded-lg bg-[#292D3C] text-lg font-medium cursor-pointer flex items-center justify-between">
+              <span id="selected-season">Season ${initialSeason}</span>
+              <i class="icon-chevron-down transition-transform duration-200"></i>
+            </div>
+            <div id="season-options" class="absolute w-full mt-2 bg-[#292D3C] rounded-lg shadow-lg hidden z-10 max-h-60 overflow-y-auto">
+              ${data.seasons.map((season, i) => 
+                `<div class="season-option px-4 py-2 hover:bg-[#464b5e] cursor-pointer transition-colors duration-150 ${i+1 === initialSeason ? 'bg-[#464b5e]' : ''}" data-value="${season.season_number}">${season.name}</div>`
+              ).join('')}
+            </div>
+          </div
+
+          <div class="flex flex-col" id="episodes-list">
             ${seasonData.episodes.map(episode => `
-            <div class="flex flex-row gap-6 -mx-4 p-4 transition duration-200 ease hover:bg-[#191E25] rounded-xl cursor-pointer episode-item" data-episode="${episode.episode_number}">
+            <div class="flex flex-row gap-3 p-3 px-5 transition duration-200 ease hover:bg-[#191E25] rounded-lg cursor-pointer episode-item" data-episode="${episode.episode_number}">
               <div class="relative">
-                <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative">
+                <div class="bg-zinc-600 w-[8rem] aspect-video rounded-md overflow-hidden relative">
                   <img class="object-cover w-full h-full" src="${TMDB_IMAGE_BASE_URL}original${episode.still_path}">
+                  <div class="absolute inset-0 flex items-end justify-start">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center">
+                      <i class="fas fa-play text-white text-lg" style="filter: drop-shadow(2px 2px 8px black);"></i>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="flex flex-col justify-start">
-                <h3 class="text-xl font-medium mb-2">S${episode.season_number} E${episode.episode_number} - ${episode.name}</h3>
-                <div class="flex flex-row gap-3 mb-3 font-medium text-lg opacity-[95%]">
-                  <span>${new Date(episode.air_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-                  <span>${episode.runtime || 0} min</span>
-                  <span class="px-2 bg-[#32363D] rounded-[0.275rem]">${contentRating}</span>
+              <div class="flex flex-col justify-center flex-1">
+                <div class="flex justify-between items-start">
+                  <h3 class="text-base font-medium text-white leading-tight w-[90%]">${episode.episode_number}. ${episode.name}</h3>
                 </div>
-
-                <p class="text-zinc-400 text-xl font-light max-w-3xl mb-3 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
-              
-                <span class="text-sm font-medium"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
+                <div class="flex flex-row gap-2 text-sm text-zinc-400 font-light">
+                  <span>${episode.runtime || 0}m</span>
+                  <span>${new Date(episode.air_date).getFullYear()}</span>
+                  <span>${contentRating}</span>
+                </div>
               </div>
             </div>
+            <p class="text-[0.95] mx-2 mb-2 leading-tight text-[#ADACAC] font-light px-3 -mt-1 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
             `).join('')}
           </div>
         </div>
@@ -433,8 +438,8 @@ async function loadMediaDetails(type, id) {
           initialSeason = selectedSeason;
           selectedSeasonText.textContent = data.seasons[index].name;
           
-          seasonOptionElements.forEach(opt => opt.classList.remove('bg-[#454950]'));
-          option.classList.add('bg-[#454950]');
+          seasonOptionElements.forEach(opt => opt.classList.remove('bg-[#464b5e]'));
+          option.classList.add('bg-[#464b5e]');
           
           seasonOptions.classList.add('hidden');
           chevronIcon?.classList.remove('rotate-180');
