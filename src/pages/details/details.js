@@ -296,7 +296,7 @@ async function loadMediaDetails(type, id) {
 
                   <p class="text-zinc-400 text-xl font-light max-w-3xl mb-3 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
 
-                  <span class="text-sm font-medium"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
+                  <span class="text-sm font-medium text-[#2392EE]"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
                 </div>
               </div>
             `).join('')}
@@ -338,7 +338,7 @@ async function loadMediaDetails(type, id) {
               ${sources
                 .filter(source => (type === 'movie' ? !source.tvOnly : true))
                 .map((source, index) => `
-                  <button class="source-button px-4 py-2 rounded-lg ${index === initialSourceIndex ? 'bg-blue-600' : 'bg-[#32363D]'}" data-index="${index}">
+                  <button class="source-button px-4 py-2 rounded-lg ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#32363D]'}" data-index="${index}">
                     ${source.name}
                   </button>
                 `).join('')}
@@ -373,12 +373,12 @@ async function loadMediaDetails(type, id) {
           // Enable sandbox mode
           mediaPlayer.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation');
           popupBlocker.classList.remove('bg-[#32363D]');
-          popupBlocker.classList.add('bg-blue-600');
+          popupBlocker.classList.add('bg-[#2392EE]');
           popupBlocker.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>Popups Disabled';
         } else {
           // Disable sandbox mode
           mediaPlayer.removeAttribute('sandbox');
-          popupBlocker.classList.remove('bg-blue-600');
+          popupBlocker.classList.remove('bg-[#2392EE]');
           popupBlocker.classList.add('bg-[#32363D]');
           popupBlocker.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>Disable Popups';
         }
@@ -515,7 +515,7 @@ async function loadMediaDetails(type, id) {
                       <span class="px-2 bg-[#32363D] rounded-[0.275rem]">${contentRating}</span>
                     </div>
                     <p class="text-zinc-400 text-xl font-light max-w-3xl mb-3 line-clamp-2">${episode.overview || 'No overview available'}</p>
-                    <span class="text-sm font-medium"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
+                    <span class="text-sm font-medium text-[#2392EE]"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
                   </div>
                 </div>
               `).join('');
@@ -564,11 +564,11 @@ async function loadMediaDetails(type, id) {
         initialSourceIndex = selectedIndex;
         
         sourceButtons.forEach(btn => {
-          btn.classList.remove('bg-blue-600');
+          btn.classList.remove('bg-[#2392EE]');
           btn.classList.add('bg-[#32363D]');
         });
         button.classList.remove('bg-[#32363D]');
-        button.classList.add('bg-blue-600');
+        button.classList.add('bg-[#2392EE]');
         
         // update player source
         const selectedSource = sources[selectedIndex];

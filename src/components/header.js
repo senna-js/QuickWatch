@@ -29,7 +29,7 @@ export function renderHeader() {
   return `
     <header class="fixed top-0 left-0 mx-[4rem] bg-transparent transition-all duration-200 rounded-b-2xl z-50 py-3 px-[1rem] pl-[2rem] text-white items-center text-md flex flex-row justify-between hidden md:flex" style="width: calc(100% - 8rem)">
       <div class="flex items-center flex-row gap-2">
-        <a href="/" class="text-2xl mr-6 logo" style="font-family: 'Instrument Serif';">quickwatch</a>
+        <a href="/" class="text-2xl mr-6 hover:text-[#2392EE]" style="font-family: 'Instrument Serif';">quickwatch</a>
         <a href="/" class="px-4 py-2 rounded-lg pagebtn ${isHome ? 'active' : ''}">Home</a>
         <a href="/movies" class="px-4 py-2 rounded-lg pagebtn ${isMovies ? 'active' : ''}">Movies</a>
         <a href="/tv" class="px-4 py-2 rounded-lg pagebtn ${isTv ? 'active' : ''}">TV shows</a>

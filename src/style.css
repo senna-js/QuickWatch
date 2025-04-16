@@ -148,7 +148,6 @@ button {
 .pagebtn { transition: all .1s ease-in-out; }
 .pagebtn.active { background: radial-gradient(50% 50% at 50% 0,rgba(var(--action-background-color,255,255,255),.2) 0,transparent 100%),#39404e; }
 .pagebtn:hover { background: #e7eaee; color: #00050d; box-shadow: 0 0 30px #e7eaee50 }
-.logo:hover {filter: brightness(0) saturate(100%) invert(49%) sepia(64%) saturate(1103%) hue-rotate(191deg) brightness(94%) contrast(92%);}
 * { scrollbar-width: none; }
 
 .carousel-item:active {
@@ -158,6 +157,6 @@ button {
 @media (min-width: 768px) {
   #continue-watching .carousel-item:first-child,
   .movie-carousel .carousel-item:first-child {
-    margin-left: 4.4rem;
+  margin-left: 4.4rem;
   }
 }

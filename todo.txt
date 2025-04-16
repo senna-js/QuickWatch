@@ -1,2 +1,0 @@
-- related/details tabs for mobile
-- make the modal look nicer and work on mobile

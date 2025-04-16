@@ -319,18 +319,13 @@ async function loadMediaDetails(type, id) {
         </div>
       </section>
       
-      <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
-        <div class="relative w-full max-w-6xl">
-          <button id="close-modal" class="absolute -top-10 right-0 text-white text-2xl">
-            <i class="icon-x"></i> Close
-          </button>
-          
-          <div class="iframe-container loading rounded">
+      <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex flex-col items-center justify-between p-0">
+        <div class="relative w-full h-full flex flex-col">
+          <div class="iframe-container loading rounded-none flex-grow">
             <iframe 
               id="media-player"
               src="${iframeUrl}" 
-              class="w-full rounded-xl" 
-              height="700" 
+              class="w-full h-full rounded-none" 
               frameborder="0" 
               allowfullscreen
             ></iframe>
@@ -339,15 +334,24 @@ async function loadMediaDetails(type, id) {
             </div>
           </div>
           
-          <div class="mt-4 bg-[#121212] p-4 rounded-lg">
-            <div class="flex flex-wrap gap-3">
-              ${sources
-                .filter(source => type === 'movie' ? !source.tvOnly : true)
-                .map((source, index) => `
-                  <button class="source-button px-4 py-2 rounded-lg ${index === initialSourceIndex ? 'bg-blue-600' : 'bg-[#32363D]'}" data-index="${index}">
-                    ${source.name}
-                  </button>
-                `).join('')}
+          <div class="w-full bg-[#121212] p-3 flex flex-col">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-lg font-medium truncate">${data.title || data.name}</h3>
+              <button id="close-modal" class="text-white px-3 py-1 rounded-lg bg-[#32363D]">
+                <i class="icon-x"></i> Close
+              </button>
+            </div>
+            
+            <div class="source-selector-container overflow-x-auto pb-1">
+              <div class="flex gap-2 min-w-max">
+                ${sources
+                  .filter(source => type === 'movie' ? !source.tvOnly : true)
+                  .map((source, index) => `
+                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#32363D]'}" data-index="${index}">
+                      ${source.name}
+                    </button>
+                  `).join('')}
+              </div>
             </div>
           </div>
         </div>
@@ -529,11 +533,11 @@ async function loadMediaDetails(type, id) {
         initialSourceIndex = selectedIndex;
         
         sourceButtons.forEach(btn => {
-          btn.classList.remove('bg-blue-600');
+          btn.classList.remove('bg-[#2392EE]');
           btn.classList.add('bg-[#32363D]');
         });
         button.classList.remove('bg-[#32363D]');
-        button.classList.add('bg-blue-600');
+        button.classList.add('bg-[#2392EE]');
         
         // update player source
         const selectedSource = sources[selectedIndex];
