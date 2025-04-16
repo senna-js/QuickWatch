@@ -3,10 +3,10 @@
 import { renderHomePage } from './pages/browse/home.js';
 import { renderWatchlistPage } from './pages/watchlist/watchlist.js';
 import { renderSearchPage } from './pages/search/search.js';
-import { renderDetailsPage } from './pages/details/details.js';
-import { renderDetailsMobilepage } from './pages/details/details_mobile.js';
+import { renderDetailsPage } from './pages/details/watch.js';
+import { renderDetailsMobilepage } from './pages/details/watch_mobile.js';
 import { render404Page } from './pages/404.js';
-import { renderDownloadDetailsPage } from './pages/details/download-details.js';
+import { renderDownloadDetailsPage } from './pages/details/download.js';
 import { renderIOSAppPage } from './pages/iosapp.js';
 import { renderAnimePaheEmbed } from './pages/embeds/animepahe-embed.js';
 import { renderVidSrcEmbed } from './pages/embeds/vidsrc-embed.js';
