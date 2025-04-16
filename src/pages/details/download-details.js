@@ -1,7 +1,7 @@
 // Download Details
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
-import { renderError, renderAlert } from '../../components/error.js';
+import { renderError, renderAlert } from '../../components/misc/error.js';
 
 /**
  * Renders the download details page for a movie or TV show

@@ -1,4 +1,4 @@
-import { renderSpinner } from '../../components/loading.js';
+import { renderSpinner } from '../misc/loading.js';
 import { fetchVideoUrl } from '../../pages/embeds/animepahe-embed.js';
 
 /**

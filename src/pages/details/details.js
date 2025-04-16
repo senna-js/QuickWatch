@@ -1,11 +1,10 @@
 // Details Page
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
-import { renderSpinner, renderFullPageSpinner } from '../../components/loading.js';
-import { renderError } from '../../components/error.js';
-import { createCarouselItem } from '../../components/carouselItem.js';
-import { initTabSwitcher } from '../../components/tabSwitcher.js';
-import { loadRelatedContent, loadDetailsContent } from '../../components/tabContent.js';
+import { renderSpinner, renderFullPageSpinner } from '../../components/misc/loading.js';
+import { renderError } from '../../components/misc/error.js';
+import { initTabSwitcher } from '../../components/tabs/tabSwitcher.js';
+import { loadRelatedContent, loadDetailsContent } from '../../components/tabs/tabContent.js';
 
 /**
  * Renders the details page for a movie or TV show

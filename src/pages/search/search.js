@@ -1,9 +1,9 @@
 // Search Page
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
-import { renderSpinner } from '../../components/loading.js';
-import { renderSearchError } from '../../components/error.js';
-import { renderNoResults } from '../../components/empty.js';
+import { renderSpinner } from '../../components/misc/loading.js';
+import { renderSearchError } from '../../components/misc/error.js';
+import { renderNoResults } from '../../components/misc/empty.js';
 import { createCarouselItem } from '../../components/carouselItem.js';
 
 /**

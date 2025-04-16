@@ -1,6 +1,6 @@
 // AnimePahe Embed Page
-import { renderFullPageSpinner, renderSpinner } from '../../components/loading.js';
-import { renderError } from '../../components/error.js';
+import { renderFullPageSpinner, renderSpinner } from '../../components/misc/loading.js';
+import { renderError } from '../../components/misc/error.js';
 import { initializeCustomPlayer } from '../../components/player/index.js';
 
 /**
