@@ -1,7 +1,7 @@
 // Tab Functions
 
-import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
-import { createCarouselItem } from '../carouselItem.js';
+import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../../router.js';
+import { createCarouselItem } from '../../carouselItem.js';
 
 /**
  * Load and display related content for a media item
