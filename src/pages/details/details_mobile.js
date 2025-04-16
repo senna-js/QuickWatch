@@ -46,6 +46,17 @@ async function loadMediaDetails(type, id) {
     const response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?language=en-US&append_to_response=images&include_image_language=en`, options);
     const data = await response.json();
     
+    const mediaTitle = data.title || data.name;
+    document.title = `QW | ${mediaTitle}`;
+    
+    const currentPath = window.location.pathname;
+    const titleSlug = mediaTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    
+    if (!currentPath.includes('-')) {
+      const newPath = `/${type}/${id}-${titleSlug}`;
+      history.replaceState(null, null, newPath);
+    }
+    
     // Fetch content ratings
     let contentRating = type === 'movie' ? 'MOVIE' : 'TV';
     if (type === 'tv') {

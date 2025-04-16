@@ -80,18 +80,20 @@ function handleRoute() {
     document.title = 'Search';
     currentPagePromise = Promise.resolve(renderSearchPage(appContainer));
   }
-  else if (path.match(/^\/movie\/[\d]+$/)) {
-    document.title = 'QW Movie'; // make dynamic
-    const id = path.split('/')[2];
+  else if (path.match(/^\/movie\/[\d]+(-[a-z0-9-]*)?$/)) {
+    const pathParts = path.split('/')[2];
+    const id = pathParts.split('-')[0];
+    document.title = 'Loading...';
     if (window.innerWidth <= 768) {
       currentPagePromise = Promise.resolve(renderDetailsMobilepage(appContainer, { type: 'movie', id }));
     } else {
       currentPagePromise = Promise.resolve(renderDetailsPage(appContainer, { type: 'movie', id }));
     }
   } 
-  else if (path.match(/^\/tv\/[\d]+$/)) {
-    document.title = 'QW TV'; // make dynamic
-    const id = path.split('/')[2];
+  else if (path.match(/^\/tv\/[\d]+(-[a-z0-9-]*)?$/)) {
+    const pathParts = path.split('/')[2];
+    const id = pathParts.split('-')[0];
+    document.title = 'Loading...';
     if (window.innerWidth <= 768) {
       currentPagePromise = Promise.resolve(renderDetailsMobilepage(appContainer, { type: 'tv', id }));
     } else {
