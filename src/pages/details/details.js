@@ -267,15 +267,14 @@ async function loadMediaDetails(type, id) {
         </div>
       </section>
       
-      ${type === 'tv' && seasonData?.episodes ? `
       <section class="w-full mb-16 relative">
         <div class="flex flex-row gap-8 px-16 text-xl text-bold">
-          <span class="tab-item active border-b-2 border-white pb-2" data-tab="episodes">Episodes</span>
-          <span class="tab-item text-zinc-400" data-tab="related">Related</span>
+          ${type === 'tv' ? `<span class="tab-item active border-b-2 border-white pb-2" data-tab="episodes">Episodes</span>` : ''}
+          <span class="tab-item ${type === 'movie' ? 'active border-b-2 border-white pb-2' : 'text-zinc-400'}" data-tab="related">Related</span>
           <span class="tab-item text-zinc-400" data-tab="details">Details</span>
         </div>
-
         <div class="px-16 mt-8">
+          ${type === 'tv' ? `
           <div id="episodes-tab" class="tab-content active">
             <div class="flex flex-col gap-0" id="episodes-list">
               ${seasonData.episodes.map(episode => `
@@ -301,8 +300,9 @@ async function loadMediaDetails(type, id) {
             `).join('')}
             </div>
           </div>
+          ` : ''}
           
-          <div id="related-tab" class="tab-content hidden">
+          <div id="related-tab" class="tab-content ${type === 'movie' ? 'active' : 'hidden'}">
             <div class="related-content-container">
               <div class="flex flex-col items-center justify-center py-12">
                 <p class="text-xl text-zinc-400">Click to load related content</p>
@@ -319,7 +319,6 @@ async function loadMediaDetails(type, id) {
           </div>
         </div>
       </section>
-      ` : ''}
       
       <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
         <div class="relative w-full max-w-6xl">
@@ -344,7 +343,7 @@ async function loadMediaDetails(type, id) {
           <div class="mt-4 bg-[#121212] p-4 rounded-lg">
             <div class="flex flex-wrap gap-3">
               ${sources
-                .filter(source => type === 'movie' ? !source.tvOnly : true)
+                .filter(source => (type === 'movie' ? !source.tvOnly : true))
                 .map((source, index) => `
                   <button class="source-button px-4 py-2 rounded-lg ${index === initialSourceIndex ? 'bg-blue-600' : 'bg-[#32363D]'}" data-index="${index}">
                     ${source.name}
@@ -361,9 +360,7 @@ async function loadMediaDetails(type, id) {
     if (watchlistButton) {
       watchlistButton.addEventListener('click', () => {
         const watchlist = JSON.parse(localStorage.getItem('quickwatch-watchlist') || '[]');
-        
         const existingItem = watchlist.find(item => item.id === id && item.mediaType === type);
-        
         if (!existingItem) {
           watchlist.push({
             id,
@@ -608,10 +605,31 @@ async function loadMediaDetails(type, id) {
           }
           
           if (tabName === 'related') {
-            try {
-              const relatedContainer = selectedTabContent.querySelector('.related-content-container');
+            await loadRelatedContent();
+          }
+          if (tabName === 'details') {
+            await loadDetailsContent();
+          }
+        });
+      });
+    }
+    
+    const activeTab = document.querySelector('.tab-item.active');
+    if (activeTab && activeTab.dataset.tab !== 'episodes') {
+      if (activeTab.dataset.tab === 'related') {
+        loadRelatedContent();
+      } else if (activeTab.dataset.tab === 'details') {
+        loadDetailsContent();
+      }
+    }
+    
+    // related tab
+    async function loadRelatedContent() {
+      const relatedTabContent = document.getElementById('related-tab');
+      if (!relatedTabContent) return;
+      const relatedContainer = relatedTabContent.querySelector('.related-content-container');
               relatedContainer.innerHTML = renderSpinner('large');
-              
+      try {
               const similarResponse = await fetch(`${TMDB_BASE_URL}/${type}/${id}/similar`, options);
               const similarData = await similarResponse.json();
               
@@ -656,7 +674,7 @@ async function loadMediaDetails(type, id) {
               }
             } catch (error) {
               console.error('Error loading related content:', error);
-              selectedTabContent.querySelector('.related-content-container').innerHTML = `
+              relatedContainer.innerHTML = `
                 <div class="flex flex-col items-center justify-center py-12">
                   <p class="text-xl text-zinc-400">Failed to load related content</p>
                 </div>
@@ -664,11 +682,12 @@ async function loadMediaDetails(type, id) {
             }
           }
 
-    if (tabName === 'details') {
+    async function loadDetailsContent() {
+      const detailsTabContent = document.getElementById('details-tab');
+      if (!detailsTabContent) return;
+      const detailsContentContainer = detailsTabContent.querySelector('.details-content-container');
+      detailsContentContainer.innerHTML = renderSpinner('large');
       try {
-        const detailsContainer = selectedTabContent.querySelector('.details-content-container');
-        detailsContainer.innerHTML = renderSpinner('large');
-        
         const creditsResponse = await fetch(`${TMDB_BASE_URL}/${type}/${id}/credits`, options);
         const creditsData = await creditsResponse.json();
         
@@ -737,7 +756,7 @@ async function loadMediaDetails(type, id) {
           </div>`;
         }).join('');
         
-        detailsContainer.innerHTML = `
+        detailsContentContainer.innerHTML = `
           <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div class="md:col-span-2">
               <h2 class="text-2xl font-bold mb-4">About ${type === 'movie' ? 'Movie' : 'Show'}</h2>
@@ -845,7 +864,7 @@ async function loadMediaDetails(type, id) {
         `;
       } catch (error) {
         console.error('Error loading details content:', error);
-        selectedTabContent.querySelector('.details-content-container').innerHTML = `
+        detailsContentContainer.innerHTML = `
           <div class="flex flex-col items-center justify-center py-12">
             <p class="text-xl text-zinc-400">Failed to load details</p>
           </div>
@@ -853,17 +872,7 @@ async function loadMediaDetails(type, id) {
       }
     }
 
-        });
-      });
-    }
-
     window.splashScreen?.completeStep(renderStep);
-    
-    if (window.splashScreen) {
-      setTimeout(() => {
-        window.splashScreen.hide();
-      }, 800);
-    }
     
     if (window.splashScreen) {
       setTimeout(() => {
