@@ -11,10 +11,10 @@ export function renderHeader() {
   
   const currentPath = window.location.pathname;
   const isHome = currentPath === '/' || currentPath === '/index.html';
-  const isMovies = currentPath.startsWith('/movies');
-  const isTv = currentPath.startsWith('/tv');
-  const isWatchlist = currentPath.startsWith('/watchlist');
-  const isSearch = currentPath.startsWith('/search');
+  const isMovies = currentPath === '/movies';
+  const isTv = currentPath === '/tv';
+  const isWatchlist = currentPath === '/watchlist';
+  const isSearch = currentPath === '/search';
 
   setTimeout(() => {
     const header = document.querySelector('header');

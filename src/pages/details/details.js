@@ -283,7 +283,7 @@ async function loadMediaDetails(type, id) {
               <div class="flex flex-row gap-6 -mx-4 p-4 transition duration-200 ease hover:bg-[#191E25] rounded-xl cursor-pointer episode-item" data-episode="${episode.episode_number}">
                 <div class="relative">
                   <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative">
-                    <img class="object-cover w-full h-full" src="${TMDB_IMAGE_BASE_URL}original${episode.still_path}">
+                    <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
                   </div>
                 </div>
                 <div class="flex flex-col justify-start">
@@ -342,12 +342,54 @@ async function loadMediaDetails(type, id) {
                     ${source.name}
                   </button>
                 `).join('')}
+              <div class="flex-grow"></div>
+              <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#32363D]">
+                <i class="fas fa-shield-alt mr-2"></i>Disable Popups
+              </button>
             </div>
           </div>
         </div>
       </div>
     `;
+
+    // media player load event
+    const mediaPlayer = document.getElementById('media-player');
+    const iframeContainer = mediaPlayer?.parentElement;
+    if (mediaPlayer && iframeContainer) {
+      mediaPlayer.addEventListener('load', () => {
+        iframeContainer.classList.remove('loading');
+      });
+    }
     
+    // popup blocker toggle - moved after mediaPlayer is defined
+    const popupBlocker = document.getElementById('popup-blocker');
+    let popupBlockerEnabled = false;
+    
+    if (popupBlocker && mediaPlayer) {
+      popupBlocker.addEventListener('click', () => {
+        popupBlockerEnabled = !popupBlockerEnabled;
+        
+        if (popupBlockerEnabled) {
+          // Enable sandbox mode
+          mediaPlayer.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation');
+          popupBlocker.classList.remove('bg-[#32363D]');
+          popupBlocker.classList.add('bg-blue-600');
+          popupBlocker.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>Popups Disabled';
+        } else {
+          // Disable sandbox mode
+          mediaPlayer.removeAttribute('sandbox');
+          popupBlocker.classList.remove('bg-blue-600');
+          popupBlocker.classList.add('bg-[#32363D]');
+          popupBlocker.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>Disable Popups';
+        }
+        
+        // Reload the iframe to apply changes
+        const currentSrc = mediaPlayer.src;
+        mediaPlayer.src = currentSrc;
+        iframeContainer.classList.add('loading');
+      });
+    }
+  
     // watchlist button
     const watchlistButton = detailsContainer.querySelector('.add-to-watchlist');
     if (watchlistButton) {
@@ -449,7 +491,7 @@ async function loadMediaDetails(type, id) {
           chevronIcon?.classList.remove('rotate-180');
           
           initialEpisode = 1;
-          
+
           try {
             const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/${selectedSeason}?language=en-US`, options);
             seasonData = await seasonResponse.json();
@@ -461,8 +503,9 @@ async function loadMediaDetails(type, id) {
                 <div class="flex flex-row gap-6 -mx-4 p-4 transition duration-200 ease hover:bg-[#191E25] rounded-xl cursor-pointer episode-item" data-episode="${episode.episode_number}">
                   <div class="relative">
                     <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative">
-                      <img class="object-cover w-full h-full" src="${TMDB_IMAGE_BASE_URL}original${episode.still_path}">
+                      <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
                     </div>
+
                   </div>
                   <div class="flex flex-col justify-start">
                     <h3 class="text-xl font-medium mb-2">S${episode.season_number} E${episode.episode_number} - ${episode.name}</h3>
@@ -555,15 +598,6 @@ async function loadMediaDetails(type, id) {
         }
       });
     });
-    
-    // media player load event
-    const mediaPlayer = document.getElementById('media-player');
-    const iframeContainer = mediaPlayer?.parentElement;
-    if (mediaPlayer && iframeContainer) {
-      mediaPlayer.addEventListener('load', () => {
-        iframeContainer.classList.remove('loading');
-      });
-    }
     
     // tab switching
     const tabItems = document.querySelectorAll('.tab-item');
