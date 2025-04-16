@@ -15,11 +15,8 @@ export function renderDetailsPage(container, params) {
   }
   
   container.innerHTML = `
-    <div id="backdrop-bg" class="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-20 z-0 blur-[1rem]"></div>
-
     ${renderHeader()}
-  
-    <div class="md:ml-16 p-4 md:p-12 pb-20 md:pb-12 relative z-10 mt-10" id="details-container">
+    <div id="details-container">
       ${renderFullPageSpinner()}
     </div>
   `;
@@ -44,8 +41,22 @@ async function loadMediaDetails(type, id) {
       }
     };
     
-    const response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?language=en-US`, options);
+    const response = await fetch(`${TMDB_BASE_URL}/${type}/${id}?language=en-US&append_to_response=images&include_image_language=en`, options);
     const data = await response.json();
+    
+    // Fetch content ratings
+    let contentRating = type === 'movie' ? 'MOVIE' : 'TV';
+    if (type === 'tv') {
+      try {
+        const ratingsResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/content_ratings`, options);
+        const ratingsData = await ratingsResponse.json();
+        
+        const usRating = ratingsData.results?.find(rating => rating.iso_3166_1 === 'US');
+        if (usRating && usRating.rating) { contentRating = usRating.rating; }
+      } catch (error) {
+        console.error('Error fetching content ratings:', error);
+      }
+    }
     
     window.splashScreen?.completeStep(mediaDetailsStep);
     
@@ -93,8 +104,10 @@ async function loadMediaDetails(type, id) {
     const seasonStep = window.splashScreen?.addStep('Fetching season data...');
     
     let seasonData = null;
-    const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/1?language=en-US`, options);
-    seasonData = await seasonResponse.json();
+    if (type === 'tv') {
+      const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/1?language=en-US`, options);
+      seasonData = await seasonResponse.json();
+    }
     
     let initialSeason = 1;
     let initialEpisode = 1;
@@ -117,13 +130,6 @@ async function loadMediaDetails(type, id) {
 
     const detailsContainer = document.getElementById('details-container');
     if (!detailsContainer) return;
-    
-    if (data.backdrop_path) {
-      const backdropBg = document.getElementById('backdrop-bg');
-      if (backdropBg) {
-        backdropBg.style.backgroundImage = `url(${TMDB_IMAGE_BASE_URL}original${data.backdrop_path})`;
-      }
-    }
     
     const sources = [
       {
@@ -152,11 +158,6 @@ async function loadMediaDetails(type, id) {
         tvUrl: `https://vidsrc.cc/v3/embed/tv/${id}/{season}/{episode}?autoPlay=false`
       },
       {
-        name: '111Movies',
-        movieUrl: `https://111movies.com/movie/${id}`,
-        tvUrl: `https://111movies.com/tv/${id}/{season}/{episode}`
-      },
-      {
         name: '🤩 AnimePahe',
         tvOnly: true,
         tvUrl: `/embed/animepahe/${id}/{season}/{episode}`
@@ -183,93 +184,160 @@ async function loadMediaDetails(type, id) {
           .replace('{season}', initialSeason)
           .replace('{episode}', initialEpisode);
     
+    // genres
+    const genresText = data.genres?.slice(0, 3).map(genre => genre.name).join(' • ') || '';
+    
+    // release year
+    const year = new Date(data.release_date || data.first_air_date).getFullYear() || 'N/A';
+    
+    // (white) network logo
+    const networkLogo = data.networks && data.networks.length > 0 ? 
+      `<img src="${TMDB_IMAGE_BASE_URL}w500${data.networks[0].logo_path}" class="max-w-[6rem] mb-4" style="filter: invert(50%) brightness(10000%);">` : '';
+    
+    // title logo with title fallback
+    const titleDisplay = data.images?.logos && data.images.logos.length > 0 ?
+      `<img src="${TMDB_IMAGE_BASE_URL}w500${data.images.logos[0].file_path}" class="max-w-[26rem] max-h-[15rem] mb-8">` :
+      `<h1 class="text-4xl font-bold mb-8">${data.title || data.name}</h1>`;
+    
     detailsContainer.innerHTML = `
-      <div class="mb-8">
-        <div class="iframe-container loading rounded">
-          <iframe 
-            id="media-player"
-            src="${iframeUrl}" 
-            class="w-full rounded-xl" 
-            height="700" 
-            frameborder="0" 
-            allowfullscreen
-          ></iframe>
-          <div class="iframe-loader">
-            ${renderSpinner('large')}
-          </div>
-        </div>
+      <section class="w-full mt-16 relative" style="height: calc(100vh - 4rem);">
+        <img class="object-cover w-full h-full object-right-top" src="${TMDB_IMAGE_BASE_URL}original${data.backdrop_path}">
         
-        <div class="mt-4">
-          <div class="flex flex-col md:flex-row items-center justify-center gap-3">
-            <div class="relative w-full md:w-auto">
-              <select id="source-select" class="w-full md:w-auto bg-zinc-900 text-white py-2 px-4 rounded-full appearance-none border border-zinc-700 focus:border-zinc-500 focus:outline-none transition-colors text-sm min-w-[200px]">
-                ${sources
-                  .filter(source => type === 'movie' ? !source.tvOnly : true)
-                  .map((source, index) => `<option value="${index}" ${index === initialSourceIndex ? 'selected' : ''}>${source.name}</option>`)
-                  .join('')}
-              </select>
-              <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <i class="icon-chevron-down text-zinc-400 text-xs mr-1"></i>
-              </div>
-            </div>
-
+        <div class="absolute inset-0 bg-gradient-to-t from-[#00050D] via-transparent to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#00050D] via-[#00050D80] to-transparent w-full">
+          <div class="absolute bottom-0 left-0 pl-16 pb-16 w-full">
+            
+            ${networkLogo}
+            ${titleDisplay}
+            
             ${type === 'tv' ? `
-            <div class="relative w-full md:w-auto">
-              <select id="season-select" class="w-full md:w-auto bg-zinc-900 text-white py-2 px-4 rounded-full appearance-none border border-zinc-700 focus:border-zinc-500 focus:outline-none transition-colors text-sm min-w-[100px]">
-                ${Array.from({length: data.number_of_seasons || 0}, (_, i) => 
-                  `<option value="${i+1}" ${i+1 === initialSeason ? 'selected' : ''}>S${i+1}</option>`
-                ).join('')}
-              </select>
-              <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <i class="icon-chevron-down text-zinc-400 text-xs mr-1"></i>
+            <div class="relative inline-block w-48 mb-4">
+              <div id="custom-select" class="w-full px-4 py-3 rounded-lg bg-[#32363D] text-lg md:text-xl font-medium cursor-pointer flex items-center justify-between">
+                <span id="selected-season">Season ${initialSeason}</span>
+                <i class="icon-chevron-down transition-transform duration-200"></i>
               </div>
-            </div>
-            <div class="relative w-full md:w-auto">
-              <select id="episode-select" class="w-full md:w-auto bg-zinc-900 text-white py-2 px-4 rounded-full appearance-none border border-zinc-700 focus:border-zinc-500 focus:outline-none transition-colors text-sm min-w-[300px]">
-                ${seasonData?.episodes?.map((episode, i) => 
-                  `<option value="${i+1}" ${i+1 === initialEpisode ? 'selected' : ''}>E${i+1}  ${episode.name}</option>`
-                ).join('') || ''}
-              </select>
-              <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                <i class="icon-chevron-down text-zinc-400 text-xs mr-1"></i>
+              <div id="season-options" class="absolute w-full mt-2 bg-[#32363D] rounded-lg shadow-lg hidden z-10 max-h-60 overflow-y-auto">
+                ${data.seasons.map((season, i) => 
+                  `<div class="season-option px-4 py-2 hover:bg-[#454950] cursor-pointer transition-colors duration-150 ${i+1 === initialSeason ? 'bg-[#454950]' : ''}" data-value="${season.season_number}">${season.name}</div>`
+                ).join('')}
               </div>
             </div>
             ` : ''}
-            <a href="/dl/${type}/${id}" class="w-full md:w-auto bg-zinc-900 text-white py-1 px-5 rounded-full border border-zinc-700 hover:bg-zinc-800 hover:border-zinc-500 transition-colors text-sm flex items-center justify-center gap-2">
-              <i class="icon-download text-lg"></i>
-              <span>Download</span>
-            </a>
+            
+            <p class="text-lg mb-3 max-w-3xl">
+              ${data.overview || 'No overview available'}
+            </p>
+            
+            <div class="flex items-center gap-4 mb-3 text-[0.95rem] text-zinc-400 font-bold">
+              <span>TMDB ${data.vote_average?.toFixed(1) || 'N/A'}</span>
+              <span>${year}</span>
+              ${type === 'tv' ? `<span>${data.number_of_episodes || 0} episodes</span>` : ''}
+              <button class="bg-[#32363D] px-2.5 py-0 rounded-[0.275rem] text-white">
+                ${contentRating}
+              </button>
+              ${type === 'tv' ? `
+              <button class="bg-[#32363D] px-2.5 py-0 rounded-[0.275rem] text-white">
+                ${data.status || 'Returning series'}
+              </button>
+              ` : ''}
+            </div>
+            
+            <div class="flex items-center text-[0.95rem] gap-2 mb-12">
+              ${genresText}
+            </div>
+            
+            <div class="flex items-center gap-4 mb-6">
+              <button class="px-6 py-3 rounded-lg bg-[#32363D] text-lg md:text-xl pagebtn font-medium flex flex-row items-center justify-center gap-4" id="play-button">
+                <i class="fas fa-play text-[1.65rem]"></i>
+                <div class="flex flex-col items-start justify-center text-lg leading-tight">
+                  ${type === 'tv' ? `
+                  <span class="mr-2">Episode ${initialEpisode}</span>
+                  <span class="mr-2">Continue watching</span>
+                  ` : `<span class="mr-2">Play movie</span>`}
+                </div>
+              </button>
+              
+              <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-film text-3xl"></i></button>
+              <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full add-to-watchlist"><i class="icon-plus text-4xl"></i></button>
+              <a href="/dl/${type}/${id}" class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full flex items-center justify-center"><i class="icon-download text-3xl"></i></a>
+              <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-share text-3xl"></i></button>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
       
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-        <div class="md:col-span-1">
-          <img src="${TMDB_IMAGE_BASE_URL}w500${data.poster_path}" 
-               class="w-full rounded-lg" alt="${data.title || data.name} poster">
+      ${type === 'tv' && seasonData?.episodes ? `
+      <section class="w-full mb-16 relative">
+        <div class="flex flex-row gap-8 px-16 text-xl text-bold">
+          <span class="border-b-2 border-white pb-2">Episodes</span>
+          <span class="text-zinc-400">Related</span>
+          <span class="text-zinc-400">Details</span>
         </div>
-        
-        <div class="md:col-span-3">
-          <h1 class="text-4xl font-bold mb-4">${data.title || data.name}</h1>
+
+        <div class="px-16 mt-8">
+          <div class="flex flex-col gap-8" id="episodes-list">
+            ${seasonData.episodes.map(episode => `
+            <div class="flex flex-row gap-6 -mx-4 p-4 transition duration-200 ease hover:bg-[#191E25] rounded-xl cursor-pointer episode-item" data-episode="${episode.episode_number}">
+              <div class="relative">
+                <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative">
+                  <img class="object-cover w-full h-full" src="${TMDB_IMAGE_BASE_URL}original${episode.still_path}">
+                </div>
+              </div>
+              <div class="flex flex-col justify-start">
+                <h3 class="text-xl font-medium mb-2">S${episode.season_number} E${episode.episode_number} - ${episode.name}</h3>
+                <div class="flex flex-row gap-3 mb-3 font-medium text-lg opacity-[95%]">
+                  <span>${new Date(episode.air_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                  <span>${episode.runtime || 0} min</span>
+                  <span class="px-2 bg-[#32363D] rounded-[0.275rem]">${contentRating}</span>
+                </div>
+
+                <p class="text-zinc-400 text-xl font-light max-w-3xl mb-3 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
+              
+                <span class="text-sm font-medium"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
+              </div>
+            </div>
+            `).join('')}
+          </div>
+        </div>
+      </section>
+      ` : ''}
+      
+      <div id="player-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
+        <div class="relative w-full max-w-6xl">
+          <button id="close-modal" class="absolute -top-10 right-0 text-white text-2xl">
+            <i class="icon-x"></i> Close
+          </button>
           
-          <div class="flex items-center space-x-4 mb-6">
-            <span class="flex items-center"><i class="fas fa-star text-yellow-500 mr-1"></i> ${data.vote_average?.toFixed(1) || 'N/A'}</span>
-            <span>${new Date(data.release_date || data.first_air_date).getFullYear() || 'N/A'}</span>
-            <span class="px-2 py-1 border border-zinc-500 text-sm">${type === 'movie' ? 'MOVIE' : 'TV'}</span>
+          <div class="iframe-container loading rounded">
+            <iframe 
+              id="media-player"
+              src="${iframeUrl}" 
+              class="w-full rounded-xl" 
+              height="700" 
+              frameborder="0" 
+              allowfullscreen
+            ></iframe>
+            <div class="iframe-loader">
+              ${renderSpinner('large')}
+            </div>
           </div>
           
-          <h2 class="text-2xl font-bold mb-4">Overview</h2>
-          <p class="text-zinc-300 mb-6">${data.overview || 'No overview available'}</p>
-          
-          <div class="flex space-x-4 mb-6">
-            <button class="flex items-center px-6 py-3 bg-transparent border border-white rounded-md hover:bg-zinc-800 transition add-to-watchlist">
-              <i class="fas fa-plus mr-2"></i> Add to Watchlist
-            </button>
+          <div class="mt-4 bg-[#121212] p-4 rounded-lg">
+            <div class="flex flex-wrap gap-3">
+              ${sources
+                .filter(source => type === 'movie' ? !source.tvOnly : true)
+                .map((source, index) => `
+                  <button class="source-button px-4 py-2 rounded-lg ${index === initialSourceIndex ? 'bg-blue-600' : 'bg-[#32363D]'}" data-index="${index}">
+                    ${source.name}
+                  </button>
+                `).join('')}
+            </div>
           </div>
         </div>
       </div>
     `;
     
+    // watchlist button
     const watchlistButton = detailsContainer.querySelector('.add-to-watchlist');
     if (watchlistButton) {
       watchlistButton.addEventListener('click', () => {
@@ -294,73 +362,209 @@ async function loadMediaDetails(type, id) {
       });
     }
 
-    const mediaPlayer = document.getElementById('media-player');
-    const iframeContainer = mediaPlayer.parentElement;
-
-    mediaPlayer.addEventListener('load', () => {
-      iframeContainer.classList.remove('loading');
-    });
-
-    const updatePlayerSource = () => {
-      let selectedSeason = '1';
-      let selectedEpisode = '1';
-      const sourceSelect = document.getElementById('source-select');
-      const selectedSourceIndex = parseInt(sourceSelect.value);
-      
-      if (type === 'tv') {
-        const seasonSelect = document.getElementById('season-select');
-        const episodeSelect = document.getElementById('episode-select');
-        selectedSeason = seasonSelect.value;
-        selectedEpisode = episodeSelect.value;
-        
-        localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
-          season: parseInt(selectedSeason),
-          episode: parseInt(selectedEpisode),
-          sourceIndex: selectedSourceIndex,
-          timestamp: new Date().toISOString()
-        }));
-      } else {
-        localStorage.setItem(`source-pref-${type}-${id}`, JSON.stringify(selectedSourceIndex));
-      }
-
-      const selectedSource = sources[selectedSourceIndex];
-      const newUrl = type === 'movie' 
-        ? selectedSource.movieUrl 
-        : selectedSource.tvUrl
-            .replace('{season}', selectedSeason)
-            .replace('{episode}', selectedEpisode);
-      
-      iframeContainer.classList.add('loading');
-      mediaPlayer.src = newUrl;
-    };
+    // play button and modal
+    const playButton = document.getElementById('play-button');
+    const playerModal = document.getElementById('player-modal');
+    const closeModal = document.getElementById('close-modal');
     
-    const sourceSelect = document.getElementById('source-select');
-    if (sourceSelect) {
-      sourceSelect.addEventListener('change', updatePlayerSource);
-    }
-
-    if (type === 'tv') {
-      const seasonSelect = document.getElementById('season-select');
-      const episodeSelect = document.getElementById('episode-select');
-            
-      seasonSelect.addEventListener('change', async () => {
-        const selectedSeason = parseInt(seasonSelect.value);
-        
-        const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/${selectedSeason}?language=en-US`, options);
-        const seasonData = await seasonResponse.json();
-        
-        episodeSelect.innerHTML = seasonData.episodes.map((episode, index) => 
-          `<option value="${index + 1}">E${index + 1}  ${episode.name}</option>`
-        ).join('');
-        
-        updatePlayerSource();
+    if (playButton && playerModal && closeModal) {
+      playButton.addEventListener('click', () => {
+        playerModal.classList.remove('hidden');
       });
       
-      episodeSelect.addEventListener('change', updatePlayerSource);
+      closeModal.addEventListener('click', () => {
+        playerModal.classList.add('hidden');
+      });
+    }
+
+    // episode selection
+    const episodeItems = document.querySelectorAll('.episode-item');
+    episodeItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const episodeNumber = item.dataset.episode;
+        if (episodeNumber) {
+          initialEpisode = parseInt(episodeNumber);
+          const selectedSource = sources[initialSourceIndex];
+          const newUrl = selectedSource.tvUrl
+            .replace('{season}', initialSeason)
+            .replace('{episode}', episodeNumber);
+          
+          // update player and show modal
+          const mediaPlayer = document.getElementById('media-player');
+          if (mediaPlayer) {
+            mediaPlayer.src = newUrl;
+            document.getElementById('player-modal').classList.remove('hidden');
+          }
+          
+          // save progress
+          localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
+            season: initialSeason,
+            episode: parseInt(episodeNumber),
+            sourceIndex: initialSourceIndex,
+            timestamp: new Date().toISOString()
+          }));
+        }
+      });
+    });
+    
+    // custom select
+    const customSelect = document.getElementById('custom-select');
+    const seasonOptions = document.getElementById('season-options');
+    const selectedSeasonText = document.getElementById('selected-season');
+    const chevronIcon = customSelect?.querySelector('.icon-chevron-down');
+    
+    if (customSelect && seasonOptions && type === 'tv') {
+      customSelect.addEventListener('click', () => {
+        seasonOptions.classList.toggle('hidden');
+        chevronIcon?.classList.toggle('rotate-180');
+      });
+      
+      document.addEventListener('click', (e) => {
+        if (!customSelect.contains(e.target)) {
+          seasonOptions.classList.add('hidden');
+          chevronIcon?.classList.remove('rotate-180');
+        }
+      });
+      
+      const seasonOptionElements = document.querySelectorAll('.season-option');
+      seasonOptionElements.forEach((option, index) => {
+        option.addEventListener('click', async () => {
+          const selectedSeason = parseInt(option.dataset.value);
+          initialSeason = selectedSeason;
+          selectedSeasonText.textContent = data.seasons[index].name;
+          
+          seasonOptionElements.forEach(opt => opt.classList.remove('bg-[#454950]'));
+          option.classList.add('bg-[#454950]');
+          
+          seasonOptions.classList.add('hidden');
+          chevronIcon?.classList.remove('rotate-180');
+          
+          initialEpisode = 1;
+          
+          try {
+            const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/${selectedSeason}?language=en-US`, options);
+            seasonData = await seasonResponse.json();
+            
+            // update episodes list
+            const episodesList = document.getElementById('episodes-list');
+            if (episodesList && seasonData.episodes) {
+              episodesList.innerHTML = seasonData.episodes.map(episode => `
+                <div class="flex flex-row gap-6 -mx-4 p-4 transition duration-200 ease hover:bg-[#191E25] rounded-xl cursor-pointer episode-item" data-episode="${episode.episode_number}">
+                  <div class="relative">
+                    <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative">
+                      <img class="object-cover w-full h-full" src="${TMDB_IMAGE_BASE_URL}original${episode.still_path}">
+                    </div>
+                  </div>
+                  <div class="flex flex-col justify-start">
+                    <h3 class="text-xl font-medium mb-2">S${episode.season_number} E${episode.episode_number} - ${episode.name}</h3>
+                    <div class="flex flex-row gap-3 mb-3 font-medium text-lg opacity-[95%]">
+                      <span>${new Date(episode.air_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                      <span>${episode.runtime || 0} min</span>
+                      <span class="px-2 bg-[#32363D] rounded-[0.275rem]">${contentRating}</span>
+                    </div>
+                    <p class="text-zinc-400 text-xl font-light max-w-3xl mb-3 line-clamp-2">${episode.overview || 'No overview available'}</p>
+                    <span class="text-sm font-medium"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
+                  </div>
+                </div>
+              `).join('');
+              
+              const newEpisodeItems = episodesList.querySelectorAll('.episode-item');
+              newEpisodeItems.forEach(item => {
+                item.addEventListener('click', () => {
+                  const episodeNumber = item.dataset.episode;
+                  if (episodeNumber) {
+                    initialEpisode = parseInt(episodeNumber);
+                    const selectedSource = sources[initialSourceIndex];
+                    const newUrl = selectedSource.tvUrl
+                      .replace('{season}', initialSeason)
+                      .replace('{episode}', episodeNumber);
+                    
+                    // update player and show modal
+                    const mediaPlayer = document.getElementById('media-player');
+                    if (mediaPlayer) {
+                      mediaPlayer.src = newUrl;
+                      document.getElementById('player-modal').classList.remove('hidden');
+                    }
+                    
+                    // save progress
+                    localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
+                      season: initialSeason,
+                      episode: parseInt(episodeNumber),
+                      sourceIndex: initialSourceIndex,
+                      timestamp: new Date().toISOString()
+                    }));
+                  }
+                });
+              });
+            }
+          } catch (error) {
+            console.error('Error fetching season data:', error);
+          }
+        });
+      });
+    }
+    
+    // source selection
+    const sourceButtons = document.querySelectorAll('.source-button');
+    sourceButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const selectedIndex = parseInt(button.dataset.index);
+        initialSourceIndex = selectedIndex;
+        
+        sourceButtons.forEach(btn => {
+          btn.classList.remove('bg-blue-600');
+          btn.classList.add('bg-[#32363D]');
+        });
+        button.classList.remove('bg-[#32363D]');
+        button.classList.add('bg-blue-600');
+        
+        // update player source
+        const selectedSource = sources[selectedIndex];
+        const newUrl = type === 'movie' 
+          ? selectedSource.movieUrl 
+          : selectedSource.tvUrl
+              .replace('{season}', initialSeason)
+              .replace('{episode}', initialEpisode);
+        
+        const mediaPlayer = document.getElementById('media-player');
+        if (mediaPlayer) {
+          const iframeContainer = mediaPlayer.parentElement;
+          iframeContainer.classList.add('loading');
+          mediaPlayer.src = newUrl;
+        }
+        
+        // save preference
+        if (type === 'tv') {
+          localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
+            season: initialSeason,
+            episode: initialEpisode,
+            sourceIndex: selectedIndex,
+            timestamp: new Date().toISOString()
+          }));
+        } else {
+          localStorage.setItem(`source-pref-${type}-${id}`, JSON.stringify(selectedIndex));
+        }
+      });
+    });
+    
+    // media player load event
+    const mediaPlayer = document.getElementById('media-player');
+    const iframeContainer = mediaPlayer?.parentElement;
+    if (mediaPlayer && iframeContainer) {
+      mediaPlayer.addEventListener('load', () => {
+        iframeContainer.classList.remove('loading');
+      });
+    }
+
+    window.splashScreen?.completeStep(renderStep);
+    
+    if (window.splashScreen) {
+      setTimeout(() => {
+        window.splashScreen.hide();
+      }, 800);
     }
     
     if (window.splashScreen) {
-      // Give a moment to see the completed steps before hiding
       setTimeout(() => {
         window.splashScreen.hide();
       }, 800);

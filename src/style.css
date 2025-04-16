@@ -1,19 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,wght@0,100..900;1,100..900&display=swap');
 @font-face {
   font-family: 'Amazon Ember';
-  src: url(AmazonEmber_Lt.ttf);
+  src: url(/AmazonEmber_Lt.ttf);
   font-weight: 300;
 }
 
 @font-face {
   font-family: 'Amazon Ember';
-  src: url(AmazonEmber_Rg.ttf);
+  src: url(/AmazonEmber_Rg.ttf);
   font-weight: 400;
 }
 
 @font-face {
   font-family: 'Amazon Ember';
-  src: url(Amazon-Ember-Medium.ttf);
+  src: url(/Amazon-Ember-Medium.ttf);
   font-weight: 500;
 }
 
