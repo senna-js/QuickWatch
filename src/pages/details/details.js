@@ -146,10 +146,10 @@ async function loadMediaDetails(type, id) {
     if (!detailsContainer) return;
     
     const sources = [
-      {
+      { // add event listeners (for progress tracking. check source documentation)
         name: 'VidLink',
-        movieUrl: `https://vidlink.pro/movie/${id}`,
-        tvUrl: `https://vidlink.pro/tv/${id}/{season}/{episode}`
+        movieUrl: `https://vidlink.pro/movie/${id}?primaryColor=FFFFFF&secondaryColor=2392EE&title=true&poster=false&autoplay=false`,
+        tvUrl: `https://vidlink.pro/tv/${id}/{season}/{episode}?primaryColor=2392EE&secondaryColor=FFFFFF&title=true&poster=false&autoplay=false&nextbutton=true`
       },
       {
         name: 'Vidsrc.xyz',
@@ -166,10 +166,40 @@ async function loadMediaDetails(type, id) {
         movieUrl: `https://vidsrc.su/embed/movie/${id}`,
         tvUrl: `https://vidsrc.su/embed/tv/${id}/{season}/{episode}`
       },
-      {
+      { // add event listeners
         name: 'VidsrcCC',
-        movieUrl: `https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false`,
-        tvUrl: `https://vidsrc.cc/v3/embed/tv/${id}/{season}/{episode}?autoPlay=false`
+        movieUrl: `https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false&poster=false`,
+        tvUrl: `https://vidsrc.cc/v3/embed/tv/${id}/{season}/{episode}?autoPlay=false&poster=false`
+      },
+      { // add event listeners
+        name: 'Vidzee',
+        movieUrl: `https://vidzee.wtf/movie/${id}`,
+        tvUrl: `https://vidzee.wtf/tv/${id}/{season}/{episode}`
+      },
+      { // add event listeners
+        name: 'VidFast',
+        movieUrl: `https://vidfast.pro/movie/${id}?autoPlay=false&theme=2392EE&poster=false`,
+        tvUrl: `https://vidfast.pro/tv/${id}/{season}/{episode}?autoPlay=false&theme=2392EE&poster=false`
+      },
+      { // add event listeners
+        name: 'MultiWTF',
+        movieUrl: `https://vidsrc.wtf/api/1/movie/?id=${id}&color=2392EE`,
+        tvUrl: `https://vidsrc.wtf/api/1/tv/?id=${id}&s={season}&e={episode}&color=2392EE`
+      },
+      { // add event listeners
+        name: 'GlobalWTF',
+        movieUrl: `https://vidsrc.wtf/api/2/movie/?id=${id}&color=2392EE`,
+        tvUrl: `https://vidsrc.wtf/api/2/tv/?id=${id}&s={season}&e={episode}&color=2392EE`
+      },
+      { // add event listeners
+        name: 'PremiWTF',
+        movieUrl: `https://vidsrc.wtf/api/4/movie/?id=${id}&color=2392EE`,
+        tvUrl: `https://vidsrc.wtf/api/4/tv/?id=${id}&s={season}&e={episode}&color=2392EE`
+      },
+      { // add event listeners
+        name: 'Videasy',
+        movieUrl: `https://player.videasy.net/movie/${id}?color=2392EE`,
+        tvUrl: `https://player.videasy.net/tv/${id}/{season}/{episode}?color=2392EE&nextEpisode=true&episodeSelector=true&autoplayNextEpisode=false`
       },
       {
         name: '🤩 AnimePahe',

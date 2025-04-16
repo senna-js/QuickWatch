@@ -1,0 +1,4 @@
+- add event listeners for sources
+- make the event listeners in a universal format
+- use those event listeners + animepahe to make a specific line of how long left on the details.js page AND show XXm left on the 'Continue watching' button.
+- eventually make it work for movies
