@@ -1,5 +1,7 @@
 // Tab Switcher
 
+import { loadRelatedContent, loadDetailsContent, loadRelatedContentMobile, loadDetailsContentMobile } from './tabContent.js';
+
 /**
  * Initialize tab switching functionality
  * @param {string} type - The media type ('movie' or 'tv')
@@ -37,6 +39,54 @@ export function initTabSwitcher(type, id, data) {
         } else {
           content.classList.add('hidden');
         }
+      });
+    });
+  });
+}
+
+/**
+ * Initialize tab switching functionality for mobile
+ * @param {string} type - The media type ('movie' or 'tv')
+ * @param {string} id - The media ID
+ * @param {Object} data - The media data object
+ */
+export function initTabSwitcherMobile(type, id, data) {
+  const tabItems = document.querySelectorAll('.tab-item');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const tabName = item.dataset.tab;
+      
+      tabItems.forEach(t => {
+        if (t.dataset.tab === tabName) {
+          t.classList.add('active', 'border-b-2', 'border-white', 'pb-2');
+          t.classList.remove('text-zinc-400');
+        } else {
+          t.classList.remove('active', 'border-b-2', 'border-white', 'pb-2');
+          t.classList.add('text-zinc-400');
+        }
+      });
+      
+      tabContents.forEach(content => {
+        if (content.id === `${tabName}-tab`) {
+          content.classList.remove('hidden');
+          
+          if (tabName === 'related') {
+            const container = content.querySelector('.related-content-container');
+            if (container) loadRelatedContentMobile(type, id, container);
+          } else if (tabName === 'details') {
+            const container = content.querySelector('.details-content-container');
+            if (container) loadDetailsContentMobile(type, data, container);
+          }
+        } else {
+          content.classList.add('hidden');
+        }
+      });
+      
+      window.scrollTo({
+        top: document.querySelector('.tab-item').getBoundingClientRect().top + window.scrollY - 60,
+        behavior: 'smooth'
       });
     });
   });

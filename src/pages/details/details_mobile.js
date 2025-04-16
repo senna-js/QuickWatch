@@ -3,6 +3,8 @@ import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.j
 import { renderHeader } from '../../components/header.js';
 import { renderSpinner, renderFullPageSpinner } from '../../components/loading.js';
 import { renderError } from '../../components/error.js';
+import { loadRelatedContentMobile, loadDetailsContentMobile } from '../../components/tabContent.js';
+import { initTabSwitcherMobile } from '../../components/tabSwitcher.js';
 
 /**
  * Renders the details page for a movie or TV show
@@ -230,12 +232,12 @@ async function loadMediaDetails(type, id) {
           <button class="flex-1 py-3 bg-white text-black rounded-lg font-medium flex items-center justify-center gap-2 w-full mb-3" id="play-button">
             <i class="fas fa-play"></i>
             ${type === 'tv' ? `
-              <span>Watch S1 E${initialEpisode}</span>
+              <span>Watch S${initialSeason} E${initialEpisode}</span>
               ` : `<span>Play movie</span>`}
           </button>
           
           <div class="flex flex-row gap-8 ml-4 p-2 w-full items-center justify-start">
-            <button class="h-12 bg-[#00050d] flex flex-col items-center justify-center">
+            <button class="h-12 bg-[#00050d] flex flex-col items-center justify-center add-to-watchlist">
               <i class="icon-plus text-3xl"></i>
               <span class="text-xs font-light">My List</span>
             </button>
@@ -255,57 +257,67 @@ async function loadMediaDetails(type, id) {
         </div>
       </section>
       
-      ${type === 'tv' && seasonData?.episodes ? `
       <section class="w-full mb-16 relative">
         <div class="flex flex-row gap-8 px-5 text-xl text-bold">
-          <span class="border-b-2 border-white pb-2">Episodes</span>
-          <span class="text-zinc-400">Related</span>
-          <span class="text-zinc-400">Details</span>
+          ${type === 'tv' ? `<span class="tab-item active border-b-2 border-white pb-2 cursor-pointer" data-tab="episodes">Episodes</span>` : ''}
+          <span class="tab-item ${type === 'movie' ? 'active border-b-2 border-white pb-2' : 'text-zinc-400'} cursor-pointer" data-tab="related">Related</span>
+          <span class="tab-item text-zinc-400 cursor-pointer" data-tab="details">Details</span>
         </div>
 
         <div class="mt-4 pb-16">
-          <div class="relative mb-3 mx-[1.3rem]">
-            <div id="custom-select" class="w-full px-4 py-3 rounded-lg bg-[#292D3C] text-lg font-medium cursor-pointer flex items-center justify-between">
-              <span id="selected-season">Season ${initialSeason}</span>
-              <i class="icon-chevron-down transition-transform duration-200"></i>
+          ${type === 'tv' ? `
+          <div id="episodes-tab" class="tab-content active">
+            <div class="relative mb-3 mx-[1.3rem]">
+              <div id="custom-select" class="w-full px-4 py-3 rounded-lg bg-[#292D3C] text-lg font-medium cursor-pointer flex items-center justify-between">
+                <span id="selected-season">Season ${initialSeason}</span>
+                <i class="icon-chevron-down transition-transform duration-200"></i>
+              </div>
+              <div id="season-options" class="absolute w-full mt-2 bg-[#292D3C] rounded-lg shadow-lg hidden z-10 max-h-60 overflow-y-auto">
+                ${data.seasons.map((season, i) => 
+                  `<div class="season-option px-4 py-2 hover:bg-[#464b5e] cursor-pointer transition-colors duration-150 ${i+1 === initialSeason ? 'bg-[#464b5e]' : ''}" data-value="${season.season_number}">${season.name}</div>`
+                ).join('')}
+              </div>
             </div>
-            <div id="season-options" class="absolute w-full mt-2 bg-[#292D3C] rounded-lg shadow-lg hidden z-10 max-h-60 overflow-y-auto">
-              ${data.seasons.map((season, i) => 
-                `<div class="season-option px-4 py-2 hover:bg-[#464b5e] cursor-pointer transition-colors duration-150 ${i+1 === initialSeason ? 'bg-[#464b5e]' : ''}" data-value="${season.season_number}">${season.name}</div>`
-              ).join('')}
-            </div>
-          </div
 
-          <div class="flex flex-col" id="episodes-list">
-            ${seasonData.episodes.map(episode => `
-            <div class="flex flex-row gap-3 p-3 px-5 transition duration-200 ease hover:bg-[#191E25] rounded-lg cursor-pointer episode-item" data-episode="${episode.episode_number}">
-              <div class="relative">
-                <div class="bg-zinc-600 w-[8rem] aspect-video rounded-md overflow-hidden relative">
-                  <img class="object-cover w-full h-full" src="${TMDB_IMAGE_BASE_URL}original${episode.still_path}">
-                  <div class="absolute inset-0 flex items-end justify-start">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center">
-                      <i class="fas fa-play text-white text-lg" style="filter: drop-shadow(2px 2px 8px black);"></i>
+            <div class="flex flex-col" id="episodes-list">
+              ${seasonData.episodes.map(episode => `
+              <div class="flex flex-row gap-3 p-3 px-5 transition duration-200 ease hover:bg-[#191E25] rounded-lg cursor-pointer episode-item" data-episode="${episode.episode_number}">
+                <div class="relative">
+                  <div class="bg-zinc-600 w-[8rem] aspect-video rounded-md overflow-hidden relative">
+                    <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
+                    <div class="absolute inset-0 flex items-end justify-start">
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-play text-white text-lg" style="filter: drop-shadow(2px 2px 8px black);"></i>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="flex flex-col justify-center flex-1">
-                <div class="flex justify-between items-start">
-                  <h3 class="text-base font-medium text-white leading-tight w-[90%]">${episode.episode_number}. ${episode.name}</h3>
+                <div class="flex flex-col justify-center flex-1">
+                  <div class="flex justify-between items-start">
+                    <h3 class="text-base font-medium text-white leading-tight w-[90%]">${episode.episode_number}. ${episode.name}</h3>
+                  </div>
+                  <div class="flex flex-row gap-2 text-sm text-zinc-400 font-light">
+                    <span>${episode.runtime || 0}m</span>
+                    <span>${new Date(episode.air_date).getFullYear()}</span>
+                    <span>${contentRating}</span>
+                  </div>
                 </div>
-                <div class="flex flex-row gap-2 text-sm text-zinc-400 font-light">
-                  <span>${episode.runtime || 0}m</span>
-                  <span>${new Date(episode.air_date).getFullYear()}</span>
-                  <span>${contentRating}</span>
-                </div>
               </div>
+              <p class="text-[0.95] mx-2 mb-2 leading-tight text-[#ADACAC] font-light px-3 -mt-1 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
+              `).join('')}
             </div>
-            <p class="text-[0.95] mx-2 mb-2 leading-tight text-[#ADACAC] font-light px-3 -mt-1 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
-            `).join('')}
+          </div>
+          ` : ''}
+          
+          <div id="related-tab" class="tab-content ${type === 'movie' ? 'active' : 'hidden'}">
+            <div class="related-content-container px-4"></div>
+          </div>
+          
+          <div id="details-tab" class="tab-content hidden">
+            <div class="details-content-container px-4"></div>
           </div>
         </div>
       </section>
-      ` : ''}
       
       <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
         <div class="relative w-full max-w-6xl">
@@ -561,20 +573,33 @@ async function loadMediaDetails(type, id) {
       });
     }
 
+    initTabSwitcherMobile(type, id, data);
+    
+    if (type === 'movie') {
+      const relatedContainer = document.querySelector('.related-content-container');
+      if (relatedContainer) {
+        loadRelatedContentMobile(type, id, relatedContainer);
+      }
+    }
+    
+    if (detailsContainer && detailsContainer.innerHTML.trim() === '') {
+      loadDetailsContentMobile(type, data, detailsContainer);
+    }
+
     window.splashScreen?.completeStep(renderStep);
-    
+
     if (window.splashScreen) {
       setTimeout(() => {
         window.splashScreen.hide();
       }, 800);
     }
-    
+
     if (window.splashScreen) {
       setTimeout(() => {
         window.splashScreen.hide();
       }, 800);
     }
-    
+
   } catch (error) {
     console.error('Error loading media details:', error);
     document.getElementById('details-container').innerHTML = renderError(
