@@ -5,6 +5,9 @@ import { renderSpinner, renderFullPageSpinner } from '../../components/misc/load
 import { renderError } from '../../components/misc/error.js';
 import { loadRelatedContentMobile, loadDetailsContentMobile } from '../../components/watch/tabs/tabContent.js';
 import { initTabSwitcherMobile } from '../../components/watch/tabs/tabSwitcher.js';
+import { renderPlayerModal, initPlayerModal } from '../../components/watch/playerModal.js';
+import { renderEpisodeList, initEpisodeList } from '../../components/watch/tv/episodeList.js';
+import { renderSeasonSelector, initSeasonSelector } from '../../components/watch/tv/seasonSelector.js';
 
 /**
  * Renders the details page for a movie or TV show
@@ -156,11 +159,6 @@ async function loadMediaDetails(type, id) {
         tvUrl: `https://vidsrc.xyz/embed/tv/${id}/{season}-{episode}`
       },
       {
-        name: 'Vidjoy',
-        movieUrl: `https://vidjoy.pro/embed/movie/${id}`,
-        tvUrl: `https://vidjoy.pro/embed/tv/${id}/{season}/{episode}`
-      },
-      {
         name: 'VidsrcSU',
         movieUrl: `https://vidsrc.su/embed/movie/${id}`,
         tvUrl: `https://vidsrc.su/embed/tv/${id}/{season}/{episode}`
@@ -179,21 +177,6 @@ async function loadMediaDetails(type, id) {
         name: 'VidFast',
         movieUrl: `https://vidfast.pro/movie/${id}?autoPlay=false&theme=2392EE&poster=false`,
         tvUrl: `https://vidfast.pro/tv/${id}/{season}/{episode}?autoPlay=false&theme=2392EE&poster=false`
-      },
-      { // add event listeners
-        name: 'MultiWTF',
-        movieUrl: `https://vidsrc.wtf/api/1/movie/?id=${id}&color=2392EE`,
-        tvUrl: `https://vidsrc.wtf/api/1/tv/?id=${id}&s={season}&e={episode}&color=2392EE`
-      },
-      { // add event listeners
-        name: 'GlobalWTF',
-        movieUrl: `https://vidsrc.wtf/api/2/movie/?id=${id}&color=2392EE`,
-        tvUrl: `https://vidsrc.wtf/api/2/tv/?id=${id}&s={season}&e={episode}&color=2392EE`
-      },
-      { // add event listeners
-        name: 'PremiWTF',
-        movieUrl: `https://vidsrc.wtf/api/4/movie/?id=${id}&color=2392EE`,
-        tvUrl: `https://vidsrc.wtf/api/4/tv/?id=${id}&s={season}&e={episode}&color=2392EE`
       },
       { // add event listeners
         name: 'Videasy',
@@ -308,44 +291,8 @@ async function loadMediaDetails(type, id) {
         <div class="mt-4 pb-16">
           ${type === 'tv' ? `
           <div id="episodes-tab" class="tab-content active">
-            <div class="relative mb-3 mx-[1.3rem]">
-              <div id="custom-select" class="w-full px-4 py-3 rounded-lg bg-[#292D3C] text-lg font-medium cursor-pointer flex items-center justify-between">
-                <span id="selected-season">Season ${initialSeason}</span>
-                <i class="icon-chevron-down transition-transform duration-200"></i>
-              </div>
-              <div id="season-options" class="absolute w-full mt-2 bg-[#292D3C] rounded-lg shadow-lg hidden z-10 max-h-60 overflow-y-auto">
-                ${data.seasons.map((season, i) => 
-                  `<div class="season-option px-4 py-2 hover:bg-[#464b5e] cursor-pointer transition-colors duration-150 ${i+1 === initialSeason ? 'bg-[#464b5e]' : ''}" data-value="${season.season_number}">${season.name}</div>`
-                ).join('')}
-              </div>
-            </div>
-
-            <div class="flex flex-col" id="episodes-list">
-              ${seasonData.episodes.map(episode => `
-              <div class="flex flex-row gap-3 p-3 px-5 transition duration-200 ease hover:bg-[#191E25] rounded-lg cursor-pointer episode-item" data-episode="${episode.episode_number}">
-                <div class="relative">
-                  <div class="bg-zinc-600 w-[8rem] aspect-video rounded-md overflow-hidden relative">
-                    <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
-                    <div class="absolute inset-0 flex items-end justify-start">
-                      <div class="w-10 h-10 rounded-full flex items-center justify-center">
-                        <i class="fas fa-play text-white text-lg" style="filter: drop-shadow(2px 2px 8px black);"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex flex-col justify-center flex-1">
-                  <div class="flex justify-between items-start">
-                    <h3 class="text-base font-medium text-white leading-tight w-[90%]">${episode.episode_number}. ${episode.name}</h3>
-                  </div>
-                  <div class="flex flex-row gap-2 text-sm text-zinc-400 font-light">
-                    <span>${episode.runtime || 0}m</span>
-                    <span>${new Date(episode.air_date).getFullYear()}</span>
-                    <span>${contentRating}</span>
-                  </div>
-                </div>
-              </div>
-              <p class="text-[0.95] mx-2 mb-2 leading-tight text-[#ADACAC] font-light px-3 -mt-1 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
-              `).join('')}
+            ${renderSeasonSelector(data, initialSeason, true)}
+            ${renderEpisodeList(seasonData.episodes, contentRating, true)}
             </div>
           </div>
           ` : ''}
@@ -360,43 +307,7 @@ async function loadMediaDetails(type, id) {
         </div>
       </section>
       
-      <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex flex-col items-center justify-between p-0">
-        <div class="relative w-full h-full flex flex-col">
-          <div class="iframe-container loading rounded-none flex-grow">
-            <iframe 
-              id="media-player"
-              src="${iframeUrl}" 
-              class="w-full h-full rounded-none" 
-              frameborder="0" 
-              allowfullscreen
-            ></iframe>
-            <div class="iframe-loader">
-              ${renderSpinner('large')}
-            </div>
-          </div>
-          
-          <div class="w-full bg-[#121212] p-3 flex flex-col">
-            <div class="flex justify-between items-center mb-2">
-              <h3 class="text-lg font-medium truncate">${data.title || data.name}</h3>
-              <button id="close-modal" class="text-white px-3 py-1 rounded-lg bg-[#32363D]">
-                <i class="icon-x"></i> Close
-              </button>
-            </div>
-            
-            <div class="source-selector-container overflow-x-auto pb-1">
-              <div class="flex gap-2 min-w-max">
-                ${sources
-                  .filter(source => type === 'movie' ? !source.tvOnly : true)
-                  .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#32363D]'}" data-index="${index}">
-                      ${source.name}
-                    </button>
-                  `).join('')}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      ${renderPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, data.title || data.name, true)}
     `;
     
     // watchlist button
@@ -424,198 +335,11 @@ async function loadMediaDetails(type, id) {
       });
     }
 
-    // play button and modal
-    const playButton = document.getElementById('play-button');
-    const playerModal = document.getElementById('player-modal');
-    const closeModal = document.getElementById('close-modal');
+    initPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, true);
     
-    if (playButton && playerModal && closeModal) {
-      playButton.addEventListener('click', () => {
-        playerModal.classList.remove('hidden');
-      });
-      
-      closeModal.addEventListener('click', () => {
-        playerModal.classList.add('hidden');
-      });
-    }
-
-    // episode selection
-    const episodeItems = document.querySelectorAll('.episode-item');
-    episodeItems.forEach(item => {
-      item.addEventListener('click', () => {
-        const episodeNumber = item.dataset.episode;
-        if (episodeNumber) {
-          initialEpisode = parseInt(episodeNumber);
-          const selectedSource = sources[initialSourceIndex];
-          const newUrl = selectedSource.tvUrl
-            .replace('{season}', initialSeason)
-            .replace('{episode}', episodeNumber);
-          
-          // update player and show modal
-          const mediaPlayer = document.getElementById('media-player');
-          if (mediaPlayer) {
-            mediaPlayer.src = newUrl;
-            document.getElementById('player-modal').classList.remove('hidden');
-          }
-          
-          // save progress
-          localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
-            season: initialSeason,
-            episode: parseInt(episodeNumber),
-            sourceIndex: initialSourceIndex,
-            timestamp: new Date().toISOString()
-          }));
-        }
-      });
-    });
-    
-    // custom select
-    const customSelect = document.getElementById('custom-select');
-    const seasonOptions = document.getElementById('season-options');
-    const selectedSeasonText = document.getElementById('selected-season');
-    const chevronIcon = customSelect?.querySelector('.icon-chevron-down');
-    
-    if (customSelect && seasonOptions && type === 'tv') {
-      customSelect.addEventListener('click', () => {
-        seasonOptions.classList.toggle('hidden');
-        chevronIcon?.classList.toggle('rotate-180');
-      });
-      
-      document.addEventListener('click', (e) => {
-        if (!customSelect.contains(e.target)) {
-          seasonOptions.classList.add('hidden');
-          chevronIcon?.classList.remove('rotate-180');
-        }
-      });
-      
-      const seasonOptionElements = document.querySelectorAll('.season-option');
-      seasonOptionElements.forEach((option, index) => {
-        option.addEventListener('click', async () => {
-          const selectedSeason = parseInt(option.dataset.value);
-          initialSeason = selectedSeason;
-          selectedSeasonText.textContent = data.seasons[index].name;
-          
-          seasonOptionElements.forEach(opt => opt.classList.remove('bg-[#464b5e]'));
-          option.classList.add('bg-[#464b5e]');
-          
-          seasonOptions.classList.add('hidden');
-          chevronIcon?.classList.remove('rotate-180');
-          
-          initialEpisode = 1;
-          
-          try {
-            const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/${selectedSeason}?language=en-US`, options);
-            seasonData = await seasonResponse.json();
-            
-            // update episodes list
-            const episodesList = document.getElementById('episodes-list');
-            if (episodesList && seasonData.episodes) {
-              episodesList.innerHTML = seasonData.episodes.map(episode => `
-                <div class="flex flex-row gap-6 -mx-4 p-4 transition duration-200 ease hover:bg-[#191E25] rounded-xl cursor-pointer episode-item" data-episode="${episode.episode_number}">
-                  <div class="relative">
-                    <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative">
-                      <img class="object-cover w-full h-full" src="${TMDB_IMAGE_BASE_URL}original${episode.still_path}">
-                    </div>
-                  </div>
-                  <div class="flex flex-col justify-start">
-                    <h3 class="text-xl font-medium mb-2">S${episode.season_number} E${episode.episode_number} - ${episode.name}</h3>
-                    <div class="flex flex-row gap-3 mb-3 font-medium text-lg opacity-[95%]">
-                      <span>${new Date(episode.air_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-                      <span>${episode.runtime || 0} min</span>
-                      <span class="px-2 bg-[#32363D] rounded-[0.275rem]">${contentRating}</span>
-                    </div>
-                    <p class="text-zinc-400 text-xl font-light max-w-3xl mb-3 line-clamp-2">${episode.overview || 'No overview available'}</p>
-                    <span class="text-sm font-medium"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
-                  </div>
-                </div>
-              `).join('');
-              
-              const newEpisodeItems = episodesList.querySelectorAll('.episode-item');
-              newEpisodeItems.forEach(item => {
-                item.addEventListener('click', () => {
-                  const episodeNumber = item.dataset.episode;
-                  if (episodeNumber) {
-                    initialEpisode = parseInt(episodeNumber);
-                    const selectedSource = sources[initialSourceIndex];
-                    const newUrl = selectedSource.tvUrl
-                      .replace('{season}', initialSeason)
-                      .replace('{episode}', episodeNumber);
-                    
-                    // update player and show modal
-                    const mediaPlayer = document.getElementById('media-player');
-                    if (mediaPlayer) {
-                      mediaPlayer.src = newUrl;
-                      document.getElementById('player-modal').classList.remove('hidden');
-                    }
-                    
-                    // save progress
-                    localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
-                      season: initialSeason,
-                      episode: parseInt(episodeNumber),
-                      sourceIndex: initialSourceIndex,
-                      timestamp: new Date().toISOString()
-                    }));
-                  }
-                });
-              });
-            }
-          } catch (error) {
-            console.error('Error fetching season data:', error);
-          }
-        });
-      });
-    }
-    
-    // source selection
-    const sourceButtons = document.querySelectorAll('.source-button');
-    sourceButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const selectedIndex = parseInt(button.dataset.index);
-        initialSourceIndex = selectedIndex;
-        
-        sourceButtons.forEach(btn => {
-          btn.classList.remove('bg-[#2392EE]');
-          btn.classList.add('bg-[#32363D]');
-        });
-        button.classList.remove('bg-[#32363D]');
-        button.classList.add('bg-[#2392EE]');
-        
-        // update player source
-        const selectedSource = sources[selectedIndex];
-        const newUrl = type === 'movie' 
-          ? selectedSource.movieUrl 
-          : selectedSource.tvUrl
-              .replace('{season}', initialSeason)
-              .replace('{episode}', initialEpisode);
-        
-        const mediaPlayer = document.getElementById('media-player');
-        if (mediaPlayer) {
-          const iframeContainer = mediaPlayer.parentElement;
-          iframeContainer.classList.add('loading');
-          mediaPlayer.src = newUrl;
-        }
-        
-        // save preference
-        if (type === 'tv') {
-          localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
-            season: initialSeason,
-            episode: initialEpisode,
-            sourceIndex: selectedIndex,
-            timestamp: new Date().toISOString()
-          }));
-        } else {
-          localStorage.setItem(`source-pref-${type}-${id}`, JSON.stringify(selectedIndex));
-        }
-      });
-    });
-    
-    // media player load event
-    const mediaPlayer = document.getElementById('media-player');
-    const iframeContainer = mediaPlayer?.parentElement;
-    if (mediaPlayer && iframeContainer) {
-      mediaPlayer.addEventListener('load', () => {
-        iframeContainer.classList.remove('loading');
-      });
+    if (type === 'tv') {
+      initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex);
+      initSeasonSelector(id, data, seasonData, initialSeason, initialEpisode, sources, initialSourceIndex, contentRating, true);
     }
 
     initTabSwitcherMobile(type, id, data);

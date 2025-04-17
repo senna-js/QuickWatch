@@ -31,7 +31,7 @@ export function renderSearchPage(container) {
           <input type="text" id="search-input" placeholder="Enter your search query..." 
             class="w-full p-3 md:p-4 bg-gray-800 rounded-lg text-white outline-none focus:ring-2 focus:ring-gray-700">
         </div>
-        <div id="search-results" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6"></div>
+        <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
       </div>
     </div>
   `;
@@ -123,7 +123,7 @@ function displaySearchResults(results, container) {
       container.appendChild(resultItem);
     });
   } else {
-    container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6';
+    container.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6';
     container.innerHTML = '';
     
     if (results.length === 0) {
