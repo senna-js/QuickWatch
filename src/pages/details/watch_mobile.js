@@ -237,14 +237,51 @@ async function loadMediaDetails(type, id) {
             ${(() => {
               if (type === 'tv') {
                 const progress = getProgress(id, 'tv', initialSeason, initialEpisode);
+                const remainingMinutes = progress ? Math.round((progress.fullDuration - progress.watchedDuration) / 60) : 0;
+                
+                if (progress && remainingMinutes <= 5) {
+                  // Check if there are more episodes in current season
+                  const nextEpisode = initialEpisode + 1;
+                  if (nextEpisode <= seasonData.episodes.length) {
+                    return `
+                      <span class="mr-2">Watch S${initialSeason}E${nextEpisode} <span class="font-light">(Next episode)</span></span>
+                      <span class="hidden" id="next-episode-data" 
+                        data-season="${initialSeason}" 
+                        data-episode="${nextEpisode}">
+                      </span>
+                    `;
+                  } else {
+                    // Check if there are more seasons
+                    const nextSeason = initialSeason + 1;
+                    if (nextSeason <= data.number_of_seasons) {
+                      return `
+                        <span class="mr-2">Watch S${nextSeason}E1 <span class="font-light">(Next season)</span></span>
+                        <span class="hidden" id="next-episode-data" 
+                          data-season="${nextSeason}" 
+                          data-episode="1">
+                        </span>
+                      `;
+                    } else {
+                      // No more seasons: rewatch
+                      return `
+                        <span class="mr-2">Rewatch S1E1 <span class="font-light">(Start over)</span></span>
+                        <span class="hidden" id="next-episode-data" 
+                          data-season="1" 
+                          data-episode="1">
+                        </span>
+                      `;
+                    }
+                  }
+                }
+                
                 return `
-                  <span class="mr-2">Continue S${initialSeason}E${initialEpisode} ${progress && progress.watchedDuration > 0 ? 
-                    `<span class="font-light">(${Math.round((progress.fullDuration - progress.watchedDuration) / 60)}min left)</span>` : ''}</span>
+                  <span class="mr-2">Continue S${initialSeason}E${initialEpisode} ${progress && progress.watchedDuration > 0 ? 
+                    `<span class="font-light">(${remainingMinutes}min left)</span>` : ''}</span>
                 `;
               } else {
                 const progress = getProgress(id, 'movie');
                 return progress && progress.watchedDuration > 0 ? 
-                  `<span class="mr-2">Continue Watching <span class="font-light">(${formatRemainingTime(progress.fullDuration, progress.watchedDuration)})</span></span>` :
+                  `<span class="mr-2">Continue Watching <span class="font-light">(${formatRemainingTime(progress.fullDuration, progress.watchedDuration)})</span></span>` :
                   `<span class="mr-2">Play movie</span>`;
               }
             })()}
@@ -326,6 +363,41 @@ async function loadMediaDetails(type, id) {
     }
 
     initPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, true);
+    
+    if (type === 'tv') {
+      const playButton = document.getElementById('play-button');
+      const nextEpisodeData = document.getElementById('next-episode-data');
+      
+      if (playButton && nextEpisodeData) {
+        const originalClickHandler = playButton.onclick;
+        playButton.onclick = null;
+        
+        playButton.addEventListener('click', () => {
+          // if we have next episode data, update the initialSeason and initialEpisode
+          if (nextEpisodeData) {
+            const nextSeason = parseInt(nextEpisodeData.dataset.season);
+            const nextEpisode = parseInt(nextEpisodeData.dataset.episode);
+            
+            if (!isNaN(nextSeason) && !isNaN(nextEpisode)) {
+              const modal = document.getElementById('player-modal');
+              if (modal) {
+                const modalContent = renderPlayerModal(type, id, sources, initialSourceIndex, nextSeason, nextEpisode, data.title || data.name, true);
+                modal.outerHTML = modalContent;
+                initPlayerModal(type, id, sources, initialSourceIndex, nextSeason, nextEpisode, true);
+                
+                document.getElementById('player-modal').classList.remove('hidden');
+                return;
+              }
+            }
+          }
+          
+          const playerModal = document.getElementById('player-modal');
+          if (playerModal) {
+            playerModal.classList.remove('hidden');
+          }
+        });
+      }
+    }
     
     if (type === 'tv') {
       initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex);
