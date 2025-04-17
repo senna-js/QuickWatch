@@ -164,40 +164,22 @@ async function loadContinueWatching() {
   
   const isMobile = window.innerWidth < 768;
   
-  const timestampKeys = Object.keys(localStorage).filter(key => 
-    key.startsWith('quickwatch_timestamp_')
-  );
-  
   const continueWatchingItems = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-  const uniqueItems = new Map();
   
-  continueWatchingItems.forEach(item => {
-    uniqueItems.set(item.id, item);
-  });
-  
-  timestampKeys.forEach(key => {
-    // format: quickwatch_timestamp_ID_EPISODE
-    const parts = key.split('_');
-    if (parts.length >= 3) {
-      const id = parts[2];
-      
-      const timestampData = localStorage.getItem(key);
-      let mediaType = null;
-      
-      try {
-        const data = JSON.parse(timestampData);
-        mediaType = data.mediaType;
-      } catch (e) {
-        console.error('Error parsing timestamp data:', e);
-      }
-      
-      if (!uniqueItems.has(id)) {
-        uniqueItems.set(id, { id, mediaType });
+  const groupedItems = continueWatchingItems.reduce((acc, item) => {
+    const key = `${item.id}_${item.mediaType}`;
+    if (!acc[key]) {
+      acc[key] = item;
+    } else {
+      // Update if the timestamp is more recent
+      if (item.timestamp > acc[key].timestamp) {
+        acc[key] = item;
       }
     }
-  });
-  
-  if (uniqueItems.size === 0) {
+    return acc;
+  }, {});
+
+  if (Object.keys(groupedItems).length === 0) {
     const sectionTitle = continueWatchingContainer.previousElementSibling;
     if (sectionTitle) {
       sectionTitle.style.display = 'none';
@@ -205,7 +187,7 @@ async function loadContinueWatching() {
     continueWatchingContainer.style.display = 'none';
     return;
   }
-  
+
   const sectionTitle = continueWatchingContainer.previousElementSibling;
   if (sectionTitle) {
     sectionTitle.style.display = 'block';
@@ -221,12 +203,18 @@ async function loadContinueWatching() {
   };
   
   let index = 0;
-  for (const item of uniqueItems.values()) {
+  for (const item of Object.values(groupedItems)) {
     const response = await fetch(`${TMDB_BASE_URL}/${item.mediaType}/${item.id}?append_to_response=images&language=en-US&include_image_language=en`, options);
     
     if (response.ok) {
       const detailData = await response.json();
       detailData.media_type = item.mediaType;
+      
+      // Add progress information to detailData
+      detailData.progress = item.watchedDuration / item.fullDuration;
+      detailData.timestamp = item.timestamp;
+      detailData.season = item.season;
+      detailData.episode = item.episode;
       
       const removeCallback = (id, mediaType) => {
         removeFromContinueWatching(id, mediaType);
@@ -244,9 +232,28 @@ async function loadContinueWatching() {
         }
       };
       
-      const carouselItem = createCarouselItem(detailData, index === 0, 'carousel', removeCallback, isMobile);
+      const carouselItem = createCarouselItem(detailData, index === 0, 'continue-watching', removeCallback, isMobile);
       
       if (carouselItem) {
+        // progress bar
+        const progressBar = document.createElement('div');
+        progressBar.className = 'absolute bottom-0 left-0 right-0 h-1 bg-gray-800';
+        
+        const progressFill = document.createElement('div');
+        progressFill.className = 'h-full bg-red-600';
+        progressFill.style.width = `${(item.watchedDuration / item.fullDuration) * 100}%`;
+        
+        progressBar.appendChild(progressFill);
+        carouselItem.appendChild(progressBar);
+        
+        // episode info for tv shows
+        if (item.mediaType === 'tv' && item.season !== 0) {
+          const episodeInfo = document.createElement('div');
+          episodeInfo.className = 'absolute bottom-2 left-2 text-white text-sm';
+          episodeInfo.textContent = `S${item.season} E${item.episode}`;
+          carouselItem.appendChild(episodeInfo);
+        }
+        
         continueWatchingContainer.appendChild(carouselItem);
         index++;
       }

@@ -1,4 +1,4 @@
-- add event listeners for sources
-- make the event listeners in a universal format
-- use those event listeners + animepahe to make a specific line of how long left on the details.js page AND show XXm left on the 'Continue watching' button.
-- eventually make it work for movies
+- make animepahe save progress to quickwatch-continue
+- if a user has 5 mins left on an episode, make the continue watching button show 'Start watching Episode XX' where XX is the next episode
+- make carouselitem expanded downwards when hovering and make the progress bar consistent with watch.js
+- finish all progress trackers in sourceTrackers.js

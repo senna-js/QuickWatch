@@ -8,6 +8,7 @@ import { initTabSwitcherMobile } from '../../components/watch/tabs/tabSwitcher.j
 import { renderPlayerModal, initPlayerModal } from '../../components/watch/playerModal.js';
 import { renderEpisodeList, initEpisodeList } from '../../components/watch/tv/episodeList.js';
 import { renderSeasonSelector, initSeasonSelector } from '../../components/watch/tv/seasonSelector.js';
+import { getProgress } from '../../components/watch/progress/index.js';
 
 /**
  * Renders the details page for a movie or TV show
@@ -189,6 +190,18 @@ async function loadMediaDetails(type, id) {
     const titleDisplay = data.images?.logos && data.images.logos.length > 0 ?
       `<img src="${TMDB_IMAGE_BASE_URL}w500${data.images.logos[0].file_path}" class="max-w-[16rem] max-h-[15rem] mb-4">` :
       `<h1 class="text-4xl font-bold mb-8">${data.title || data.name}</h1>`;
+
+    function formatRemainingTime(duration, watched) {
+      const remainingMinutes = Math.round((duration - watched) / 60);
+      if (remainingMinutes <= 0) return null;
+      
+      if (remainingMinutes >= 60) {
+        const hours = Math.floor(remainingMinutes / 60);
+        const minutes = remainingMinutes % 60;
+        return `${hours}h${minutes}m left`;
+      }
+      return `${remainingMinutes}min left`;
+    }
     
     detailsContainer.innerHTML = `
       <section class="w-full relative h-[60vh]">
@@ -220,10 +233,21 @@ async function loadMediaDetails(type, id) {
       <section class="px-5 py-6 bg-[#00050d]">
         <div class="flex flex-col w-full items-center justify-center mb-6">
           <button class="flex-1 py-3 bg-white text-black rounded-lg font-medium flex items-center justify-center gap-2 w-full mb-3" id="play-button">
-            <i class="fas fa-play"></i>
-            ${type === 'tv' ? `
-              <span>Watch S${initialSeason} E${initialEpisode}</span>
-              ` : `<span>Play movie</span>`}
+            <i class="fas fa-play"></i>            
+            ${(() => {
+              if (type === 'tv') {
+                const progress = getProgress(id, 'tv', initialSeason, initialEpisode);
+                return `
+                  <span class="mr-2">Continue S${initialSeason}E${initialEpisode} ${progress && progress.watchedDuration > 0 ? 
+                    `<span class="font-light">(${Math.round((progress.fullDuration - progress.watchedDuration) / 60)}min left)</span>` : ''}</span>
+                `;
+              } else {
+                const progress = getProgress(id, 'movie');
+                return progress && progress.watchedDuration > 0 ? 
+                  `<span class="mr-2">Continue Watching <span class="font-light">(${formatRemainingTime(progress.fullDuration, progress.watchedDuration)})</span></span>` :
+                  `<span class="mr-2">Play movie</span>`;
+              }
+            })()}
           </button>
           
           <div class="flex flex-row gap-8 ml-4 p-2 w-full items-center justify-start">
