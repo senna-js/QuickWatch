@@ -83,7 +83,6 @@ async function loadMediaDetails(type, id) {
     const viewingTimer = setInterval(() => {
       const viewingDuration = Date.now() - viewingStartTime;
       const seconds = Math.floor(viewingDuration / 1000);
-      console.log(`${seconds}/30s`);
       
       if (!addedToContinueWatching && viewingDuration >= 30000) {
         addedToContinueWatching = true;

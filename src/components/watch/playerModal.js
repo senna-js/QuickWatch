@@ -180,7 +180,6 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
           season: initialSeason,
           episode: initialEpisode,
           sourceIndex: sourceIndex,
-          timestamp: new Date().toISOString()
         }));
       } else {
         localStorage.setItem(`source-pref-${type}-${id}`, sourceIndex);

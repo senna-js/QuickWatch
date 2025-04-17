@@ -100,7 +100,6 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
           season: initialSeason,
           episode: parseInt(episodeNumber),
           sourceIndex: initialSourceIndex,
-          timestamp: new Date().toISOString()
         }));
       }
     });

@@ -174,7 +174,6 @@ export async function initSeasonSelector(id, data, seasonData, initialSeason, in
                     season: initialSeason,
                     episode: parseInt(episodeNumber),
                     sourceIndex: initialSourceIndex,
-                    timestamp: new Date().toISOString()
                   }));
                 }
               });
