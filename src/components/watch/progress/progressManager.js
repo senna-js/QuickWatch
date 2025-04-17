@@ -1,3 +1,5 @@
+import { setupVideasyTracking } from "./sourceTrackers";
+
 export function initializeProgressTracking(playerIframe, sourceType, mediaId, mediaType, season, episode, sourceIndex) {
   switch (sourceType) {
     case 'VidLink':
@@ -13,7 +15,7 @@ export function initializeProgressTracking(playerIframe, sourceType, mediaId, me
       // Will be implemented when format is provided
       break;
     case 'Videasy':
-      // Will be implemented when format is provided
+      setupVideasyTracking(playerIframe, mediaId, mediaType, season, episode, sourceIndex);
       break;
     default:
       console.log(`Progress tracking not implemented for ${sourceType}`);
@@ -106,12 +108,13 @@ export function saveProgress(progressData) {
 export function getProgress(mediaId, mediaType, season = 0, episode = 0) {
   try {
     const continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+    console.log('continueData:', continueData);
     
     return continueData.find(item => 
-      item.id === mediaId && 
-      item.mediaType === mediaType &&
+      item.id ===parseInt(mediaId) && 
+      item.mediaType === String(mediaType) &&
       (mediaType === 'movie' || 
-       (item.season === season && item.episode === episode))
+       (item.season === parseInt(season) && item.episode === parseInt(episode)))
     ) || null;
   } catch (error) {
     console.error('Error getting progress:', error);

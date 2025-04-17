@@ -137,7 +137,7 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
   };
   
   import('../watch/progress/index.js').then(module => {
-    const { initializeSourceTracking } = module;
+    const { initializeSourceTracking, getProgress } = module;
     
     if (playButton && playerModal && closeModal) {
       playButton.addEventListener('click', () => {
@@ -147,14 +147,18 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
         
         if (mediaPlayer) {
           const currentSource = sources[initialSourceIndex];
+          // get existing progress before initializing new tracking
+          const existingProgress = getProgress(parseInt(id), type, initialSeason, initialEpisode);
+          
           currentTrackerCleanup = initializeSourceTracking(
             mediaPlayer,
             currentSource,
-            id,
+            parseInt(id),
             type,
             initialSeason,
             initialEpisode,
-            initialSourceIndex
+            initialSourceIndex,
+            existingProgress
           );
           
           mediaPlayer.addEventListener('load', () => {
@@ -254,35 +258,42 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
           );
         }
         
+        // replace the progress data section in the source button click handler
+        const existingProgress = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+        const existingItem = existingProgress.find(item => 
+        item.id === parseInt(id) && 
+        item.mediaType === type &&
+        (type === 'movie' || (item.season === parseInt(initialSeason) && item.episode === parseInt(initialEpisode)))
+        );
+        
         const progressData = {
-          id: id,
-          mediaType: type,
-          season: parseInt(initialSeason) || 0,
-          episode: parseInt(initialEpisode) || 0,
-          sourceIndex: sourceIndex,
-          lastViewed: new Date().toISOString()
+        id: parseInt(id),
+        mediaType: type,
+        season: parseInt(initialSeason) || 0,
+        episode: parseInt(initialEpisode) || 0,
+        sourceIndex: sourceIndex,
+        fullDuration: existingItem?.fullDuration || 0,
+        watchedDuration: existingItem?.watchedDuration || 0,
+        timestamp: Date.now()
         };
         
-        const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-        
-        const existingIndex = continueWatching.findIndex(item => 
-          item.id === id && item.mediaType === type
+        const existingIndex = existingProgress.findIndex(item => 
+        item.id === parseInt(id) && 
+        item.mediaType === type &&
+        (type === 'movie' || (item.season === parseInt(initialSeason) && item.episode === parseInt(initialEpisode)))
         );
         
         if (existingIndex !== -1) {
-          continueWatching[existingIndex] = {
-            ...continueWatching[existingIndex],
-            ...progressData
-          };
+        existingProgress[existingIndex] = progressData;
         } else {
-          continueWatching.unshift(progressData);
-          
-          if (continueWatching.length > 10) {
-            continueWatching.pop();
-          }
+        existingProgress.unshift(progressData);
+        
+        if (existingProgress.length > 50) {
+        existingProgress.pop();
+        }
         }
         
-        localStorage.setItem('quickwatch-continue', JSON.stringify(continueWatching));
+        localStorage.setItem('quickwatch-continue', JSON.stringify(existingProgress));
       });
     });
   });
