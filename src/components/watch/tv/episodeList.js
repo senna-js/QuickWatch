@@ -1,14 +1,39 @@
 // Episode List Component
 import { TMDB_IMAGE_BASE_URL } from '../../../router.js';
 
-/**
- * Renders the episode list for TV shows
- * @param {Array} episodes - Array of episode data
- * @param {string} contentRating - Content rating of the TV show
- * @param {boolean} isMobile - Whether the list is for mobile view
- * @returns {string} HTML for the episode list
- */
+
+function getEpisodeProgress(id, season, episode) {
+  const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+  const savedItem = continueWatching.find(item => 
+    item.id === parseInt(id) &&
+    item.mediaType === 'tv' && 
+    item.season === parseInt(season) && 
+    item.episode === parseInt(episode) 
+  );
+  
+  if (savedItem) {
+    // calculate progress
+    const progress = savedItem.fullDuration > 0 ? 
+      savedItem.watchedDuration / savedItem.fullDuration : 0;
+    
+    return {
+      progress: progress,
+      duration: savedItem.fullDuration || 0,
+      fullDuration: savedItem.fullDuration || 0,
+      watchedDuration: savedItem.watchedDuration || 0,
+      remaining: savedItem.fullDuration ? 
+        Math.round((savedItem.fullDuration - savedItem.watchedDuration) / 60) : 0
+    };
+  }
+  
+  return null;
+}
+
 export function renderEpisodeList(episodes, contentRating, isMobile = false) {
+  const urlPath = window.location.pathname;
+  const idMatch = urlPath.match(/\/tv\/(\d+)/);
+  const showId = idMatch ? idMatch[1] : '';
+  
   if (isMobile) {
     return `
       <div class="flex flex-col" id="episodes-list">
@@ -22,6 +47,18 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
                   <i class="fas fa-play text-white text-lg" style="filter: drop-shadow(2px 2px 8px black);"></i>
                 </div>
               </div>
+              ${(() => {
+                const progress = getEpisodeProgress(showId, episode.season_number, episode.episode_number);
+                if (progress) {
+                  return `
+                  <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent h-12"></div>
+                  <div class="absolute inset-x-0 bottom-0 h-1 bg-gray-800">
+                    <div class="h-full bg-[#2392EE]" style="width: ${progress.progress * 100}%"></div>
+                  </div>
+                  `;
+                }
+                return '';
+              })()}
             </div>
           </div>
           <div class="flex flex-col justify-center flex-1">
@@ -47,6 +84,18 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
           <div class="relative">
             <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative">
               <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
+              ${(() => {
+                const progress = getEpisodeProgress(showId, episode.season_number, episode.episode_number);
+                if (progress) {
+                  return `
+                  <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent h-16"></div>
+                  <div class="absolute inset-x-0 bottom-0 h-1.5 bg-gray-800">
+                    <div class="h-full bg-[#2392EE]" style="width: ${progress.progress * 100}%"></div>
+                  </div>
+                  `;
+                }
+                return '';
+              })()}
             </div>
           </div>
           <div class="flex flex-col justify-start">
@@ -76,8 +125,11 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
  * @param {Array} sources - Array of video sources
  * @param {number} initialSourceIndex - Index of the initially selected source
  */
-export function initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex) {
+export function initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex, episodes = []) {
   const episodeItems = document.querySelectorAll('.episode-item');
+  
+  updateProgressIndicators(id, initialSeason);
+  
   episodeItems.forEach(item => {
     item.addEventListener('click', () => {
       const episodeNumber = item.dataset.episode;
@@ -88,20 +140,140 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
           .replace('{season}', initialSeason)
           .replace('{episode}', episodeNumber);
         
-        // Update player and show modal
-        const mediaPlayer = document.getElementById('media-player');
-        if (mediaPlayer) {
-          mediaPlayer.src = newUrl;
-          document.getElementById('player-modal').classList.remove('hidden');
+        const playerModal = document.getElementById('player-modal');
+        if (playerModal) {
+          playerModal.classList.remove('hidden');
+          
+          const iframeContainer = document.getElementById('iframe-container');
+          if (iframeContainer) {
+            while (iframeContainer.querySelector('iframe')) {
+              iframeContainer.querySelector('iframe').remove();
+            }
+            
+            const iframe = document.createElement('iframe');
+            iframe.id = 'media-player';
+            iframe.src = newUrl;
+            iframe.className = window.innerWidth <= 768 ? 'w-full h-full rounded-none' : 'w-full rounded-xl';
+            if (window.innerWidth > 768) iframe.height = '700';
+            iframe.frameBorder = '0';
+            iframe.allowFullscreen = true;
+            
+            iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
+            iframeContainer.classList.add('loading');
+            
+            iframe.addEventListener('load', () => {
+              iframeContainer.classList.remove('loading');
+            });
+
+            import('../progress/index.js').then(module => {
+              const { initializeSourceTracking } = module;
+              const cleanup = initializeSourceTracking(
+                iframe,
+                selectedSource,
+                id,
+                'tv',
+                initialSeason,
+                initialEpisode,
+                initialSourceIndex
+              );
+
+              // clean up previous tracking
+              const closeModal = document.getElementById('close-modal');
+              if (closeModal) {
+                const closeHandler = () => {
+                  cleanup();
+                  closeModal.removeEventListener('click', closeHandler);
+                };
+                closeModal.addEventListener('click', closeHandler);
+              }
+            });
+          }
         }
         
         // Save progress
-        localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
+        const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+        
+        const existingIndex = continueWatching.findIndex(item => 
+          item.id === id && item.mediaType === 'tv'
+        );
+        
+        if (existingIndex !== -1) {
+          continueWatching.splice(existingIndex, 1);
+        }
+        
+        // Find episode duration from episodes array if available
+        let episodeDuration = 1800; // Default to 30 minutes
+        if (episodes && episodes.length > 0) {
+          const episode = episodes.find(ep => ep.episode_number === parseInt(episodeNumber));
+          if (episode && episode.runtime) {
+            episodeDuration = episode.runtime * 60;
+          }
+        }
+        
+        continueWatching.unshift({
+          id: id,
+          mediaType: 'tv',
           season: initialSeason,
           episode: parseInt(episodeNumber),
           sourceIndex: initialSourceIndex,
-        }));
+          progress: 0,
+          duration: episodeDuration,
+          fullDuration: episodeDuration,
+          watchedDuration: 0,
+          timestamp: Date.now()
+        });
+        
+        if (continueWatching.length > 10) {
+          continueWatching.pop();
+        }
+        
+        localStorage.setItem('quickwatch-continue', JSON.stringify(continueWatching));
       }
     });
+  });
+}
+
+function updateProgressIndicators(id, season) {
+  console.log(`Updating progress indicators for show ${id}, season ${season}`);
+  const episodeItems = document.querySelectorAll('.episode-item');
+  
+  episodeItems.forEach(item => {
+    const episodeNumber = parseInt(item.dataset.episode);
+    const progress = getEpisodeProgress(id, season, episodeNumber);
+    
+    console.log(`Episode ${episodeNumber} progress:`, progress);
+    
+    let progressBar = item.querySelector('.progress-bar');
+    let progressOverlay = item.querySelector('.progress-overlay');
+    let remainingTime = item.querySelector('.remaining-time');
+    
+    if (progressBar) progressBar.remove();
+    if (progressOverlay) progressOverlay.remove();
+    if (remainingTime) remainingTime.remove();
+    
+    if (progress) {
+      console.log(`Adding progress for episode ${episodeNumber}`);
+      const thumbnailContainer = item.querySelector('.bg-zinc-600');
+      if (thumbnailContainer) {
+        progressOverlay = document.createElement('div');
+        progressOverlay.className = 'progress-overlay absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent';
+        progressOverlay.style.height = '16px';
+        thumbnailContainer.appendChild(progressOverlay);
+        
+        progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar absolute inset-x-0 bottom-0 h-1.5 bg-gray-800';
+        
+        const progressValue = typeof progress.progress === 'number' ? 
+          Math.min(Math.max(progress.progress, 0), 1) : 0;
+        
+        progressBar.innerHTML = `<div class="h-full bg-[#2392EE]" style="width: ${progressValue * 100}%"></div>`;
+        thumbnailContainer.appendChild(progressBar);
+        
+        remainingTime = document.createElement('div');
+        remainingTime.className = 'remaining-time absolute bottom-2 right-3 text-sm text-white font-medium';
+        remainingTime.textContent = `${progress.remaining || 0}m left`;
+        thumbnailContainer.appendChild(remainingTime);
+      }
+    }
   });
 }

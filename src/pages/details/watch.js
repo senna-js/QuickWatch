@@ -76,46 +76,6 @@ async function loadMediaDetails(type, id) {
     
     window.splashScreen?.completeStep(mediaDetailsStep);
     
-    const viewingStartTime = Date.now();
-    const currentMedia = { id, mediaType: type };
-    let addedToContinueWatching = false;
-    
-    const viewingTimer = setInterval(() => {
-      const viewingDuration = Date.now() - viewingStartTime;
-      const seconds = Math.floor(viewingDuration / 1000);
-      
-      if (!addedToContinueWatching && viewingDuration >= 30000) {
-        addedToContinueWatching = true;
-        const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-        
-        const existingIndex = continueWatching.findIndex(item => 
-          item.id === currentMedia.id && item.mediaType === currentMedia.mediaType
-        );
-        
-        if (existingIndex !== -1) {
-          continueWatching.splice(existingIndex, 1);
-        }
-        
-        continueWatching.unshift({
-          id: currentMedia.id,
-          mediaType: currentMedia.mediaType
-        });
-        
-        if (continueWatching.length > 10) {
-          continueWatching.pop();
-        }
-        
-        localStorage.setItem('quickwatch-continue', JSON.stringify(continueWatching));
-        console.log('Added to continue watching list after 30s of viewing');
-      }
-    }, 5000);
-    
-    window.addEventListener('beforeunload', () => {
-      clearInterval(viewingTimer);
-      const viewingDuration = Date.now() - viewingStartTime;
-      console.log(`Final viewing time: ${Math.floor(viewingDuration / 1000)} seconds`);
-    });
-    
     const seasonStep = window.splashScreen?.addStep('Fetching season data...');
     
     let seasonData = null;
@@ -128,10 +88,12 @@ async function loadMediaDetails(type, id) {
     let initialEpisode = 1;
     
     if (type === 'tv') {
-      const savedProgress = JSON.parse(localStorage.getItem(`tv-progress-${id}`) || '{}');
-      if (savedProgress.season && savedProgress.episode) {
-        initialSeason = savedProgress.season;
-        initialEpisode = savedProgress.episode;
+      const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+      const savedItem = continueWatching.find(item => item.id === id && item.mediaType === type);
+      
+      if (savedItem && savedItem.season && savedItem.episode) {
+        initialSeason = savedItem.season;
+        initialEpisode = savedItem.episode;
         if (initialSeason !== 1) {
           const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/${initialSeason}?language=en-US`, options);
           seasonData = await seasonResponse.json();
@@ -191,14 +153,18 @@ async function loadMediaDetails(type, id) {
 
     let initialSourceIndex = 0;
     if (type === 'tv') {
-      const savedProgress = JSON.parse(localStorage.getItem(`tv-progress-${id}`) || '{}');
-      if (savedProgress.sourceIndex !== undefined && savedProgress.sourceIndex >= 0 && savedProgress.sourceIndex < sources.length) {
-        initialSourceIndex = savedProgress.sourceIndex;
+      const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+      const savedItem = continueWatching.find(item => item.id === id && item.mediaType === type);
+      
+      if (savedItem && savedItem.sourceIndex !== undefined && savedItem.sourceIndex >= 0 && savedItem.sourceIndex < sources.length) {
+        initialSourceIndex = savedItem.sourceIndex;
       }
     } else {
-      const savedSourcePref = JSON.parse(localStorage.getItem(`source-pref-${type}-${id}`) || 'null');
-      if (savedSourcePref !== null && savedSourcePref >= 0 && savedSourcePref < sources.length) {
-        initialSourceIndex = savedSourcePref;
+      const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+      const savedItem = continueWatching.find(item => item.id === id && item.mediaType === type);
+      
+      if (savedItem && savedItem.sourceIndex !== undefined && savedItem.sourceIndex >= 0 && savedItem.sourceIndex < sources.length) {
+        initialSourceIndex = savedItem.sourceIndex;
       }
     }
 

@@ -14,25 +14,12 @@ import { renderSpinner } from '../misc/loading.js';
  * @returns {string} HTML for the player modal
  */
 export function renderPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, mediaTitle, isMobile = false) {
-  const defaultSource = sources[initialSourceIndex];
-  const iframeUrl = type === 'movie' 
-    ? defaultSource.movieUrl 
-    : defaultSource.tvUrl
-        .replace('{season}', initialSeason)
-        .replace('{episode}', initialEpisode);
-  
   if (isMobile) {
     return `
       <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex flex-col items-center justify-between p-0">
         <div class="relative w-full h-full flex flex-col">
-          <div class="iframe-container loading rounded-none flex-grow">
-            <iframe 
-              id="media-player"
-              src="${iframeUrl}" 
-              class="w-full h-full rounded-none" 
-              frameborder="0" 
-              allowfullscreen
-            ></iframe>
+          <div class="iframe-container loading rounded-none flex-grow" id="iframe-container">
+            <!-- iframe goes here -->
             <div class="iframe-loader">
               ${renderSpinner('large')}
             </div>
@@ -72,15 +59,8 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
             <i class="icon-x"></i> Close
           </button>
           
-          <div class="iframe-container loading rounded">
-            <iframe 
-              id="media-player"
-              src="${iframeUrl}" 
-              class="w-full rounded-xl" 
-              height="700" 
-              frameborder="0" 
-              allowfullscreen
-            ></iframe>
+          <div class="iframe-container loading rounded" id="iframe-container">
+            <!-- iframe goes here -->
             <div class="iframe-loader">
               ${renderSpinner('large')}
             </div>
@@ -124,75 +104,200 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
   const playButton = document.getElementById('play-button');
   const playerModal = document.getElementById('player-modal');
   const closeModal = document.getElementById('close-modal');
+  let mediaPlayer = null;
+  let currentTrackerCleanup = null;
   
-  if (playButton && playerModal && closeModal) {
-    playButton.addEventListener('click', () => {
-      playerModal.classList.remove('hidden');
-    });
+  const createIframe = () => {
+    const iframeContainer = document.getElementById('iframe-container');
+    if (!iframeContainer) return;
     
-    closeModal.addEventListener('click', () => {
-      playerModal.classList.add('hidden');
-    });
-  }
-
-  // media player load event
-  const mediaPlayer = document.getElementById('media-player');
-  const iframeContainer = mediaPlayer?.parentElement;
-  if (mediaPlayer && iframeContainer) {
-    mediaPlayer.addEventListener('load', () => {
-      iframeContainer.classList.remove('loading');
-    });
-  }
-
-  // source selection
-  const sourceButtons = document.querySelectorAll('.source-button');
-  sourceButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const sourceIndex = parseInt(button.dataset.index);
-      if (isNaN(sourceIndex) || sourceIndex < 0 || sourceIndex >= sources.length) return;
-      
-      initialSourceIndex = sourceIndex;
-      const selectedSource = sources[sourceIndex];
-      
-      // update active button styling
-      sourceButtons.forEach(btn => {
-        btn.classList.remove('bg-[#2392EE]');
-        btn.classList.add('bg-[#32363D]');
+    while (iframeContainer.querySelector('iframe')) {
+      iframeContainer.querySelector('iframe').remove();
+    }
+    
+    const defaultSource = sources[initialSourceIndex];
+    const iframeUrl = type === 'movie' 
+      ? defaultSource.movieUrl 
+      : defaultSource.tvUrl
+          .replace('{season}', initialSeason)
+          .replace('{episode}', initialEpisode);
+    
+    const iframe = document.createElement('iframe');
+    iframe.id = 'media-player';
+    iframe.src = iframeUrl;
+    iframe.className = isMobile ? 'w-full h-full rounded-none' : 'w-full rounded-xl';
+    if (!isMobile) iframe.height = '700';
+    iframe.frameBorder = '0';
+    iframe.allowFullscreen = true;
+    
+    iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
+    iframeContainer.classList.add('loading');
+    
+    return iframe;
+  };
+  
+  import('../watch/progress/index.js').then(module => {
+    const { initializeSourceTracking } = module;
+    
+    if (playButton && playerModal && closeModal) {
+      playButton.addEventListener('click', () => {
+        playerModal.classList.remove('hidden');
+        
+        mediaPlayer = createIframe();
+        
+        if (mediaPlayer) {
+          const currentSource = sources[initialSourceIndex];
+          currentTrackerCleanup = initializeSourceTracking(
+            mediaPlayer,
+            currentSource,
+            id,
+            type,
+            initialSeason,
+            initialEpisode,
+            initialSourceIndex
+          );
+          
+          mediaPlayer.addEventListener('load', () => {
+            const iframeContainer = mediaPlayer.parentElement;
+            if (iframeContainer) {
+              iframeContainer.classList.remove('loading');
+            }
+          });
+        }
       });
-      button.classList.remove('bg-[#32363D]');
-      button.classList.add('bg-[#2392EE]');
       
-      // update iframe URL
-      const newUrl = type === 'movie'
-        ? selectedSource.movieUrl
-        : selectedSource.tvUrl
-            .replace('{season}', initialSeason)
-            .replace('{episode}', initialEpisode);
-      
-      if (mediaPlayer) {
-        mediaPlayer.src = newUrl;
-        iframeContainer.classList.add('loading');
-      }
-      
-      // save source preference
-      if (type === 'tv') {
-        localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
-          season: initialSeason,
-          episode: initialEpisode,
+      closeModal.addEventListener('click', () => {
+        playerModal.classList.add('hidden');
+        
+        if (currentTrackerCleanup) {
+          currentTrackerCleanup();
+          currentTrackerCleanup = null;
+        }
+        
+        const iframeContainer = document.getElementById('iframe-container');
+        if (iframeContainer && iframeContainer.querySelector('iframe')) {
+          iframeContainer.querySelector('iframe').remove();
+          mediaPlayer = null;
+        }
+      });
+    }
+  
+    // media player load event
+    const iframeContainer = mediaPlayer?.parentElement;
+    if (mediaPlayer && iframeContainer) {
+      mediaPlayer.addEventListener('load', () => {
+        iframeContainer.classList.remove('loading');
+      });
+    }
+  
+    // source selection
+    const sourceButtons = document.querySelectorAll('.source-button');
+    sourceButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const sourceIndex = parseInt(button.dataset.index);
+        if (isNaN(sourceIndex) || sourceIndex < 0 || sourceIndex >= sources.length) return;
+        
+        initialSourceIndex = sourceIndex;
+        const selectedSource = sources[sourceIndex];
+        
+        // update active button styling
+        sourceButtons.forEach(btn => {
+          btn.classList.remove('bg-[#2392EE]');
+          btn.classList.add('bg-[#32363D]');
+        });
+        button.classList.remove('bg-[#32363D]');
+        button.classList.add('bg-[#2392EE]');
+        
+        if (currentTrackerCleanup) {
+          currentTrackerCleanup();
+          currentTrackerCleanup = null;
+        }
+        
+        const iframeContainer = document.getElementById('iframe-container');
+        if (iframeContainer) {
+          iframeContainer.classList.add('loading');
+          
+          if (iframeContainer.querySelector('iframe')) {
+            iframeContainer.querySelector('iframe').remove();
+          }
+          
+          const newUrl = type === 'movie'
+            ? selectedSource.movieUrl
+            : selectedSource.tvUrl
+                .replace('{season}', initialSeason)
+                .replace('{episode}', initialEpisode);
+          
+          const iframe = document.createElement('iframe');
+          iframe.id = 'media-player';
+          iframe.src = newUrl;
+          iframe.className = isMobile ? 'w-full h-full rounded-none' : 'w-full rounded-xl';
+          if (!isMobile) iframe.height = '700';
+          iframe.frameBorder = '0';
+          iframe.allowFullscreen = true;
+          
+          iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
+          
+          mediaPlayer = iframe;
+          
+          mediaPlayer.addEventListener('load', () => {
+            iframeContainer.classList.remove('loading');
+          });
+          
+          currentTrackerCleanup = initializeSourceTracking(
+            mediaPlayer,
+            selectedSource,
+            id,
+            type,
+            initialSeason,
+            initialEpisode,
+            sourceIndex
+          );
+        }
+        
+        const progressData = {
+          id: id,
+          mediaType: type,
+          season: parseInt(initialSeason) || 0,
+          episode: parseInt(initialEpisode) || 0,
           sourceIndex: sourceIndex,
-        }));
-      } else {
-        localStorage.setItem(`source-pref-${type}-${id}`, sourceIndex);
-      }
+          lastViewed: new Date().toISOString()
+        };
+        
+        const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+        
+        const existingIndex = continueWatching.findIndex(item => 
+          item.id === id && item.mediaType === type
+        );
+        
+        if (existingIndex !== -1) {
+          continueWatching[existingIndex] = {
+            ...continueWatching[existingIndex],
+            ...progressData
+          };
+        } else {
+          continueWatching.unshift(progressData);
+          
+          if (continueWatching.length > 10) {
+            continueWatching.pop();
+          }
+        }
+        
+        localStorage.setItem('quickwatch-continue', JSON.stringify(continueWatching));
+      });
     });
   });
 
   const popupBlocker = document.getElementById('popup-blocker');
   let popupBlockerEnabled = false;
   
-  if (popupBlocker && mediaPlayer) {
+  if (popupBlocker) {
     popupBlocker.addEventListener('click', () => {
       popupBlockerEnabled = !popupBlockerEnabled;
+      
+      const mediaPlayer = document.getElementById('media-player');
+      const iframeContainer = document.getElementById('iframe-container');
+      
+      if (!mediaPlayer || !iframeContainer) return;
       
       if (popupBlockerEnabled) {
         mediaPlayer.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation');

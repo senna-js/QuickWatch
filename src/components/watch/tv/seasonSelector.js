@@ -170,11 +170,29 @@ export async function initSeasonSelector(id, data, seasonData, initialSeason, in
                   }
                   
                   // Save progress
-                  localStorage.setItem(`tv-progress-${id}`, JSON.stringify({
+                  const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+                  
+                  const existingIndex = continueWatching.findIndex(item => 
+                    item.id === id && item.mediaType === 'tv'
+                  );
+                  
+                  if (existingIndex !== -1) {
+                    continueWatching.splice(existingIndex, 1);
+                  }
+                  
+                  continueWatching.unshift({
+                    id: id,
+                    mediaType: 'tv',
                     season: initialSeason,
                     episode: parseInt(episodeNumber),
                     sourceIndex: initialSourceIndex,
-                  }));
+                  });
+                  
+                  if (continueWatching.length > 10) {
+                    continueWatching.pop();
+                  }
+                  
+                  localStorage.setItem('quickwatch-continue', JSON.stringify(continueWatching));
                 }
               });
             });
