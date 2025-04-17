@@ -161,3 +161,8 @@ button {
   margin-left: 4.4rem;
   }
 }
+
+::selection {
+  background-color: #b5b9be3c;
+  color: #fff;
+}

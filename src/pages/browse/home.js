@@ -215,6 +215,16 @@ async function loadContinueWatching() {
       detailData.timestamp = item.timestamp;
       detailData.season = item.season;
       detailData.episode = item.episode;
+
+      const recents = JSON.parse(localStorage.getItem('quickwatch-recents') || '[]');
+      const latestEpisodeInfo = recents
+        .filter(recent => recent.id === item.id && recent.mediaType === item.mediaType)
+        .sort((a, b) => b.timestamp - a.timestamp)[0];
+
+      if (latestEpisodeInfo) {
+        detailData.season = latestEpisodeInfo.season;
+        detailData.episode = latestEpisodeInfo.episode;
+      }
       
       const removeCallback = (id, mediaType) => {
         removeFromContinueWatching(id, mediaType);
@@ -247,10 +257,10 @@ async function loadContinueWatching() {
         carouselItem.appendChild(progressBar);
         
         // episode info for tv shows
-        if (item.mediaType === 'tv' && item.season !== 0) {
+        if (item.mediaType === 'tv' && detailData.season !== 0) {
           const episodeInfo = document.createElement('div');
           episodeInfo.className = 'absolute bottom-2 left-2 text-white text-sm';
-          episodeInfo.textContent = `S${item.season} E${item.episode}`;
+          episodeInfo.textContent = `S${detailData.season} E${detailData.episode}`;
           carouselItem.appendChild(episodeInfo);
         }
         

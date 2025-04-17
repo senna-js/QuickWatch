@@ -193,7 +193,7 @@ async function loadMediaDetails(type, id) {
 
       function formatRemainingTime(duration, watched) {
         const remainingMinutes = Math.round((duration - watched) / 60);
-        if (remainingMinutes <= 0) return null;
+        if (remainingMinutes <= 0) return "Completed";
         
         if (remainingMinutes >= 60) {
           const hours = Math.floor(remainingMinutes / 60);
@@ -248,10 +248,50 @@ async function loadMediaDetails(type, id) {
                   ${(() => {
                     if (type === 'tv') {
                       const progress = getProgress(id, 'tv', initialSeason, initialEpisode);
+                      const remainingMinutes = progress ? Math.round((progress.fullDuration - progress.watchedDuration) / 60) : 0;
+                      
+                      if (progress && remainingMinutes <= 5) {
+                        // Check if there are more episodes in current season
+                        const nextEpisode = initialEpisode + 1;
+                        if (nextEpisode <= seasonData.episodes.length) {
+                          return `
+                            <span class="mr-2 font-bold">Watch Episode ${nextEpisode}</span>
+                            <span class="mr-2 text-base font-regular text-[#a5abb5]">Next episode</span>
+                            <span class="hidden" id="next-episode-data" 
+                              data-season="${initialSeason}" 
+                              data-episode="${nextEpisode}">
+                            </span>
+                          `;
+                        } else {
+                          // Check if there are more seasons
+                          const nextSeason = initialSeason + 1;
+                          if (nextSeason <= data.number_of_seasons) {
+                            return `
+                              <span class="mr-2 font-bold">Watch Season ${nextSeason}</span>
+                              <span class="mr-2 text-base font-regular text-[#a5abb5]">Next season</span>
+                              <span class="hidden" id="next-episode-data" 
+                                data-season="${nextSeason}" 
+                                data-episode="1">
+                              </span>
+                            `;
+                          } else {
+                            // No more seasons: rewatch
+                            return `
+                              <span class="mr-2 font-bold">Rewatch Episode 1</span>
+                              <span class="mr-2 text-base font-regular text-[#a5abb5]">Start over</span>
+                              <span class="hidden" id="next-episode-data" 
+                                data-season="1" 
+                                data-episode="1">
+                              </span>
+                            `;
+                          }
+                        }
+                      }
+                      
                       return `
                         <span class="mr-2 font-bold">Continue Episode ${initialEpisode}</span>
                         <span class="mr-2 text-base font-regular text-[#a5abb5]">${progress && progress.watchedDuration > 0 ? 
-                          `${Math.round((progress.fullDuration - progress.watchedDuration) / 60)}min left` : 
+                          `${remainingMinutes}min left` : 
                           'Start watching'}</span>
                       `;
                     } else {
@@ -301,6 +341,42 @@ async function loadMediaDetails(type, id) {
 
     initPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode);
   
+    if (type === 'tv') {
+      const playButton = document.getElementById('play-button');
+      const nextEpisodeData = document.getElementById('next-episode-data');
+      
+      if (playButton && nextEpisodeData) {
+        const originalClickHandler = playButton.onclick;
+        playButton.onclick = null;
+        
+        playButton.addEventListener('click', () => {
+          // if we have next episode data, update the initialSeason and initialEpisode
+          if (nextEpisodeData) {
+            const nextSeason = parseInt(nextEpisodeData.dataset.season);
+            const nextEpisode = parseInt(nextEpisodeData.dataset.episode);
+            
+            if (!isNaN(nextSeason) && !isNaN(nextEpisode)) {
+              const modal = document.getElementById('player-modal');
+              if (modal) {
+                // BUG: for some reason the previous episode is still playing when the next episode is clicked. !todo
+                const modalContent = renderPlayerModal(type, id, sources, initialSourceIndex, nextSeason, nextEpisode, mediaTitle);
+                modal.outerHTML = modalContent;
+                initPlayerModal(type, id, sources, initialSourceIndex, nextSeason, nextEpisode);
+                
+                document.getElementById('player-modal').classList.remove('hidden');
+                return;
+              }
+            }
+          }
+          
+          const playerModal = document.getElementById('player-modal');
+          if (playerModal) {
+            playerModal.classList.remove('hidden');
+          }
+        });
+      }
+    }
+    
     // watchlist button
     const watchlistButton = detailsContainer.querySelector('.add-to-watchlist');
     if (watchlistButton) {
