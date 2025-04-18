@@ -10,7 +10,6 @@ import { createCarouselItem } from '../../components/carouselItem.js';
 export function renderHomePage(container) {
   window.splashScreen.show();
   const heroLoadingStep = window.splashScreen.addStep('Loading hero content...');
-  const continueWatchingStep = window.splashScreen.addStep('Loading continue watching...');
   const trendingMoviesStep = window.splashScreen.addStep('Loading trending movies...');
   const trendingTVStep = window.splashScreen.addStep('Loading trending TV shows...');
   const topRatedStep = window.splashScreen.addStep('Loading top rated movies...');
@@ -75,7 +74,6 @@ export function renderHomePage(container) {
   
   fetchAllCategories({
     hero: heroLoadingStep,
-    continueWatching: continueWatchingStep,
     trendingMovies: trendingMoviesStep,
     trendingTV: trendingTVStep,
     topRated: topRatedStep,
@@ -90,7 +88,7 @@ async function fetchAllCategories(loadingSteps) {
   try {
     let imageLoadingPromises = [];
     
-    await loadContinueWatching(loadingSteps.continueWatching);
+    await loadContinueWatching();
     
     const isMobile = window.innerWidth < 768;
     
@@ -177,6 +175,7 @@ async function fetchAllCategories(loadingSteps) {
         window.splashScreen.completeStep(category.loadingStep);
       }
     }
+    window.splashScreen.hide();
   } catch (error) {
     console.error('Error fetching categories:', error);
     for (const step of Object.values(loadingSteps)) {
@@ -186,10 +185,9 @@ async function fetchAllCategories(loadingSteps) {
   }
 }
 
-async function loadContinueWatching(loadingStep) {
+async function loadContinueWatching() {
   const continueWatchingContainer = document.querySelector('#continue-watching');
   if (!continueWatchingContainer) {
-    if (loadingStep) window.splashScreen.completeStep(loadingStep);
     return;
   }
   
@@ -216,7 +214,6 @@ async function loadContinueWatching(loadingStep) {
       sectionTitle.style.display = 'none';
     }
     continueWatchingContainer.style.display = 'none';
-    if (loadingStep) window.splashScreen.completeStep(loadingStep);
     return;
   }
 

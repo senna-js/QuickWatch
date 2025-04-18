@@ -35,8 +35,8 @@ export function renderHeader() {
         <a href="/tv" class="px-4 py-2 rounded-lg pagebtn ${isTv ? 'active' : ''}">TV shows</a>
       </div>
       <div class="flex items-center flex-row gap-2">
-        <a href="/watchlist" class="px-4 py-2 rounded-lg pagebtn ${isWatchlist ? 'active' : ''}">Watchlist</a>
-        <a href="/search" class="px-4 py-2 rounded-lg pagebtn ${isSearch ? 'active' : ''}">Search</a>
+        <a href="/search" class="px-3 py-2 rounded-full pagebtn ${isSearch ? 'active' : ''}"><i class="fas fa-search aspect-square"></i></a>
+        <a href="/watchlist" class="px-3.5 py-2 rounded-full pagebtn ${isWatchlist ? 'active' : ''}"><i class="${isWatchlist ? 'fas' : 'far'} fa-bookmark aspect-square"></i></a>
       </div>
     </header>
     
