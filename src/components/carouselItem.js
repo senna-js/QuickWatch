@@ -10,14 +10,18 @@ import { TMDB_IMAGE_BASE_URL } from '../router.js';
  * @param {Function} onRemove - Optional callback when remove button is clicked
  * @param {boolean} usePoster - Whether to use poster instead of backdrop
  * @param {Function} onLoaded - Optional callback when the image has loaded
+ * @param {Object} progressData - Optional progress data {percentage, watchedDuration, fullDuration}
+ * @param {Object} episodeInfo - Optional episode info for TV shows {season, episode}
  * @returns {HTMLElement} - The carousel item element
  */
-export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null, usePoster = false, onLoaded = null) {
+export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null, usePoster = false, onLoaded = null, progressData = null, episodeInfo = null) {
   const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
   const title = item.title || item.name;
   const releaseDate = item.release_date || item.first_air_date;
   const formattedDate = releaseDate ? new Date(releaseDate).getFullYear() : '';
   const rating = item.vote_average ? Math.round(item.vote_average * 10) / 10 : '';
+  const storedProgressData = getWatchProgress(item.id);
+  const displayProgressData = progressData || storedProgressData;
   
   let imagePath;
   
@@ -69,8 +73,9 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   
   // overlay with details
   const overlay = document.createElement('div');
-  overlay.className = 'w-full h-full flex flex-col justify-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity duration-300';
-  
+  overlay.className = displayProgressData?.continueText 
+  ? 'w-full h-full flex flex-col justify-start p-4 bg-gradient-to-b from-black/80 to-transparent opacity-0 transition-opacity duration-300'
+  : 'w-full h-full flex flex-col justify-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity duration-300';
   // title
   const titleElement = document.createElement('h3');
   titleElement.className = 'text-white font-semibold text-lg';
@@ -125,31 +130,33 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   overlay.appendChild(titleElement);
   overlay.appendChild(detailsContainer);
   
-  // check for watch progress
-  const progressData = getWatchProgress(item.id);
-  if (progressData) {
-    const progressContainer = document.createElement('div');
-    progressContainer.className = 'mt-3';
+  if (displayProgressData) {
     
-    const progressBarContainer = document.createElement('div');
-    progressBarContainer.className = 'w-full h-1 bg-zinc-700 rounded-full';
+    if (displayProgressData.continueText) {
+      const continueTextElement = document.createElement('div');
+      continueTextElement.className = 'text-sm font-bold text-white absolute m-2 bottom-0 z-[3]';
+      continueTextElement.style.textShadow = '0 0 0.5rem #000';
+      continueTextElement.innerHTML = displayProgressData.statusText 
+        ? `${displayProgressData.continueText} <span class="font-light">(${displayProgressData.statusText})</span>`
+        : displayProgressData.continueText;
+      card.appendChild(continueTextElement);
+    }
     
-    const progressBar = document.createElement('div');
-    progressBar.className = 'h-full bg-red-600 rounded-full';
-    progressBar.style.width = `${progressData.percentage}%`;
-    
-    progressBarContainer.appendChild(progressBar);
-    progressContainer.appendChild(progressBarContainer);
-    
-    const remainingTimeText = document.createElement('div');
-    remainingTimeText.className = 'text-xs text-zinc-400 mt-1';
-    remainingTimeText.textContent = `${progressData.remainingMinutes} minutes remaining`;
-    
-    progressContainer.appendChild(remainingTimeText);
-    overlay.appendChild(progressContainer);
   }
   
   card.appendChild(overlay);
+  
+  if (displayProgressData) {
+    const progressBar = document.createElement('div');
+    progressBar.className = 'absolute inset-x-0 bottom-0 h-1.5 bg-gray-800 rounded-b-lg';
+    
+    const progressFill = document.createElement('div');
+    progressFill.className = 'h-full bg-[#2392EE] rounded-b-lg';
+    progressFill.style.width = `${displayProgressData.percentage}%`;
+    
+    progressBar.appendChild(progressFill);
+    card.appendChild(progressBar);
+  }
   
   if (onRemove) {
     const removeButton = document.createElement('button');

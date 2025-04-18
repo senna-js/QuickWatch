@@ -213,17 +213,11 @@ async function loadContinueWatching() {
       // Add progress information to detailData
       detailData.progress = item.watchedDuration / item.fullDuration;
       detailData.timestamp = item.timestamp;
-      detailData.season = item.season;
-      detailData.episode = item.episode;
-
-      const recents = JSON.parse(localStorage.getItem('quickwatch-recents') || '[]');
-      const latestEpisodeInfo = recents
-        .filter(recent => recent.id === item.id && recent.mediaType === item.mediaType)
-        .sort((a, b) => b.timestamp - a.timestamp)[0];
-
-      if (latestEpisodeInfo) {
-        detailData.season = latestEpisodeInfo.season;
-        detailData.episode = latestEpisodeInfo.episode;
+      
+      // Use the season and episode directly from continue watching data
+      if (item.mediaType === 'tv') {
+        detailData.season = item.season || 1;
+        detailData.episode = item.episode || 1;
       }
       
       const removeCallback = (id, mediaType) => {
@@ -242,31 +236,52 @@ async function loadContinueWatching() {
         }
       };
       
-      const carouselItem = createCarouselItem(detailData, index === 0, 'continue-watching', removeCallback, isMobile);
+      const progressData = {
+        percentage: (item.watchedDuration / item.fullDuration) * 100,
+        watchedDuration: item.watchedDuration,
+        fullDuration: item.fullDuration
+      };
       
-      if (carouselItem) {
-        // progress bar
-        const progressBar = document.createElement('div');
-        progressBar.className = 'absolute bottom-0 left-0 right-0 h-1 bg-gray-800';
-        
-        const progressFill = document.createElement('div');
-        progressFill.className = 'h-full bg-red-600';
-        progressFill.style.width = `${(item.watchedDuration / item.fullDuration) * 100}%`;
-        
-        progressBar.appendChild(progressFill);
-        carouselItem.appendChild(progressBar);
-        
-        // episode info for tv shows
-        if (item.mediaType === 'tv' && detailData.season !== 0) {
-          const episodeInfo = document.createElement('div');
-          episodeInfo.className = 'absolute bottom-2 left-2 text-white text-sm';
-          episodeInfo.textContent = `S${detailData.season} E${detailData.episode}`;
-          carouselItem.appendChild(episodeInfo);
+      if (item.mediaType === 'tv') {
+        if (item.watchedDuration > 0) {
+          progressData.continueText = `Continue Episode ${item.episode}`;
+          progressData.statusText = `${Math.round((item.fullDuration - item.watchedDuration) / 60)}min left`;
+        } else {
+          progressData.continueText = `Start Episode ${item.episode}`;
         }
-        
-        continueWatchingContainer.appendChild(carouselItem);
-        index++;
+      } else {
+        if (item.watchedDuration > 0) {
+          progressData.continueText = 'Continue Watching';
+          const remainingMinutes = Math.round((item.fullDuration - item.watchedDuration) / 60);
+          if (remainingMinutes >= 60) {
+            const hours = Math.floor(remainingMinutes / 60);
+            const minutes = remainingMinutes % 60;
+            progressData.statusText = `${hours}h${minutes}m left`;
+          } else {
+            progressData.statusText = `${remainingMinutes}min left`;
+          }
+        } else {
+          progressData.continueText = 'Play movie';
+          progressData.statusText = '';
+        }
       }
+      
+      const episodeInfo = item.mediaType === 'tv' ? 
+        { season: detailData.season, episode: detailData.episode } : null;
+      
+      const carouselItem = createCarouselItem(
+        detailData, 
+        index === 0, 
+        'continue-watching', 
+        removeCallback, 
+        isMobile,
+        null, // onLoaded
+        progressData,
+        episodeInfo
+      );
+      
+      continueWatchingContainer.appendChild(carouselItem);
+      index++;
     }
   }
 }
