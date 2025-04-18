@@ -9,7 +9,13 @@ import { createCarouselItem } from '../../components/carouselItem.js';
  */
 export function renderTvPage(container) {
   window.splashScreen.show();
-  const loadingStep = window.splashScreen.addStep('Loading TV show categories...');
+  const dramaStep = window.splashScreen.addStep('Loading Drama series...');
+  const comedyStep = window.splashScreen.addStep('Loading Comedy series...');
+  const crimeStep = window.splashScreen.addStep('Loading Crime series...');
+  const scifiFantasyStep = window.splashScreen.addStep('Loading Sci-Fi & Fantasy series...');
+  const actionAdventureStep = window.splashScreen.addStep('Loading Action & Adventure series...');
+  const animationStep = window.splashScreen.addStep('Loading Animation series...');
+  const imagesStep = window.splashScreen.addStep('Loading TV show images...');
   
   container.innerHTML = `
     ${renderHeader()}
@@ -51,25 +57,30 @@ export function renderTvPage(container) {
     </div>
   `;
   
-  fetchTvGenres(loadingStep);
+  fetchTvGenres({
+    drama: dramaStep,
+    comedy: comedyStep,
+    crime: crimeStep,
+    scifiFantasy: scifiFantasyStep,
+    actionAdventure: actionAdventureStep,
+    animation: animationStep,
+    images: imagesStep
+  });
 }
 
-async function fetchTvGenres(loadingStep) {
+async function fetchTvGenres(loadingSteps) {
   try {
-    let totalItemsToLoad = 0;
-    let loadedItems = 0;
-    
     const genres = [
-      { id: 18, name: 'drama' },
-      { id: 35, name: 'comedy' },
-      { id: 80, name: 'crime' },
-      { id: 10765, name: 'sci-fi-fantasy' },
-      { id: 10759, name: 'action-adventure' },
-      { id: 16, name: 'animation' }
+      { id: 18, name: 'drama', loadingStep: loadingSteps.drama },
+      { id: 35, name: 'comedy', loadingStep: loadingSteps.comedy },
+      { id: 80, name: 'crime', loadingStep: loadingSteps.crime },
+      { id: 10765, name: 'sci-fi-fantasy', loadingStep: loadingSteps.scifiFantasy },
+      { id: 10759, name: 'action-adventure', loadingStep: loadingSteps.actionAdventure },
+      { id: 16, name: 'animation', loadingStep: loadingSteps.animation }
     ];
 
     for (const genre of genres) {
-      const url = `${TMDB_BASE_URL}/discover/tv?include_adult=false&language=en-US&page=1&sort_by=popularity.desc&with_genres=${genre.id}&append_to_response=images&include_image_language=en`;
+      const url = `${TMDB_BASE_URL}/discover/tv?include_adult=false&language=en-US&page=1&sort_by=popularity.desc&with_genres=${genre.id}&append_to_response=images,content_ratings,release_dates&include_image_language=en`;
       
       const options = {
         method: 'GET',
@@ -83,11 +94,12 @@ async function fetchTvGenres(loadingStep) {
       const data = await response.json();
 
       if (data.results && data.results.length > 0) {
-        totalItemsToLoad += Math.min(data.results.length, 10);
+        const totalImages = Math.min(data.results.length, 10);
+        let imagesLoaded = 0;
         
         const detailedResults = await Promise.all(
           data.results.slice(0, 10).map(async (item) => {
-            const detailUrl = `${TMDB_BASE_URL}/tv/${item.id}?append_to_response=images&language=en-US&include_image_language=en`;
+            const detailUrl = `${TMDB_BASE_URL}/tv/${item.id}?append_to_response=images,content_ratings,release_dates&language=en-US&include_image_language=en`;
             const detailResponse = await fetch(detailUrl, options);
             return await detailResponse.json();
           })
@@ -96,15 +108,33 @@ async function fetchTvGenres(loadingStep) {
         const carousel = document.querySelector(`[data-category="${genre.name}"]`);
         if (carousel) {
           updateTvCarousel(detailedResults, carousel, () => {
-            loadedItems++;
-            checkAllLoaded(loadedItems, totalItemsToLoad, loadingStep);
+            imagesLoaded++;
+            
+            if (imagesLoaded === totalImages) {
+              window.splashScreen.completeStep(genre.loadingStep);
+            }
+            
+            const imageProgress = Math.round((imagesLoaded / (totalImages * genres.length)) * 100);
+            if (imageProgress % 10 === 0) {
+              window.splashScreen.updateStepProgress(loadingSteps.images, imageProgress);
+            }
+            
+            if (imagesLoaded === totalImages && genre === genres[genres.length - 1]) {
+              window.splashScreen.completeStep(loadingSteps.images);
+              window.splashScreen.hide();
+            }
           });
         }
+      } else {
+        window.splashScreen.completeStep(genre.loadingStep);
       }
     }
   } catch (error) {
     console.error('Error fetching TV genres:', error);
-    window.splashScreen.completeStep(loadingStep);
+    for (const genre of genres) {
+      window.splashScreen.completeStep(genre.loadingStep);
+    }
+    window.splashScreen.completeStep(loadingSteps.images);
     window.splashScreen.hide();
   }
 }
@@ -120,11 +150,4 @@ function updateTvCarousel(items, carousel, onItemLoaded) {
       if (onItemLoaded) onItemLoaded();
     }
   });
-}
-
-function checkAllLoaded(loaded, total, loadingStep) {
-  if (loaded >= total) {
-    window.splashScreen.completeStep(loadingStep);
-    window.splashScreen.hide();
-  }
 }

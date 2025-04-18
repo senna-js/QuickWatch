@@ -9,7 +9,14 @@ import { createCarouselItem } from '../../components/carouselItem.js';
  */
 export function renderHomePage(container) {
   window.splashScreen.show();
-  const loadingStep = window.splashScreen.addStep('Loading media content...');
+  const heroLoadingStep = window.splashScreen.addStep('Loading hero content...');
+  const continueWatchingStep = window.splashScreen.addStep('Loading continue watching...');
+  const trendingMoviesStep = window.splashScreen.addStep('Loading trending movies...');
+  const trendingTVStep = window.splashScreen.addStep('Loading trending TV shows...');
+  const topRatedStep = window.splashScreen.addStep('Loading top rated movies...');
+  const popularMoviesStep = window.splashScreen.addStep('Loading popular movies...');
+  const popularTVStep = window.splashScreen.addStep('Loading popular TV shows...');
+  const imagesStep = window.splashScreen.addStep('Loading images...');
   
   container.innerHTML = `
     ${renderHeader()}
@@ -66,16 +73,24 @@ export function renderHomePage(container) {
     </div>
   `;
   
-  fetchAllCategories(loadingStep);
+  fetchAllCategories({
+    hero: heroLoadingStep,
+    continueWatching: continueWatchingStep,
+    trendingMovies: trendingMoviesStep,
+    trendingTV: trendingTVStep,
+    topRated: topRatedStep,
+    popularMovies: popularMoviesStep,
+    popularTV: popularTVStep,
+    images: imagesStep
+  });
   initButtonListeners();
 }
 
-async function fetchAllCategories(loadingStep) {
+async function fetchAllCategories(loadingSteps) {
   try {
-    let totalItemsToLoad = 0;
-    let loadedItems = 0;
+    let imageLoadingPromises = [];
     
-    await loadContinueWatching();
+    await loadContinueWatching(loadingSteps.continueWatching);
     
     const isMobile = window.innerWidth < 768;
     
@@ -83,23 +98,28 @@ async function fetchAllCategories(loadingStep) {
       {
         url: `${TMDB_BASE_URL}/trending/movie/week?language=en-US&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
         selector: '[data-category="trending-movies"]',
-        updateHero: true
+        updateHero: true,
+        loadingStep: loadingSteps.trendingMovies
       },
       {
         url: `${TMDB_BASE_URL}/trending/tv/week?language=en-US&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
-        selector: '[data-category="trending-tv"]'
+        selector: '[data-category="trending-tv"]',
+        loadingStep: loadingSteps.trendingTV
       },
       {
         url: `${TMDB_BASE_URL}/movie/top_rated?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
-        selector: '[data-category="top-rated-movies"]'
+        selector: '[data-category="top-rated-movies"]',
+        loadingStep: loadingSteps.topRated
       },
       {
         url: `${TMDB_BASE_URL}/movie/popular?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
-        selector: '[data-category="popular-movies"]'
+        selector: '[data-category="popular-movies"]',
+        loadingStep: loadingSteps.popularMovies
       },
       {
         url: `${TMDB_BASE_URL}/tv/popular?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
-        selector: '[data-category="popular-tv"]'
+        selector: '[data-category="popular-tv"]',
+        loadingStep: loadingSteps.popularTV
       }
     ];
 
@@ -122,9 +142,8 @@ async function fetchAllCategories(loadingStep) {
           const detailData = await detailResponse.json();
           
           updateHeroSection({...detailData, media_type: data.results[0].media_type || 'movie'});
+          window.splashScreen.completeStep(loadingSteps.hero);
         }
-        
-        totalItemsToLoad += Math.min(data.results.length, 10);
         
         const detailedResults = await Promise.all(
           data.results.slice(0, 10).map(async (item) => {
@@ -137,30 +156,45 @@ async function fetchAllCategories(loadingStep) {
         
         const carousel = document.querySelector(category.selector);
         if (carousel) {
+          let imagesLoaded = 0;
+          const totalImages = detailedResults.length;
+          
           updateMovieCarousel(detailedResults, carousel, isMobile, () => {
-            loadedItems++;
-            checkAllLoaded(loadedItems, totalItemsToLoad, loadingStep);
+            imagesLoaded++;
+            
+            if (imagesLoaded === totalImages) {
+              window.splashScreen.completeStep(category.loadingStep);
+            }
+            
+            const imageProgress = Math.round((imagesLoaded / (totalImages * categories.length)) * 100);
+            if (imageProgress % 10 === 0) {
+              window.splashScreen.updateStepProgress(loadingSteps.images, imageProgress);
+            }
+            
+            if (imagesLoaded === totalImages && category === categories[categories.length - 1]) {
+              window.splashScreen.completeStep(loadingSteps.images);
+            }
           });
         }
+      } else {
+        window.splashScreen.completeStep(category.loadingStep);
       }
     }
   } catch (error) {
     console.error('Error fetching categories:', error);
-    window.splashScreen.completeStep(loadingStep);
+    for (const step of Object.values(loadingSteps)) {
+      window.splashScreen.completeStep(step);
+    }
     window.splashScreen.hide();
   }
 }
 
-function checkAllLoaded(loaded, total, loadingStep) {
-  if (loaded >= total) {
-    window.splashScreen.completeStep(loadingStep);
-    window.splashScreen.hide();
-  }
-}
-
-async function loadContinueWatching() {
+async function loadContinueWatching(loadingStep) {
   const continueWatchingContainer = document.querySelector('#continue-watching');
-  if (!continueWatchingContainer) return;
+  if (!continueWatchingContainer) {
+    if (loadingStep) window.splashScreen.completeStep(loadingStep);
+    return;
+  }
   
   const isMobile = window.innerWidth < 768;
   
@@ -185,6 +219,7 @@ async function loadContinueWatching() {
       sectionTitle.style.display = 'none';
     }
     continueWatchingContainer.style.display = 'none';
+    if (loadingStep) window.splashScreen.completeStep(loadingStep);
     return;
   }
 
