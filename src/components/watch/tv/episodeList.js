@@ -100,9 +100,9 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
               <span class="px-2 bg-[#32363D] rounded-[0.275rem]">${contentRating}</span>
             </div>
 
-            <p class="text-zinc-400 text-xl font-light max-w-3xl mb-3 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
+            <p class="text-[#aaa] text-xl font-light max-w-3xl mb-3 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
 
-            <span class="text-sm font-medium text-[#2392EE]"><i class="fas fa-circle-check mr-2"></i> Available on QuickWatch</span>
+            <span class="text-base font-normal"><i class="fas fa-circle-check mr-1.5 text-[#2392EE]"></i> Available on QuickWatch</span>
           </div>
         </div>
       `).join('')}

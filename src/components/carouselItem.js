@@ -44,7 +44,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     card.className = 'carousel-item w-full bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
   } else {
     card.className = isFirstItem 
-      ? 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg ml-2 transition-all duration-300 ease-in-out relative cursor-pointer' 
+      ? 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg ml-2 transition-all duration-300 ease-in-out relative cursor-pointer'
       : 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
   }
   
@@ -64,18 +64,21 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   card.style.backgroundColor = '#1a1a1a';
   card.style.backgroundSize = 'cover';
   card.style.backgroundPosition = 'center';
-  
+
+  const infoPanel = document.createElement('div');
+
+  infoPanel.className = 'carousel-info-popup bg-[#1A1D21] text-white p-3 rounded-b-lg opacity-0 transition-opacity duration-300 pointer-events-none'; 
+  infoPanel.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
+  infoPanel.style.transform = 'translateY(-10px)';
+  infoPanel.style.position = 'absolute';
+  infoPanel.style.zIndex = '50';
+
   if (onLoaded) {
     requestAnimationFrame(() => {
       onLoaded();
     });
   }
   
-  // overlay with details
-  const overlay = document.createElement('div');
-  overlay.className = displayProgressData?.continueText 
-  ? 'w-full h-full flex flex-col justify-start p-4 bg-gradient-to-b from-black/80 to-transparent opacity-0 transition-opacity duration-300'
-  : 'w-full h-full flex flex-col justify-end p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity duration-300';
   // title
   const titleElement = document.createElement('h3');
   titleElement.className = 'text-white font-semibold text-lg';
@@ -127,8 +130,75 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     detailsContainer.appendChild(genreElement);
   }
   
-  overlay.appendChild(titleElement);
-  overlay.appendChild(detailsContainer);
+  infoPanel.appendChild(titleElement);
+  infoPanel.appendChild(detailsContainer);
+  
+  const buttonsContainer = document.createElement('div');
+  buttonsContainer.className = 'flex items-center gap-3 mt-4';
+  
+  const playButton = document.createElement('button');
+  playButton.className = 'px-4 py-2 rounded-lg bg-[#32363D] font-medium flex flex-row items-center justify-center gap-2';
+  playButton.innerHTML = `
+    <i class="fas fa-play text-lg"></i>
+    <span>${displayProgressData?.continueText || 'Play'}</span>
+  `;
+  
+  const watchlistButton = document.createElement('button');
+  watchlistButton.className = 'bg-[#32363D] w-8 h-8 rounded-full flex items-center justify-center';
+  watchlistButton.innerHTML = '<i class="icon-plus text-lg"></i>';
+  
+  const closeButton = document.createElement('button'); 
+  closeButton.className = 'bg-[#32363D] w-8 h-8 rounded-full flex items-center justify-center';
+  closeButton.innerHTML = '<i class="icon-close text-lg"></i>';
+  
+  playButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    window.history.pushState(null, null, `/${mediaType}/${item.id}`);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  });
+  
+  watchlistButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const watchlist = JSON.parse(localStorage.getItem('quickwatch-watchlist') || '[]');
+    const existingItem = watchlist.find(i => i.id === item.id && i.mediaType === mediaType);
+    
+    if (!existingItem) {
+      watchlist.push({
+        id: item.id,
+        mediaType: mediaType,
+        title: title,
+        posterPath: TMDB_IMAGE_BASE_URL + 'w500' + imagePath,
+        dateAdded: new Date().toISOString()
+      });
+      localStorage.setItem('quickwatch-watchlist', JSON.stringify(watchlist));
+      alert('Added to watchlist!');
+    } else {
+      alert('Already in your watchlist!');
+    }
+  });
+  
+  closeButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideInfoPanel();
+  });
+  
+  buttonsContainer.appendChild(playButton);
+  buttonsContainer.appendChild(watchlistButton);
+  buttonsContainer.appendChild(closeButton);
+  
+  if (item.networks && item.networks.length > 0 && item.networks[0].logo_path) {
+    const networkInfo = document.createElement('div');
+    networkInfo.className = 'mt-3 flex items-center gap-2 text-sm text-zinc-300';
+    networkInfo.innerHTML = `
+      <i class="icon-check text-blue-400"></i>
+      <span>Included with subscription</span>
+    `;
+    infoPanel.appendChild(networkInfo);
+  }
+  
+  infoPanel.appendChild(buttonsContainer);
+  
+  infoPanel.className = 'carousel-info-popup bg-[#121416] text-white p-4 rounded-b-lg opacity-0 transition-opacity duration-300 pointer-events-none shadow-lg';
   
   if (displayProgressData) {
     
@@ -144,8 +214,6 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     
   }
   
-  card.appendChild(overlay);
-  
   if (displayProgressData) {
     const progressBar = document.createElement('div');
     progressBar.className = 'absolute inset-x-0 bottom-0 h-1.5 bg-gray-800 rounded-b-lg';
@@ -158,8 +226,77 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     card.appendChild(progressBar);
   }
   
+  let hoverTimeout;
+  let currentInfoPanel = null;
+
+  const showInfoPanel = () => {
+    clearTimeout(hoverTimeout);
+
+    document.querySelectorAll('.carousel-info-popup.visible').forEach(panel => {
+      if (panel !== infoPanel) {
+        panel.classList.remove('visible');
+        panel.style.opacity = '0';
+        panel.style.transform = 'translateY(-10px)';
+        panel.style.pointerEvents = 'none';
+        panel.addEventListener('transitionend', () => panel.remove(), { once: true });
+      }
+    });
+
+    card.style.transform = 'scale(1.05)';
+    card.style.zIndex = '10';
+    card.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
+
+    if (!document.body.contains(infoPanel)) {
+      const rect = card.getBoundingClientRect();
+      infoPanel.style.width = `${rect.width * 1.05}px`;
+      infoPanel.style.left = `${rect.left + window.scrollX - (rect.width * 0.05 / 2)}px`;
+      infoPanel.style.top = `${rect.bottom + window.scrollY}px`;
+      document.body.appendChild(infoPanel);
+      currentInfoPanel = infoPanel;
+    }
+
+    infoPanel.classList.add('visible');
+    infoPanel.style.opacity = '1';
+    infoPanel.style.transform = 'translateY(0)';
+    infoPanel.style.pointerEvents = 'auto';
+
+    if (removeButton) {
+        removeButton.classList.remove('opacity-0');
+        removeButton.classList.add('opacity-100');
+    }
+  };
+
+  const hideInfoPanel = () => {
+     hoverTimeout = setTimeout(() => {
+        card.style.transform = 'scale(1)';
+        card.style.zIndex = '1';
+        card.style.boxShadow = 'none';
+
+        if (currentInfoPanel) {
+          currentInfoPanel.classList.remove('visible');
+          currentInfoPanel.style.opacity = '0';
+          currentInfoPanel.style.transform = 'translateY(-10px)';
+          currentInfoPanel.style.pointerEvents = 'none';
+          
+          const panelToRemove = currentInfoPanel;
+          panelToRemove.addEventListener('transitionend', () => {
+              if (!panelToRemove.classList.contains('visible')) {
+                  panelToRemove.remove();
+              }
+          }, { once: true });
+          currentInfoPanel = null;
+        }
+
+        if (removeButton) {
+            removeButton.classList.remove('opacity-100');
+            removeButton.classList.add('opacity-0');
+        }
+    }, 150);
+  };
+
+  let removeButton = null;
   if (onRemove) {
-    const removeButton = document.createElement('button');
+    removeButton = document.createElement('button');
     removeButton.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full w-6 h-6 flex items-center justify-center text-white z-20 opacity-0 transition-opacity duration-300';
     removeButton.innerHTML = '×';
     removeButton.style.fontSize = '18px';
@@ -171,48 +308,27 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     
     card.appendChild(removeButton);
     
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'scale(1.05)';
-      card.style.zIndex = '10';
-      card.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
-      overlay.classList.remove('opacity-0');
-      overlay.classList.add('opacity-100');
-      removeButton.classList.remove('opacity-0');
-      removeButton.classList.add('opacity-100');
-    });
-    
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'scale(1)';
-      card.style.zIndex = '1';
-      card.style.boxShadow = 'none';
-      overlay.classList.remove('opacity-100');
-      overlay.classList.add('opacity-0');
-      removeButton.classList.remove('opacity-100');
-      removeButton.classList.add('opacity-0');
-    });
-  } else {
-    card.addEventListener('mouseenter', () => {
-      card.style.transform = 'scale(1.05)';
-      card.style.zIndex = '10';
-      card.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
-      overlay.classList.remove('opacity-0');
-      overlay.classList.add('opacity-100');
-    });
-    
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'scale(1)';
-      card.style.zIndex = '1';
-      card.style.boxShadow = 'none';
-      overlay.classList.remove('opacity-100');
-      overlay.classList.add('opacity-0');
-    });
   }
+
+  card.addEventListener('mouseenter', showInfoPanel);
+  card.addEventListener('mouseleave', hideInfoPanel);
   
+  const attachPanelListeners = () => {
+    infoPanel.addEventListener('mouseenter', () => {
+      clearTimeout(hoverTimeout);
+    });
+    infoPanel.addEventListener('mouseleave', hideInfoPanel);
+  };
+
+  attachPanelListeners();
+
   card.addEventListener('click', () => {
-    setTimeout(() => {
-      window.history.pushState(null, null, `/${mediaType}/${item.id}`);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    }, 200);
+    if (!currentInfoPanel || !document.body.contains(currentInfoPanel) || infoPanel.style.opacity === '0') {
+      setTimeout(() => {
+        window.history.pushState(null, null, `/${mediaType}/${item.id}`);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }, 50);
+    }
   });
   
   return card;
