@@ -107,6 +107,14 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
   let mediaPlayer = null;
   let currentTrackerCleanup = null;
   
+  // track current episode and season
+  let currentSeason = initialSeason;
+  let currentEpisode = initialEpisode;
+  
+  // make currentSeason and currentEpisode globally accessible
+  window.currentPlayerSeason = currentSeason;
+  window.currentPlayerEpisode = currentEpisode;
+  
   const createIframe = (sourceIndex) => {
     const iframeContainer = document.getElementById('iframe-container');
     if (!iframeContainer) return null;
@@ -115,12 +123,13 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
       iframeContainer.querySelector('iframe').remove();
     }
     
+    // use current values from global state
     const selectedSource = sources[sourceIndex];
     const iframeUrl = type === 'movie' 
       ? selectedSource.movieUrl 
       : selectedSource.tvUrl
-          .replace('{season}', initialSeason)
-          .replace('{episode}', initialEpisode);
+          .replace('{season}', window.currentPlayerSeason)
+          .replace('{episode}', window.currentPlayerEpisode);
     
     const iframe = document.createElement('iframe');
     iframe.id = 'media-player';
@@ -147,20 +156,24 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
       playButton.addEventListener('click', () => {
         playerModal.classList.remove('hidden');
         
+        // update global current values to initial values when play button clicked
+        window.currentPlayerSeason = initialSeason;
+        window.currentPlayerEpisode = initialEpisode;
+        
         mediaPlayer = createIframe(initialSourceIndex);
         
         if (mediaPlayer) {
           const currentSource = sources[initialSourceIndex];
           // get existing progress before initializing new tracking
-          const existingProgress = getProgress(parseInt(id), type, initialSeason, initialEpisode);
+          const existingProgress = getProgress(parseInt(id), type, window.currentPlayerSeason, window.currentPlayerEpisode);
           
           currentTrackerCleanup = initializeSourceTracking(
             mediaPlayer,
             currentSource,
             parseInt(id),
             type,
-            initialSeason,
-            initialEpisode,
+            window.currentPlayerSeason,
+            window.currentPlayerEpisode,
             initialSourceIndex,
             existingProgress
           );
@@ -214,8 +227,8 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
             selectedSource,
             id,
             type,
-            initialSeason,
-            initialEpisode,
+            window.currentPlayerSeason,
+            window.currentPlayerEpisode,
             sourceIndex
           );
         }
@@ -224,13 +237,14 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
         import('../watch/progress/index.js').then(module => {
           const { saveProgress } = module;
           
-          const existingProgress = module.getProgress(parseInt(id), type, parseInt(initialSeason), parseInt(initialEpisode));
+          const existingProgress = module.getProgress(parseInt(id), type, 
+            parseInt(window.currentPlayerSeason), parseInt(window.currentPlayerEpisode));
           
           saveProgress({
             id: parseInt(id),
             mediaType: type,
-            season: parseInt(initialSeason) || 0,
-            episode: parseInt(initialEpisode) || 0,
+            season: parseInt(window.currentPlayerSeason) || 0,
+            episode: parseInt(window.currentPlayerEpisode) || 0,
             sourceIndex: sourceIndex,
             fullDuration: existingProgress?.fullDuration || 0,
             watchedDuration: existingProgress?.watchedDuration || 0,

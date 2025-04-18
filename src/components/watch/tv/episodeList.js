@@ -128,7 +128,10 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
     item.addEventListener('click', () => {
       const episodeNumber = item.dataset.episode;
       if (episodeNumber) {
-        initialEpisode = parseInt(episodeNumber);
+        // set the current episode in the global state
+        window.currentPlayerSeason = initialSeason;
+        window.currentPlayerEpisode = parseInt(episodeNumber);
+        
         const selectedSource = sources[initialSourceIndex];
         const newUrl = selectedSource.tvUrl
           .replace('{season}', initialSeason)
@@ -167,7 +170,7 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
                 id,
                 'tv',
                 initialSeason,
-                initialEpisode,
+                parseInt(episodeNumber),
                 initialSourceIndex
               );
 
