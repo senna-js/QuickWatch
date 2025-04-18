@@ -19,7 +19,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   const title = item.title || item.name;
   const releaseDate = item.release_date || item.first_air_date;
   const formattedDate = releaseDate ? new Date(releaseDate).getFullYear() : '';
-  
+  const user_rating = (item.vote_average / 2).toFixed(1);
   let rating = '';
   if (mediaType === 'tv' && item.content_ratings && item.content_ratings.results) {
     const usRating = item.content_ratings.results.find(r => r.iso_3166_1 === 'US');
@@ -98,7 +98,8 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     </button>
     <span class="text-sm font-normal"><i class="fas fa-circle-check mr-1 text-[#2392EE]"></i> Available on QuickWatch</span>
     <div class="flex flex-row items-center gap-2 mt-1 text-[0.9rem] text-zinc-300">
-      <span class="mr-0.5">${formattedDate}</span>
+      <span class="mr-[0.2rem]">${formattedDate}</span>
+      <span class="mr-[0.2rem]">${user_rating} <i class="fas fa-star text-[#2392EE]"></i></span>
       ${rating ? `<div class="flex items-center bg-gray-700 px-1.5 py-0.5 rounded text-xs">${rating}</div>` : ''}
     </div>
   `;
@@ -129,10 +130,10 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   
   if (displayProgressData) {
     const progressBar = document.createElement('div');
-    progressBar.className = 'absolute inset-x-0 bottom-0 h-1.5 bg-gray-800 rounded-b-lg';
+    progressBar.className = 'absolute inset-x-0 bottom-0 h-1.5 bg-[#666] rounded-b-lg';
     
     const progressFill = document.createElement('div');
-    progressFill.className = 'h-full bg-[#2392EE] rounded-b-lg';
+    progressFill.className = 'h-full bg-[#fff] rounded-b-lg';
     progressFill.style.width = `${displayProgressData.percentage}%`;
     
     progressBar.appendChild(progressFill);
