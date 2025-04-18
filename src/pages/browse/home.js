@@ -81,24 +81,24 @@ async function fetchAllCategories(loadingStep) {
     
     const categories = [
       {
-        url: `${TMDB_BASE_URL}/trending/movie/week?language=en-US&append_to_response=images&include_image_language=en`,
+        url: `${TMDB_BASE_URL}/trending/movie/week?language=en-US&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
         selector: '[data-category="trending-movies"]',
         updateHero: true
       },
       {
-        url: `${TMDB_BASE_URL}/trending/tv/week?language=en-US&append_to_response=images&include_image_language=en`,
+        url: `${TMDB_BASE_URL}/trending/tv/week?language=en-US&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
         selector: '[data-category="trending-tv"]'
       },
       {
-        url: `${TMDB_BASE_URL}/movie/top_rated?language=en-US&page=1&append_to_response=images&include_image_language=en`,
+        url: `${TMDB_BASE_URL}/movie/top_rated?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
         selector: '[data-category="top-rated-movies"]'
       },
       {
-        url: `${TMDB_BASE_URL}/movie/popular?language=en-US&page=1&append_to_response=images&include_image_language=en`,
+        url: `${TMDB_BASE_URL}/movie/popular?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
         selector: '[data-category="popular-movies"]'
       },
       {
-        url: `${TMDB_BASE_URL}/tv/popular?language=en-US&page=1&append_to_response=images&include_image_language=en`,
+        url: `${TMDB_BASE_URL}/tv/popular?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
         selector: '[data-category="popular-tv"]'
       }
     ];
@@ -117,7 +117,7 @@ async function fetchAllCategories(loadingStep) {
 
       if (data.results && data.results.length > 0) {
         if (category.updateHero) {
-          const detailUrl = `${TMDB_BASE_URL}/${data.results[0].media_type || 'movie'}/${data.results[0].id}?append_to_response=images&language=en-US&include_image_language=en`;
+          const detailUrl = `${TMDB_BASE_URL}/${data.results[0].media_type || 'movie'}/${data.results[0].id}?append_to_response=images,content_ratings,release_dates&language=en-US&include_image_language=en`;
           const detailResponse = await fetch(detailUrl, options);
           const detailData = await detailResponse.json();
           
@@ -129,7 +129,7 @@ async function fetchAllCategories(loadingStep) {
         const detailedResults = await Promise.all(
           data.results.slice(0, 10).map(async (item) => {
             const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
-            const detailUrl = `${TMDB_BASE_URL}/${mediaType}/${item.id}?append_to_response=images&language=en-US&include_image_language=en`;
+            const detailUrl = `${TMDB_BASE_URL}/${mediaType}/${item.id}?append_to_response=images,content_ratings,release_dates&language=en-US&include_image_language=en`;
             const detailResponse = await fetch(detailUrl, options);
             return {...await detailResponse.json(), media_type: mediaType};
           })
@@ -204,7 +204,7 @@ async function loadContinueWatching() {
   
   let index = 0;
   for (const item of Object.values(groupedItems)) {
-    const response = await fetch(`${TMDB_BASE_URL}/${item.mediaType}/${item.id}?append_to_response=images&language=en-US&include_image_language=en`, options);
+    const response = await fetch(`${TMDB_BASE_URL}/${item.mediaType}/${item.id}?append_to_response=images,content_ratings,release_dates&language=en-US&include_image_language=en`, options);
     
     if (response.ok) {
       const detailData = await response.json();

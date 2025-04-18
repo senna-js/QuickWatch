@@ -19,7 +19,18 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   const title = item.title || item.name;
   const releaseDate = item.release_date || item.first_air_date;
   const formattedDate = releaseDate ? new Date(releaseDate).getFullYear() : '';
-  const rating = item.vote_average ? Math.round(item.vote_average * 10) / 10 : '';
+  
+  let rating = '';
+  if (mediaType === 'tv' && item.content_ratings && item.content_ratings.results) {
+    const usRating = item.content_ratings.results.find(r => r.iso_3166_1 === 'US');
+    rating = usRating ? usRating.rating : '';
+  } else if (mediaType === 'movie' && item.release_dates && item.release_dates.results) {
+    const usRelease = item.release_dates.results.find(r => r.iso_3166_1 === 'US');
+    rating = usRelease && usRelease.release_dates && usRelease.release_dates.length > 0 
+      ? usRelease.release_dates[0].certification 
+      : '';
+  }
+  
   const storedProgressData = getWatchProgress(item.id);
   const displayProgressData = progressData || storedProgressData;
   
@@ -78,127 +89,29 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
       onLoaded();
     });
   }
-  
-  // title
-  const titleElement = document.createElement('h3');
-  titleElement.className = 'text-white font-semibold text-lg';
-  titleElement.textContent = title;
-  
-  // details container
-  const detailsContainer = document.createElement('div');
-  detailsContainer.className = 'flex flex-row items-center gap-2 mt-1 text-sm text-zinc-300';
-  
-  // year
-  if (formattedDate) {
-    const yearElement = document.createElement('span');
-    yearElement.textContent = formattedDate;
-    detailsContainer.appendChild(yearElement);
-    
-    if (rating) {
-      const separator = document.createElement('span');
-      separator.textContent = '•';
-      detailsContainer.appendChild(separator);
-    }
-  }
-  
-  // rating
-  if (rating) {
-    const ratingContainer = document.createElement('div');
-    ratingContainer.className = 'flex items-center gap-1';
-    
-    const starIcon = document.createElement('i');
-    starIcon.className = 'icon-star text-yellow-400';
-    
-    const ratingText = document.createElement('span');
-    ratingText.textContent = rating;
-    
-    ratingContainer.appendChild(starIcon);
-    ratingContainer.appendChild(ratingText);
-    detailsContainer.appendChild(ratingContainer);
-  }
-  
-  // genre
-  if (item.genres && item.genres.length > 0) {
-    if (formattedDate || rating) {
-      const separator = document.createElement('span');
-      separator.textContent = '•';
-      detailsContainer.appendChild(separator);
-    }
-    
-    const genreElement = document.createElement('span');
-    genreElement.textContent = item.genres[0].name;
-    detailsContainer.appendChild(genreElement);
-  }
-  
-  infoPanel.appendChild(titleElement);
-  infoPanel.appendChild(detailsContainer);
-  
-  const buttonsContainer = document.createElement('div');
-  buttonsContainer.className = 'flex items-center gap-3 mt-4';
-  
-  const playButton = document.createElement('button');
-  playButton.className = 'px-4 py-2 rounded-lg bg-[#32363D] font-medium flex flex-row items-center justify-center gap-2';
-  playButton.innerHTML = `
-    <i class="fas fa-play text-lg"></i>
-    <span>${displayProgressData?.continueText || 'Play'}</span>
+      
+  infoPanel.innerHTML = `
+    <h3 class="text-white font-semibold text-xl">${title}</h3>
+    <button class="play-button px-4 py-3 text-lg my-2 w-full rounded-lg bg-[#32363D] font-medium flex flex-row items-center justify-center gap-2">
+        <i class="fas fa-play text-xl mr-0.5"></i>
+        <span>${displayProgressData?.continueText || 'Play'}</span>
+    </button>
+    <span class="text-sm font-normal"><i class="fas fa-circle-check mr-1 text-[#2392EE]"></i> Available on QuickWatch</span>
+    <div class="flex flex-row items-center gap-2 mt-1 text-[0.9rem] text-zinc-300">
+      <span class="mr-0.5">${formattedDate}</span>
+      ${rating ? `<div class="flex items-center bg-gray-700 px-1.5 py-0.5 rounded text-xs">${rating}</div>` : ''}
+    </div>
   `;
   
-  const watchlistButton = document.createElement('button');
-  watchlistButton.className = 'bg-[#32363D] w-8 h-8 rounded-full flex items-center justify-center';
-  watchlistButton.innerHTML = '<i class="icon-plus text-lg"></i>';
+  infoPanel.className = 'carousel-info-popup bg-[#101317] text-white p-4 rounded-b-lg opacity-0 transition-opacity duration-300 pointer-events-none shadow-lg';
   
-  const closeButton = document.createElement('button'); 
-  closeButton.className = 'bg-[#32363D] w-8 h-8 rounded-full flex items-center justify-center';
-  closeButton.innerHTML = '<i class="icon-close text-lg"></i>';
+  const playButton = infoPanel.querySelector('.play-button');
   
   playButton.addEventListener('click', (e) => {
     e.stopPropagation();
     window.history.pushState(null, null, `/${mediaType}/${item.id}`);
     window.dispatchEvent(new PopStateEvent('popstate'));
   });
-  
-  watchlistButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const watchlist = JSON.parse(localStorage.getItem('quickwatch-watchlist') || '[]');
-    const existingItem = watchlist.find(i => i.id === item.id && i.mediaType === mediaType);
-    
-    if (!existingItem) {
-      watchlist.push({
-        id: item.id,
-        mediaType: mediaType,
-        title: title,
-        posterPath: TMDB_IMAGE_BASE_URL + 'w500' + imagePath,
-        dateAdded: new Date().toISOString()
-      });
-      localStorage.setItem('quickwatch-watchlist', JSON.stringify(watchlist));
-      alert('Added to watchlist!');
-    } else {
-      alert('Already in your watchlist!');
-    }
-  });
-  
-  closeButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    hideInfoPanel();
-  });
-  
-  buttonsContainer.appendChild(playButton);
-  buttonsContainer.appendChild(watchlistButton);
-  buttonsContainer.appendChild(closeButton);
-  
-  if (item.networks && item.networks.length > 0 && item.networks[0].logo_path) {
-    const networkInfo = document.createElement('div');
-    networkInfo.className = 'mt-3 flex items-center gap-2 text-sm text-zinc-300';
-    networkInfo.innerHTML = `
-      <i class="icon-check text-blue-400"></i>
-      <span>Included with subscription</span>
-    `;
-    infoPanel.appendChild(networkInfo);
-  }
-  
-  infoPanel.appendChild(buttonsContainer);
-  
-  infoPanel.className = 'carousel-info-popup bg-[#121416] text-white p-4 rounded-b-lg opacity-0 transition-opacity duration-300 pointer-events-none shadow-lg';
   
   if (displayProgressData) {
     
