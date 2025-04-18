@@ -56,7 +56,7 @@ window.splashScreen = {
       text: stepText, 
       completed: false,
       failed: false,
-      timeout: setTimeout(() => this.failStep(stepId), 3000) // Add 3 second timeout
+      timeout: setTimeout(() => this.failStep(stepId), 10000) // Add 10 second timeout
     };
     this.steps.push(step);
     
