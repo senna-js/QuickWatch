@@ -156,9 +156,9 @@ async function loadMediaDetails(type, id) {
     if (type === 'tv') {
       const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
       const savedItem = continueWatching.find(item => item.id === id && item.mediaType === type);
-      
-      if (savedItem && savedItem.sourceIndex !== undefined && savedItem.sourceIndex >= 0 && savedItem.sourceIndex < sources.length) {
-        initialSourceIndex = savedItem.sourceIndex;
+    
+    if (savedItem && savedItem.sourceIndex !== undefined && savedItem.sourceIndex >= 0 && savedItem.sourceIndex < sources.length) {
+      initialSourceIndex = savedItem.sourceIndex;
       }
     } else {
       const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
@@ -339,7 +339,7 @@ async function loadMediaDetails(type, id) {
       ${renderPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, mediaTitle)}
     `;
 
-    initPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode);
+    initPlayerModal(id, type, sources, initialSourceIndex, initialSeason, initialEpisode);
   
     if (type === 'tv') {
       const playButton = document.getElementById('play-button');
@@ -361,7 +361,7 @@ async function loadMediaDetails(type, id) {
                 // BUG: for some reason the previous episode is still playing when the next episode is clicked. !todo
                 const modalContent = renderPlayerModal(type, id, sources, initialSourceIndex, nextSeason, nextEpisode, mediaTitle);
                 modal.outerHTML = modalContent;
-                initPlayerModal(type, id, sources, initialSourceIndex, nextSeason, nextEpisode);
+                initPlayerModal(id, type, sources, initialSourceIndex, nextSeason, nextEpisode);
                 
                 document.getElementById('player-modal').classList.remove('hidden');
                 return;

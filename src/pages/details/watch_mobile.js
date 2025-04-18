@@ -362,7 +362,7 @@ async function loadMediaDetails(type, id) {
       });
     }
 
-    initPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, true);
+    initPlayerModal(id, type, sources, initialSourceIndex, initialSeason, initialEpisode, true);
     
     if (type === 'tv') {
       const playButton = document.getElementById('play-button');
@@ -383,7 +383,7 @@ async function loadMediaDetails(type, id) {
               if (modal) {
                 const modalContent = renderPlayerModal(type, id, sources, initialSourceIndex, nextSeason, nextEpisode, data.title || data.name, true);
                 modal.outerHTML = modalContent;
-                initPlayerModal(type, id, sources, initialSourceIndex, nextSeason, nextEpisode, true);
+                initPlayerModal(id, type, sources, initialSourceIndex, nextSeason, nextEpisode, true);
                 
                 document.getElementById('player-modal').classList.remove('hidden');
                 return;
