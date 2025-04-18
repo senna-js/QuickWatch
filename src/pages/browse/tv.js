@@ -115,9 +115,6 @@ async function fetchTvGenres(loadingSteps) {
             }
             
             const imageProgress = Math.round((imagesLoaded / (totalImages * genres.length)) * 100);
-            if (imageProgress % 10 === 0) {
-              window.splashScreen.updateStepProgress(loadingSteps.images, imageProgress);
-            }
             
             if (imagesLoaded === totalImages && genre === genres[genres.length - 1]) {
               window.splashScreen.completeStep(loadingSteps.images);

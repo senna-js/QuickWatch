@@ -167,9 +167,6 @@ async function fetchAllCategories(loadingSteps) {
             }
             
             const imageProgress = Math.round((imagesLoaded / (totalImages * categories.length)) * 100);
-            if (imageProgress % 10 === 0) {
-              window.splashScreen.updateStepProgress(loadingSteps.images, imageProgress);
-            }
             
             if (imagesLoaded === totalImages && category === categories[categories.length - 1]) {
               window.splashScreen.completeStep(loadingSteps.images);

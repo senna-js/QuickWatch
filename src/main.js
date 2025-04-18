@@ -51,7 +51,14 @@ window.splashScreen = {
     `;
     
     this.stepsContainer.appendChild(stepElement);
-    this.steps.push({ id: stepId, text: stepText, completed: false });
+    const step = { 
+      id: stepId, 
+      text: stepText, 
+      completed: false,
+      failed: false,
+      timeout: setTimeout(() => this.failStep(stepId), 3000) // Add 3 second timeout
+    };
+    this.steps.push(step);
     
     return stepId;
   },
@@ -68,8 +75,30 @@ window.splashScreen = {
       
       const stepIndex = this.steps.findIndex(step => step.id === stepId);
       if (stepIndex !== -1) {
+        // Clear the timeout since the step completed successfully
+        clearTimeout(this.steps[stepIndex].timeout);
         this.steps[stepIndex].completed = true;
       }
+    }
+  },
+  failStep: function(stepId) {
+    if (!this.stepsContainer) return;
+    
+    const stepElement = document.getElementById(stepId);
+    if (stepElement) {
+      const loader = stepElement.querySelector('.step-loader');
+      if (loader) {
+        loader.innerHTML = '<i class="fas fa-times"></i>'; // Use X icon
+        loader.classList.add('failed');                    // Add failed class
+      }
+      
+      const stepIndex = this.steps.findIndex(step => step.id === stepId);
+      if (stepIndex !== -1) {
+        this.steps[stepIndex].failed = true;
+      }
+      
+      // Add this: Hide splash screen after a short delay when a step fails
+      setTimeout(() => this.hide(), 500);
     }
   }
 };

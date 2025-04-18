@@ -59,6 +59,13 @@
   color: white;
 }
 
+.step-loader.failed {
+  animation: none;
+  border: 2px solid #d74d4d;
+  background-color: #d74d4d;
+  color: white;
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
