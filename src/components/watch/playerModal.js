@@ -14,6 +14,8 @@ import { renderSpinner } from '../misc/loading.js';
  * @returns {string} HTML for the player modal
  */
 export function renderPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, mediaTitle, isMobile = false) {
+  const filteredSources = sources.filter(source => type === 'movie' ? !source.tvOnly : true);
+  
   if (isMobile) {
     return `
       <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex flex-col items-center justify-between p-0">
@@ -35,8 +37,7 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
             
             <div class="source-selector-container overflow-x-auto pb-1">
               <div class="flex gap-2 min-w-max">
-                ${sources
-                  .filter(source => type === 'movie' ? !source.tvOnly : true)
+                ${filteredSources
                   .map((source, index) => `
                     <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#32363D]'}" data-index="${index}">
                       ${source.name}
@@ -69,8 +70,7 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
           <div class="mt-4 bg-[#121212] p-4 rounded-lg">
             <div class="relative flex justify-between items-center gap-3 overflow-auto">
               <div class="h-10 flex items-center gap-3">
-                ${sources
-                  .filter(source => (type === 'movie' ? !source.tvOnly : true))
+                ${filteredSources
                   .map((source, index) => `
                     <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#32363D]'}" data-index="${index}">
                       ${source.name}
@@ -107,18 +107,18 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
   let mediaPlayer = null;
   let currentTrackerCleanup = null;
   
-  const createIframe = () => {
+  const createIframe = (sourceIndex) => {
     const iframeContainer = document.getElementById('iframe-container');
-    if (!iframeContainer) return;
+    if (!iframeContainer) return null;
     
     while (iframeContainer.querySelector('iframe')) {
       iframeContainer.querySelector('iframe').remove();
     }
     
-    const defaultSource = sources[initialSourceIndex];
+    const selectedSource = sources[sourceIndex];
     const iframeUrl = type === 'movie' 
-      ? defaultSource.movieUrl 
-      : defaultSource.tvUrl
+      ? selectedSource.movieUrl 
+      : selectedSource.tvUrl
           .replace('{season}', initialSeason)
           .replace('{episode}', initialEpisode);
     
@@ -133,6 +133,10 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
     iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
     iframeContainer.classList.add('loading');
     
+    iframe.addEventListener('load', () => {
+      iframeContainer.classList.remove('loading');
+    });
+    
     return iframe;
   };
   
@@ -143,7 +147,7 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
       playButton.addEventListener('click', () => {
         playerModal.classList.remove('hidden');
         
-        mediaPlayer = createIframe();
+        mediaPlayer = createIframe(initialSourceIndex);
         
         if (mediaPlayer) {
           const currentSource = sources[initialSourceIndex];
@@ -160,13 +164,6 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
             initialSourceIndex,
             existingProgress
           );
-          
-          mediaPlayer.addEventListener('load', () => {
-            const iframeContainer = mediaPlayer.parentElement;
-            if (iframeContainer) {
-              iframeContainer.classList.remove('loading');
-            }
-          });
         }
       });
       
@@ -183,14 +180,6 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
           iframeContainer.querySelector('iframe').remove();
           mediaPlayer = null;
         }
-      });
-    }
-  
-    // media player load event
-    const iframeContainer = mediaPlayer?.parentElement;
-    if (mediaPlayer && iframeContainer) {
-      mediaPlayer.addEventListener('load', () => {
-        iframeContainer.classList.remove('loading');
       });
     }
   
@@ -217,36 +206,9 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
           currentTrackerCleanup = null;
         }
         
-        const iframeContainer = document.getElementById('iframe-container');
-        if (iframeContainer) {
-          iframeContainer.classList.add('loading');
-          
-          if (iframeContainer.querySelector('iframe')) {
-            iframeContainer.querySelector('iframe').remove();
-          }
-          
-          const newUrl = type === 'movie'
-            ? selectedSource.movieUrl
-            : selectedSource.tvUrl
-                .replace('{season}', initialSeason)
-                .replace('{episode}', initialEpisode);
-          
-          const iframe = document.createElement('iframe');
-          iframe.id = 'media-player';
-          iframe.src = newUrl;
-          iframe.className = isMobile ? 'w-full h-full rounded-none' : 'w-full rounded-xl';
-          if (!isMobile) iframe.height = '700';
-          iframe.frameBorder = '0';
-          iframe.allowFullscreen = true;
-          
-          iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
-          
-          mediaPlayer = iframe;
-          
-          mediaPlayer.addEventListener('load', () => {
-            iframeContainer.classList.remove('loading');
-          });
-          
+        mediaPlayer = createIframe(sourceIndex);
+        
+        if (mediaPlayer) {
           currentTrackerCleanup = initializeSourceTracking(
             mediaPlayer,
             selectedSource,
@@ -259,41 +221,24 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
         }
         
         // replace the progress data section in the source button click handler
-        const existingProgress = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-        const existingItem = existingProgress.find(item => 
-        item.id === parseInt(id) && 
-        item.mediaType === type &&
-        (type === 'movie' || (item.season === parseInt(initialSeason) && item.episode === parseInt(initialEpisode)))
-        );
+        import('../watch/progress/index.js').then(module => {
+          const { saveProgress } = module;
+          
+          const existingProgress = module.getProgress(parseInt(id), type, parseInt(initialSeason), parseInt(initialEpisode));
+          
+          saveProgress({
+            id: parseInt(id),
+            mediaType: type,
+            season: parseInt(initialSeason) || 0,
+            episode: parseInt(initialEpisode) || 0,
+            sourceIndex: sourceIndex,
+            fullDuration: existingProgress?.fullDuration || 0,
+            watchedDuration: existingProgress?.watchedDuration || 0,
+            timestamp: Date.now()
+          });
+        });
         
-        const progressData = {
-        id: parseInt(id),
-        mediaType: type,
-        season: parseInt(initialSeason) || 0,
-        episode: parseInt(initialEpisode) || 0,
-        sourceIndex: sourceIndex,
-        fullDuration: existingItem?.fullDuration || 0,
-        watchedDuration: existingItem?.watchedDuration || 0,
-        timestamp: Date.now()
-        };
-        
-        const existingIndex = existingProgress.findIndex(item => 
-        item.id === parseInt(id) && 
-        item.mediaType === type &&
-        (type === 'movie' || (item.season === parseInt(initialSeason) && item.episode === parseInt(initialEpisode)))
-        );
-        
-        if (existingIndex !== -1) {
-        existingProgress[existingIndex] = progressData;
-        } else {
-        existingProgress.unshift(progressData);
-        
-        if (existingProgress.length > 50) {
-        existingProgress.pop();
-        }
-        }
-        
-        localStorage.setItem('quickwatch-continue', JSON.stringify(existingProgress));
+        initialSourceIndex = sourceIndex;
       });
     });
   });

@@ -425,12 +425,6 @@ async function loadMediaDetails(type, id) {
       }, 800);
     }
 
-    if (window.splashScreen) {
-      setTimeout(() => {
-        window.splashScreen.hide();
-      }, 800);
-    }
-
   } catch (error) {
     console.error('Error loading media details:', error);
     document.getElementById('details-container').innerHTML = renderError(

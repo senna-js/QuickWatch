@@ -1,15 +1,9 @@
 // Episode List Component
 import { TMDB_IMAGE_BASE_URL } from '../../../router.js';
-
+import { getProgress } from '../../watch/progress/index.js';
 
 function getEpisodeProgress(id, season, episode) {
-  const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-  const savedItem = continueWatching.find(item => 
-    item.id === parseInt(id) &&
-    item.mediaType === 'tv' && 
-    item.season === parseInt(season) && 
-    item.episode === parseInt(episode) 
-  );
+  const savedItem = getProgress(parseInt(id), 'tv', parseInt(season), parseInt(episode));
   
   if (savedItem) {
     // calculate progress
