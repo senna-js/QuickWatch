@@ -42,7 +42,7 @@ export function renderHomePage(container) {
       <div class="bg-[#00050d]">
         <div class="mt-12 md:mt-24">
           <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Continue watching</h2>
-          <div id="continue-watching" class="flex flex-row gap-4 overflow-x-auto pb-4 pl-2"></div>
+          <div id="continue-watching" class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4"></div>
         </div>
         
         <div class="mt-6">
