@@ -13,6 +13,7 @@ import { renderVidSrcEmbed } from './pages/embeds/vidsrc-embed.js';
 import { renderMoviesPage } from './pages/browse/movies.js';
 import { renderTvPage } from './pages/browse/tv.js';
 import { renderGenresPage } from './pages/details/genres.js';
+import { renderGenreDetailsPage } from './pages/details/genreDetails.js';
 
 export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q';
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -138,8 +139,13 @@ function handleRoute() {
     currentPagePromise = Promise.resolve(renderTvPage(appContainer));
   }
   else if (path === '/genres') {
-    document.title = 'genres';
+    document.title = 'Genres';
     currentPagePromise = Promise.resolve(renderGenresPage(appContainer));
+  }
+  else if (path.match(/^\/genre\/[\d]+$/)) {
+    const id = path.split('/')[2];
+    document.title = 'Loading Genre...';
+    currentPagePromise = Promise.resolve(renderGenreDetailsPage(appContainer, { id }));
   }
   else {
     document.title = '404';

@@ -99,9 +99,12 @@ function displaySearchResults(results, container) {
       if (!imagePath) return;
       
       const resultItem = document.createElement('div');
-      resultItem.className = 'flex flex-row overflow-hidden cursor-pointer h-24 opacity-0 transition-all duration-500';
+      resultItem.className = 'flex flex-row overflow-hidden cursor-pointer h-24';
       resultItem.dataset.id = item.id;
       resultItem.dataset.mediaType = mediaType;
+      
+      resultItem.style.opacity = '0';
+      resultItem.style.transform = 'translateY(16px)';
       
       resultItem.innerHTML = `
         <div class="w-[10.67rem] h-full">
@@ -122,11 +125,13 @@ function displaySearchResults(results, container) {
       
       container.appendChild(resultItem);
       
-      // Stagger the animation for each item
-      setTimeout(() => {
-        resultItem.classList.add('opacity-100', 'translate-y-0');
-        resultItem.classList.remove('opacity-0');
-      }, 50 * index);
+      requestAnimationFrame(() => {
+        // Stagger the animation for each item
+        setTimeout(() => {
+          resultItem.style.opacity = '1';
+          resultItem.style.transform = 'translateY(0)';
+        }, 30 * index);
+      });
     });
   } else {
     container.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6';
@@ -141,17 +146,22 @@ function displaySearchResults(results, container) {
       const carouselItem = createCarouselItem(item, false, 'grid');
       if (carouselItem) {
         carouselItem.classList.remove('w-[300px]', 'w-[140px]');
-        carouselItem.classList.add('w-full', 'opacity-0', 'transition-all', 'duration-500');
+        carouselItem.classList.add('w-full');
         if (carouselItem.style.aspectRatio) {
         } else { carouselItem.classList.add('aspect-video'); }
         
+        carouselItem.style.opacity = '0';
+        carouselItem.style.transform = 'translateY(16px)';
+        carouselItem.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
         container.appendChild(carouselItem);
         
-        // Stagger the animation for each item
-        setTimeout(() => {
-          carouselItem.classList.add('opacity-100', 'translate-y-0');
-          carouselItem.classList.remove('opacity-0');
-        }, 50 * index);
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            carouselItem.style.opacity = '1';
+            carouselItem.style.transform = 'translateY(0)';
+          }, 30 * index);
+        });
       }
     });
   }
