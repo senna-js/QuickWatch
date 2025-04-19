@@ -11,7 +11,7 @@ export function renderHomePage(container) {
   container.innerHTML = `
     ${renderHeader()}
     
-    <div class="pb-20 md:pb-0 mb-64">
+    <div class="pb-32 md:pb-64">
       <div id="hero-section" class="h-[550px] w-full flex items-end justify-end relative">
         <div class="absolute inset-x-0 md:inset-x-auto md:left-[4.4rem] text-white z-[6] flex flex-col items-center md:items-start opacity-0" style="transform: translateY(30px);">
           <img id="logo" class="w-[250px] md:w-[400px] opacity-0" style="transform: translateY(20px);">

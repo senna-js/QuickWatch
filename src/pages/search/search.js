@@ -25,7 +25,7 @@ export function renderSearchPage(container) {
                   background-size: 100% 100%, 24px 24px;">
       </div>
       
-      <div class="relative md:px-[4.4rem] p-4 md:py-12 pb-20 md:pb-12 md:mt-10">
+      <div class="relative md:px-[4.4rem] p-4 md:py-12 md:mt-10 pb-32 md:!pb-64">
         <div class="mb-6 md:mb-8">
           <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-4 md:mb-6 md:mt-0 hidden md:block">What do you feel like watching?</h1>
           <input type="text" id="search-input" placeholder="Enter your search query..." 
@@ -75,7 +75,7 @@ function displaySearchResults(results, container) {
       return;
     }
     
-    results.forEach(item => {
+    results.forEach((item, index) => {
       const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
       const title = item.title || item.name;
       const releaseDate = item.release_date || item.first_air_date;
@@ -99,7 +99,7 @@ function displaySearchResults(results, container) {
       if (!imagePath) return;
       
       const resultItem = document.createElement('div');
-      resultItem.className = 'flex flex-row overflow-hidden cursor-pointer h-24';
+      resultItem.className = 'flex flex-row overflow-hidden cursor-pointer h-24 opacity-0 transition-all duration-500';
       resultItem.dataset.id = item.id;
       resultItem.dataset.mediaType = mediaType;
       
@@ -121,6 +121,12 @@ function displaySearchResults(results, container) {
       });
       
       container.appendChild(resultItem);
+      
+      // Stagger the animation for each item
+      setTimeout(() => {
+        resultItem.classList.add('opacity-100', 'translate-y-0');
+        resultItem.classList.remove('opacity-0');
+      }, 50 * index);
     });
   } else {
     container.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6';
@@ -131,15 +137,21 @@ function displaySearchResults(results, container) {
       return;
     }
     
-    results.forEach(item => {
+    results.forEach((item, index) => {
       const carouselItem = createCarouselItem(item, false, 'grid');
       if (carouselItem) {
         carouselItem.classList.remove('w-[300px]', 'w-[140px]');
-        carouselItem.classList.add('w-full');
+        carouselItem.classList.add('w-full', 'opacity-0', 'transition-all', 'duration-500');
         if (carouselItem.style.aspectRatio) {
         } else { carouselItem.classList.add('aspect-video'); }
         
         container.appendChild(carouselItem);
+        
+        // Stagger the animation for each item
+        setTimeout(() => {
+          carouselItem.classList.add('opacity-100', 'translate-y-0');
+          carouselItem.classList.remove('opacity-0');
+        }, 50 * index);
       }
     });
   }

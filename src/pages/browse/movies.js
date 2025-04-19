@@ -11,7 +11,7 @@ export function renderMoviesPage(container) {
   container.innerHTML = `
     ${renderHeader()}
     
-    <div class="pt-24 pb-20 md:pb-0 bg-[#00050d] mb-64">
+    <div class="pt-24 bg-[#00050d] pb-32 md:pb-64">
       <div class="px-[4.4rem]">
         <h1 class="text-4xl font-bold mb-8 font-medium">Movies</h1>
       </div>
