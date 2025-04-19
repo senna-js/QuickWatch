@@ -8,15 +8,6 @@ import { createCarouselItem } from '../../components/carouselItem.js';
  * @param {HTMLElement} container
  */
 export function renderMoviesPage(container) {
-  window.splashScreen.show();
-  const actionStep = window.splashScreen.addStep('Loading Action movies...');
-  const comedyStep = window.splashScreen.addStep('Loading Comedy movies...');
-  const dramaStep = window.splashScreen.addStep('Loading Drama movies...');
-  const scifiStep = window.splashScreen.addStep('Loading Sci-Fi movies...');
-  const horrorStep = window.splashScreen.addStep('Loading Horror movies...');
-  const animationStep = window.splashScreen.addStep('Loading Animation movies...');
-  const imagesStep = window.splashScreen.addStep('Loading movie images...');
-  
   container.innerHTML = `
     ${renderHeader()}
     
@@ -57,26 +48,18 @@ export function renderMoviesPage(container) {
     </div>
   `;
   
-  fetchMovieGenres({
-    action: actionStep,
-    comedy: comedyStep,
-    drama: dramaStep,
-    scifi: scifiStep,
-    horror: horrorStep,
-    animation: animationStep,
-    images: imagesStep
-  });
+  fetchMovieGenres();
 }
 
-async function fetchMovieGenres(loadingSteps) {
+async function fetchMovieGenres() {
   try {
     const genres = [
-      { id: 28, name: 'action', loadingStep: loadingSteps.action },
-      { id: 35, name: 'comedy', loadingStep: loadingSteps.comedy },
-      { id: 18, name: 'drama', loadingStep: loadingSteps.drama },
-      { id: 878, name: 'sci-fi', loadingStep: loadingSteps.scifi },
-      { id: 27, name: 'horror', loadingStep: loadingSteps.horror },
-      { id: 16, name: 'animation', loadingStep: loadingSteps.animation }
+      { id: 28, name: 'action' },
+      { id: 35, name: 'comedy' },
+      { id: 18, name: 'drama' },
+      { id: 878, name: 'sci-fi' },
+      { id: 27, name: 'horror' },
+      { id: 16, name: 'animation' }
     ];
 
     for (const genre of genres) {
@@ -94,9 +77,6 @@ async function fetchMovieGenres(loadingSteps) {
       const data = await response.json();
 
       if (data.results && data.results.length > 0) {
-        const totalImages = Math.min(data.results.length, 10);
-        let imagesLoaded = 0;
-        
         const detailedResults = await Promise.all(
           data.results.slice(0, 10).map(async (item) => {
             const detailUrl = `${TMDB_BASE_URL}/movie/${item.id}?append_to_response=images,content_ratings,release_dates&language=en-US&include_image_language=en`;
@@ -107,44 +87,30 @@ async function fetchMovieGenres(loadingSteps) {
         
         const carousel = document.querySelector(`[data-category="${genre.name}"]`);
         if (carousel) {
-          updateMovieCarousel(detailedResults, carousel, () => {
-            imagesLoaded++;
-            
-            if (imagesLoaded === totalImages) {
-              window.splashScreen.completeStep(genre.loadingStep);
-            }
-            
-            const imageProgress = Math.round((imagesLoaded / (totalImages * genres.length)) * 100);
-            
-            if (imagesLoaded === totalImages && genre === genres[genres.length - 1]) {
-              window.splashScreen.completeStep(loadingSteps.images);
-              window.splashScreen.hide();
-            }
-          });
+          updateMovieCarousel(detailedResults, carousel);
         }
-      } else {
-        window.splashScreen.completeStep(genre.loadingStep);
       }
     }
   } catch (error) {
     console.error('Error fetching movie genres:', error);
-    for (const genre of genres) {
-      window.splashScreen.completeStep(genre.loadingStep);
-    }
-    window.splashScreen.completeStep(loadingSteps.images);
-    window.splashScreen.hide();
   }
 }
 
-function updateMovieCarousel(items, carousel, onItemLoaded) {
+function updateMovieCarousel(items, carousel) {
   carousel.innerHTML = '';
   
   items.forEach((item, index) => {
-    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, false, onItemLoaded);
+    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, false);
     if (carouselItem) {
+      carouselItem.style.opacity = '0';
+      carouselItem.style.transform = 'translateY(20px)';
       carousel.appendChild(carouselItem);
-    } else {
-      if (onItemLoaded) onItemLoaded();
+      
+      setTimeout(() => {
+        carouselItem.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        carouselItem.style.opacity = '1';
+        carouselItem.style.transform = 'translateY(0)';
+      }, 50 * index);
     }
   });
 }

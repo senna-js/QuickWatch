@@ -9,12 +9,11 @@ import { TMDB_IMAGE_BASE_URL } from '../router.js';
  * @param {string} context - The context where the item is used ('carousel' or 'grid')
  * @param {Function} onRemove - Optional callback when remove button is clicked
  * @param {boolean} usePoster - Whether to use poster instead of backdrop
- * @param {Function} onLoaded - Optional callback when the image has loaded
  * @param {Object} progressData - Optional progress data {percentage, watchedDuration, fullDuration}
  * @param {Object} episodeInfo - Optional episode info for TV shows {season, episode}
  * @returns {HTMLElement} - The carousel item element
  */
-export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null, usePoster = false, onLoaded = null, progressData = null, episodeInfo = null) {
+export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null, usePoster = false, progressData = null, episodeInfo = null) {
   const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
   const title = item.title || item.name;
   const releaseDate = item.release_date || item.first_air_date;
@@ -45,7 +44,6 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   }
     
   if (!imagePath) {
-    if (onLoaded) onLoaded();
     return null;
   }
   
@@ -63,7 +61,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     card.classList.add('w-[140px]');
     card.style.aspectRatio = '2/3';
   } else {
-    card.classList.add('w-[300px]');
+    card.classList.add('h-[10.625rem]');
     card.classList.add('aspect-video');
   }
   
@@ -83,16 +81,10 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   infoPanel.style.transform = 'translateY(-10px)';
   infoPanel.style.position = 'absolute';
   infoPanel.style.zIndex = '50';
-
-  if (onLoaded) {
-    requestAnimationFrame(() => {
-      onLoaded();
-    });
-  }
       
   infoPanel.innerHTML = `
     <h3 class="text-white font-semibold text-xl">${title}</h3>
-    <button class="play-button px-4 py-3 text-lg my-2 w-full rounded-lg bg-[#32363D] font-medium flex flex-row items-center justify-center gap-2">
+    <button class="play-button pagebtn px-4 py-3 text-lg my-2 w-full rounded-lg bg-[#32363D] font-medium flex flex-row items-center justify-center gap-2">
         <i class="fas fa-play text-xl mr-0.5"></i>
         <span>${displayProgressData?.continueText || 'Play'}</span>
     </button>
@@ -121,7 +113,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
       continueTextElement.className = 'hidden md:block text-sm font-bold text-white absolute m-2 bottom-0 z-[3]';
       continueTextElement.style.textShadow = '0 0 0.5rem #000';
       continueTextElement.innerHTML = displayProgressData.statusText 
-        ? `${displayProgressData.continueText} <span class="font-light">(${displayProgressData.statusText})</span>`
+        ? `${displayProgressData.continueText} <span class="font-light">(${displayProgressData.statusText})</span>`
         : displayProgressData.continueText;
       card.appendChild(continueTextElement);
     }

@@ -8,19 +8,10 @@ import { createCarouselItem } from '../../components/carouselItem.js';
  * @param {HTMLElement} container
  */
 export function renderHomePage(container) {
-  window.splashScreen.show();
-  const heroLoadingStep = window.splashScreen.addStep('Loading hero content...');
-  const trendingMoviesStep = window.splashScreen.addStep('Loading trending movies...');
-  const trendingTVStep = window.splashScreen.addStep('Loading trending TV shows...');
-  const topRatedStep = window.splashScreen.addStep('Loading top rated movies...');
-  const popularMoviesStep = window.splashScreen.addStep('Loading popular movies...');
-  const popularTVStep = window.splashScreen.addStep('Loading popular TV shows...');
-  const imagesStep = window.splashScreen.addStep('Loading images...');
-  
   container.innerHTML = `
     ${renderHeader()}
     
-    <div class="pb-20 md:pb-0">
+    <div class="pb-20 md:pb-0 mb-64">
       <div id="hero-section" class="h-[550px] w-full flex items-end justify-end relative">
         <div class="absolute inset-x-0 md:inset-x-auto md:left-[4.4rem] text-white z-[6] flex flex-col items-center md:items-start">
           <img id="logo" class="w-[250px] md:w-[400px]">
@@ -72,22 +63,12 @@ export function renderHomePage(container) {
     </div>
   `;
   
-  fetchAllCategories({
-    hero: heroLoadingStep,
-    trendingMovies: trendingMoviesStep,
-    trendingTV: trendingTVStep,
-    topRated: topRatedStep,
-    popularMovies: popularMoviesStep,
-    popularTV: popularTVStep,
-    images: imagesStep
-  });
+  fetchAllCategories();
   initButtonListeners();
 }
 
-async function fetchAllCategories(loadingSteps) {
+async function fetchAllCategories() {
   try {
-    let imageLoadingPromises = [];
-    
     await loadContinueWatching();
     
     const isMobile = window.innerWidth < 768;
@@ -96,28 +77,23 @@ async function fetchAllCategories(loadingSteps) {
       {
         url: `${TMDB_BASE_URL}/trending/movie/week?language=en-US&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
         selector: '[data-category="trending-movies"]',
-        updateHero: true,
-        loadingStep: loadingSteps.trendingMovies
+        updateHero: true
       },
       {
         url: `${TMDB_BASE_URL}/trending/tv/week?language=en-US&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
-        selector: '[data-category="trending-tv"]',
-        loadingStep: loadingSteps.trendingTV
+        selector: '[data-category="trending-tv"]'
       },
       {
         url: `${TMDB_BASE_URL}/movie/top_rated?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
-        selector: '[data-category="top-rated-movies"]',
-        loadingStep: loadingSteps.topRated
+        selector: '[data-category="top-rated-movies"]'
       },
       {
         url: `${TMDB_BASE_URL}/movie/popular?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
-        selector: '[data-category="popular-movies"]',
-        loadingStep: loadingSteps.popularMovies
+        selector: '[data-category="popular-movies"]'
       },
       {
         url: `${TMDB_BASE_URL}/tv/popular?language=en-US&page=1&append_to_response=images,content_ratings,release_dates&include_image_language=en`,
-        selector: '[data-category="popular-tv"]',
-        loadingStep: loadingSteps.popularTV
+        selector: '[data-category="popular-tv"]'
       }
     ];
 
@@ -140,7 +116,6 @@ async function fetchAllCategories(loadingSteps) {
           const detailData = await detailResponse.json();
           
           updateHeroSection({...detailData, media_type: data.results[0].media_type || 'movie'});
-          window.splashScreen.completeStep(loadingSteps.hero);
         }
         
         const detailedResults = await Promise.all(
@@ -154,34 +129,12 @@ async function fetchAllCategories(loadingSteps) {
         
         const carousel = document.querySelector(category.selector);
         if (carousel) {
-          let imagesLoaded = 0;
-          const totalImages = detailedResults.length;
-          
-          updateMovieCarousel(detailedResults, carousel, isMobile, () => {
-            imagesLoaded++;
-            
-            if (imagesLoaded === totalImages) {
-              window.splashScreen.completeStep(category.loadingStep);
-            }
-            
-            const imageProgress = Math.round((imagesLoaded / (totalImages * categories.length)) * 100);
-            
-            if (imagesLoaded === totalImages && category === categories[categories.length - 1]) {
-              window.splashScreen.completeStep(loadingSteps.images);
-            }
-          });
+          updateMovieCarousel(detailedResults, carousel, isMobile);
         }
-      } else {
-        window.splashScreen.completeStep(category.loadingStep);
       }
     }
-    window.splashScreen.hide();
   } catch (error) {
     console.error('Error fetching categories:', error);
-    for (const step of Object.values(loadingSteps)) {
-      window.splashScreen.completeStep(step);
-    }
-    window.splashScreen.hide();
   }
 }
 
@@ -329,15 +282,21 @@ function removeFromContinueWatching(id, mediaType) {
   });
 }
 
-function updateMovieCarousel(items, carousel, usePoster = false, onItemLoaded) {
+function updateMovieCarousel(items, carousel, usePoster = false) {
   carousel.innerHTML = '';
   
   items.forEach((item, index) => {
-    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, usePoster, onItemLoaded);
+    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, usePoster);
     if (carouselItem) {
+      carouselItem.style.opacity = '0';
+      carouselItem.style.transform = 'translateY(20px)';
       carousel.appendChild(carouselItem);
-    } else {
-      if (onItemLoaded) onItemLoaded();
+      
+      setTimeout(() => {
+        carouselItem.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        carouselItem.style.opacity = '1';
+        carouselItem.style.transform = 'translateY(0)';
+      }, 50 * index);
     }
   });
 }

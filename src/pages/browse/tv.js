@@ -8,15 +8,6 @@ import { createCarouselItem } from '../../components/carouselItem.js';
  * @param {HTMLElement} container
  */
 export function renderTvPage(container) {
-  window.splashScreen.show();
-  const dramaStep = window.splashScreen.addStep('Loading Drama series...');
-  const comedyStep = window.splashScreen.addStep('Loading Comedy series...');
-  const crimeStep = window.splashScreen.addStep('Loading Crime series...');
-  const scifiFantasyStep = window.splashScreen.addStep('Loading Sci-Fi & Fantasy series...');
-  const actionAdventureStep = window.splashScreen.addStep('Loading Action & Adventure series...');
-  const animationStep = window.splashScreen.addStep('Loading Animation series...');
-  const imagesStep = window.splashScreen.addStep('Loading TV show images...');
-  
   container.innerHTML = `
     ${renderHeader()}
     
@@ -57,26 +48,18 @@ export function renderTvPage(container) {
     </div>
   `;
   
-  fetchTvGenres({
-    drama: dramaStep,
-    comedy: comedyStep,
-    crime: crimeStep,
-    scifiFantasy: scifiFantasyStep,
-    actionAdventure: actionAdventureStep,
-    animation: animationStep,
-    images: imagesStep
-  });
+  fetchTvGenres();
 }
 
-async function fetchTvGenres(loadingSteps) {
+async function fetchTvGenres() {
   try {
     const genres = [
-      { id: 18, name: 'drama', loadingStep: loadingSteps.drama },
-      { id: 35, name: 'comedy', loadingStep: loadingSteps.comedy },
-      { id: 80, name: 'crime', loadingStep: loadingSteps.crime },
-      { id: 10765, name: 'sci-fi-fantasy', loadingStep: loadingSteps.scifiFantasy },
-      { id: 10759, name: 'action-adventure', loadingStep: loadingSteps.actionAdventure },
-      { id: 16, name: 'animation', loadingStep: loadingSteps.animation }
+      { id: 18, name: 'drama' },
+      { id: 35, name: 'comedy' },
+      { id: 80, name: 'crime' },
+      { id: 10765, name: 'sci-fi-fantasy' },
+      { id: 10759, name: 'action-adventure' },
+      { id: 16, name: 'animation' }
     ];
 
     for (const genre of genres) {
@@ -94,9 +77,6 @@ async function fetchTvGenres(loadingSteps) {
       const data = await response.json();
 
       if (data.results && data.results.length > 0) {
-        const totalImages = Math.min(data.results.length, 10);
-        let imagesLoaded = 0;
-        
         const detailedResults = await Promise.all(
           data.results.slice(0, 10).map(async (item) => {
             const detailUrl = `${TMDB_BASE_URL}/tv/${item.id}?append_to_response=images,content_ratings,release_dates&language=en-US&include_image_language=en`;
@@ -107,44 +87,30 @@ async function fetchTvGenres(loadingSteps) {
         
         const carousel = document.querySelector(`[data-category="${genre.name}"]`);
         if (carousel) {
-          updateTvCarousel(detailedResults, carousel, () => {
-            imagesLoaded++;
-            
-            if (imagesLoaded === totalImages) {
-              window.splashScreen.completeStep(genre.loadingStep);
-            }
-            
-            const imageProgress = Math.round((imagesLoaded / (totalImages * genres.length)) * 100);
-            
-            if (imagesLoaded === totalImages && genre === genres[genres.length - 1]) {
-              window.splashScreen.completeStep(loadingSteps.images);
-              window.splashScreen.hide();
-            }
-          });
+          updateTvCarousel(detailedResults, carousel);
         }
-      } else {
-        window.splashScreen.completeStep(genre.loadingStep);
       }
     }
   } catch (error) {
     console.error('Error fetching TV genres:', error);
-    for (const genre of genres) {
-      window.splashScreen.completeStep(genre.loadingStep);
-    }
-    window.splashScreen.completeStep(loadingSteps.images);
-    window.splashScreen.hide();
   }
 }
 
-function updateTvCarousel(items, carousel, onItemLoaded) {
+function updateTvCarousel(items, carousel) {
   carousel.innerHTML = '';
   
   items.forEach((item, index) => {
-    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, false, onItemLoaded);
+    const carouselItem = createCarouselItem(item, index === 0, 'carousel', null, false);
     if (carouselItem) {
+      carouselItem.style.opacity = '0';
+      carouselItem.style.transform = 'translateY(20px)';
       carousel.appendChild(carouselItem);
-    } else {
-      if (onItemLoaded) onItemLoaded();
+      
+      setTimeout(() => {
+        carouselItem.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        carouselItem.style.opacity = '1';
+        carouselItem.style.transform = 'translateY(0)';
+      }, 50 * index);
     }
   });
 }
