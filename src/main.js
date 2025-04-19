@@ -105,7 +105,7 @@ window.splashScreen = {
 
 document.addEventListener('DOMContentLoaded', () => {
   const currentPath = window.location.pathname;
-  if (currentPath !== '/download' && currentPath !== '/search' && currentPath !== '/watchlist') {
+  if (currentPath !== '/' && currentPath !== '/tv' && currentPath !== '/movies' && currentPath !== '/download' && currentPath !== '/search' && currentPath !== '/watchlist') {
     window.splashScreen.show();
   }
 
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Error waiting for page to load:', error);
     }
     
-    if (currentPath !== '/download' && currentPath !== '/search' && currentPath !== '/watchlist') {
+    if (currentPath !== '/' && currentPath !== '/tv' && currentPath !== '/movies' !== '/download' && currentPath !== '/search' && currentPath !== '/watchlist') {
       window.splashScreen.hide();
     }
   });

@@ -107,7 +107,6 @@ function updateTvCarousel(items, carousel) {
       carousel.appendChild(carouselItem);
       
       setTimeout(() => {
-        carouselItem.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         carouselItem.style.opacity = '1';
         carouselItem.style.transform = 'translateY(0)';
       }, 50 * index);

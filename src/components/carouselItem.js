@@ -50,11 +50,11 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   const card = document.createElement('div');
   
   if (context === 'grid') {
-    card.className = 'carousel-item w-full bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
+    card.className = 'carousel-item w-full bg-[#32363D] rounded-lg transition-all duration-500 ease-in-out relative cursor-pointer';
   } else {
     card.className = isFirstItem 
-      ? 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg ml-2 transition-all duration-300 ease-in-out relative cursor-pointer'
-      : 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg transition-all duration-300 ease-in-out relative cursor-pointer';
+      ? 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg ml-2 transition-all duration-500 ease-in-out relative cursor-pointer'
+      : 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg transition-all duration-500 ease-in-out relative cursor-pointer';
   }
   
   if (usePoster) {
@@ -76,7 +76,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
 
   const infoPanel = document.createElement('div');
 
-  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-white p-3 rounded-b-lg opacity-0 transition-opacity duration-300 pointer-events-none'; 
+  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-white p-3 rounded-b-lg opacity-0 transition-opacity duration-500 pointer-events-none'; 
   infoPanel.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
   infoPanel.style.transform = 'translateY(-10px)';
   infoPanel.style.position = 'absolute';
@@ -96,14 +96,16 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     </div>
   `;
   
-  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-white p-4 rounded-b-lg opacity-0 transition-opacity duration-300 pointer-events-none shadow-lg';
+  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-white p-4 rounded-b-lg opacity-0 transition-opacity duration-500 pointer-events-none shadow-lg';
   
   const playButton = infoPanel.querySelector('.play-button');
   
   playButton.addEventListener('click', (e) => {
     e.stopPropagation();
-    window.history.pushState(null, null, `/${mediaType}/${item.id}`);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    setTimeout(() => {
+      window.history.pushState(null, null, `/${mediaType}/${item.id}`);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }, 50);
   });
   
   if (displayProgressData) {
@@ -203,7 +205,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   let removeButton = null;
   if (onRemove) {
     removeButton = document.createElement('button');
-    removeButton.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full w-6 h-6 flex items-center justify-center text-white z-20 opacity-0 transition-opacity duration-300';
+    removeButton.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full w-6 h-6 flex items-center justify-center text-white z-20 opacity-0 transition-opacity duration-500';
     removeButton.innerHTML = '×';
     removeButton.style.fontSize = '18px';
     
@@ -229,12 +231,10 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   attachPanelListeners();
 
   card.addEventListener('click', () => {
-    if (!currentInfoPanel || !document.body.contains(currentInfoPanel) || infoPanel.style.opacity === '0') {
-      setTimeout(() => {
-        window.history.pushState(null, null, `/${mediaType}/${item.id}`);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      }, 50);
-    }
+    setTimeout(() => {
+      window.history.pushState(null, null, `/${mediaType}/${item.id}`);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }, 200);
   });
   
   return card;

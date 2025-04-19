@@ -13,20 +13,20 @@ export function renderHomePage(container) {
     
     <div class="pb-20 md:pb-0 mb-64">
       <div id="hero-section" class="h-[550px] w-full flex items-end justify-end relative">
-        <div class="absolute inset-x-0 md:inset-x-auto md:left-[4.4rem] text-white z-[6] flex flex-col items-center md:items-start">
-          <img id="logo" class="w-[250px] md:w-[400px]">
+        <div class="absolute inset-x-0 md:inset-x-auto md:left-[4.4rem] text-white z-[6] flex flex-col items-center md:items-start opacity-0" style="transform: translateY(30px);">
+          <img id="logo" class="w-[250px] md:w-[400px] opacity-0" style="transform: translateY(20px);">
           <span id="overview" class="text-[14px] md:text-[18px] mt-4 w-[80%] md:w-[37%] line-clamp-3 md:line-clamp-2 font-light text-center md:text-left">
             Peter Parker is on his way to becoming a hero, but his path to get there is anything but ordinary.
           </span>
           <div class="flex flex-row gap-4 mt-4 text-white">
-            <button id="watch-now-btn" class="px-4 py-2 md:px-6 md:py-4 rounded-lg bg-[#32363D] text-lg md:text-xl pagebtn font-medium">Watch now</button>
-            <button id="info-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-2xl md:text-3xl flex items-center justify-center pagebtn font-medium"><i class="icon-info"></i></button>
-            <button id="add-watchlist-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-3xl md:text-4xl flex items-center justify-center pagebtn font-medium"><i class="icon-plus"></i></button>
+            <button id="watch-now-btn" class="px-4 py-2 md:px-6 md:py-4 rounded-lg bg-[#32363D] text-lg md:text-xl pagebtn font-medium opacity-0">Watch now</button>
+            <button id="info-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-2xl md:text-3xl flex items-center justify-center pagebtn font-medium opacity-0"><i class="icon-info"></i></button>
+            <button id="add-watchlist-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-3xl md:text-4xl flex items-center justify-center pagebtn font-medium opacity-0"><i class="icon-plus"></i></button>
           </div>
         </div>
         <div class="absolute inset-y-0 left-0 md:left-[30%] w-full md:w-[40%] bg-gradient-to-r from-[#00050d] to-transparent z-[3]"></div>
         <div class="absolute inset-x-0 bottom-0 h-[100px] bg-gradient-to-t from-[#00050d] to-transparent z-[3]"></div>
-        <img id="herobk" class="h-[550px] w-full md:w-[70%] object-cover items-center ml-auto">
+        <img id="herobk" class="h-[550px] w-full md:w-[70%] object-cover items-center ml-auto opacity-0">
       </div>
       
       <div class="bg-[#00050d]">
@@ -257,12 +257,19 @@ async function loadContinueWatching() {
         'continue-watching', 
         removeCallback, 
         isMobile,
-        null, // onLoaded
         progressData,
         episodeInfo
       );
       
+      carouselItem.style.opacity = '0';
+      carouselItem.style.transform = 'translateY(20px)';
       continueWatchingContainer.appendChild(carouselItem);
+      
+      setTimeout(() => {
+        carouselItem.style.opacity = '1';
+        carouselItem.style.transform = 'translateY(0)';
+      }, 50 * index);
+      
       index++;
     }
   }
@@ -293,7 +300,6 @@ function updateMovieCarousel(items, carousel, usePoster = false) {
       carousel.appendChild(carouselItem);
       
       setTimeout(() => {
-        carouselItem.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         carouselItem.style.opacity = '1';
         carouselItem.style.transform = 'translateY(0)';
       }, 50 * index);
@@ -306,6 +312,10 @@ async function updateHeroSection(item) {
   const overview = document.querySelector('#overview');
   const studioLogo = document.querySelector('#logo');
   const heroSection = document.querySelector('#hero-section');
+  const heroContent = heroSection.querySelector('.absolute.inset-x-0');
+  const watchNowBtn = document.querySelector('#watch-now-btn');
+  const infoBtn = document.querySelector('#info-btn');
+  const addWatchlistBtn = document.querySelector('#add-watchlist-btn');
   
   const isMobile = window.innerWidth < 768;
   
@@ -318,10 +328,17 @@ async function updateHeroSection(item) {
       studioLogo.style.display = 'none';
       
       const titleElement = document.createElement('h1');
-      titleElement.className = 'text-4xl font-bold';
+      titleElement.className = 'text-4xl font-bold opacity-0';
+      titleElement.style.transform = 'translateY(20px)';
       titleElement.textContent = item.title || item.name;
       
       studioLogo.parentNode.insertBefore(titleElement, studioLogo);
+      
+      requestAnimationFrame(() => {
+        titleElement.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        titleElement.style.opacity = '1';
+        titleElement.style.transform = 'translateY(0)';
+      });
     }
     
     // Use poster for mobile and backdrop for desktop
@@ -340,6 +357,47 @@ async function updateHeroSection(item) {
     }
     
     heroBackground.alt = item.title || item.name;
+    
+    heroBackground.onload = () => {
+      heroBackground.style.transition = 'opacity 0.6s ease';
+      heroBackground.style.opacity = '1';
+      
+      requestAnimationFrame(() => {
+        heroContent.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        heroContent.style.opacity = '1';
+        heroContent.style.transform = 'translateY(0)';
+        
+        if (studioLogo.style.display !== 'none') {
+          requestAnimationFrame(() => {
+            studioLogo.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            studioLogo.style.opacity = '1';
+            studioLogo.style.transform = 'translateY(0)';
+          });
+        }
+        
+        if (watchNowBtn) {
+          requestAnimationFrame(() => {
+            watchNowBtn.style.transition = 'opacity 0.4s ease';
+            watchNowBtn.style.opacity = '1';
+          });
+        }
+        
+        if (infoBtn) {
+          setTimeout(() => {
+            infoBtn.style.transition = 'opacity 0.4s ease';
+            infoBtn.style.opacity = '1';
+          }, 50);
+        }
+        
+        if (addWatchlistBtn) {
+          setTimeout(() => {
+            addWatchlistBtn.style.transition = 'opacity 0.4s ease';
+            addWatchlistBtn.style.opacity = '1';
+          }, 100);
+        }
+      });
+    };
+    
   } catch (error) {
     console.error('Error updating hero section:', error);
     studioLogo.style.display = 'none';
@@ -354,6 +412,15 @@ async function updateHeroSection(item) {
       heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.poster_path}`;
       heroBackground.classList.add('object-contain');
     }
+    
+    heroBackground.style.transition = 'opacity 0.6s ease';
+    heroBackground.style.opacity = '1';
+    
+    requestAnimationFrame(() => {
+      heroContent.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      heroContent.style.opacity = '1';
+      heroContent.style.transform = 'translateY(0)';
+    });
   }
       
   overview.textContent = item.overview || 'No description available';
