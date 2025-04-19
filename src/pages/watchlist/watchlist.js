@@ -23,7 +23,7 @@ export function renderWatchlistPage(container) {
   
     <div class="md:ml-16 p-4 md:p-12 md:pl-1 pb-20 md:pb-12 md:mt-10">
       <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-4 md:mb-6 md:mt-0 text-center md:text-left">Your Watchlist</h1>
-      <div id="watchlist-container" class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6 mx-auto"></div>
+      <div id="watchlist-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mx-auto"></div>
     </div>
   `;
   

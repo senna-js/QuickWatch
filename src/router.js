@@ -12,7 +12,7 @@ import { renderAnimePaheEmbed } from './pages/embeds/animepahe-embed.js';
 import { renderVidSrcEmbed } from './pages/embeds/vidsrc-embed.js';
 import { renderMoviesPage } from './pages/browse/movies.js';
 import { renderTvPage } from './pages/browse/tv.js';
-import { renderStreamingPage } from './pages/details/streaming.js';
+import { renderGenresPage } from './pages/details/genres.js';
 
 export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q';
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -137,9 +137,9 @@ function handleRoute() {
     document.title = 'TV Shows';
     currentPagePromise = Promise.resolve(renderTvPage(appContainer));
   }
-  else if (path === '/streaming') {
-    document.title = 'Streaming';
-    currentPagePromise = Promise.resolve(renderStreamingPage(appContainer));
+  else if (path === '/genres') {
+    document.title = 'genres';
+    currentPagePromise = Promise.resolve(renderGenresPage(appContainer));
   }
   else {
     document.title = '404';
