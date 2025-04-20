@@ -122,7 +122,19 @@ async function loadAnimeContent(id, episode, container, params) {
   const seasonNumber = params.season || '1';
   const searchQuery = seasonNumber === '1' ? animeName : `${animeName} Season ${seasonNumber}`;
 
-  const searchResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=search&query=${encodeURIComponent(searchQuery)}`);
+  const searchResponse = await fetch('https://varunaditya.xyz/api/proxy', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      url: `https://animepahe.ru/api?m=search&q=${encodeURIComponent(searchQuery)}`,
+      method: 'GET',
+      headers: {
+        'cookie': '__ddg2_=;'
+      }
+    })
+  });
   const searchData = await searchResponse.json();
 
   if (!searchData.data || searchData.data.length === 0) {
@@ -141,21 +153,38 @@ async function loadAnimeContent(id, episode, container, params) {
   window.splashScreen?.completeStep(searchStep);
   const episodesStep = window.splashScreen?.addStep('Loading episode list...');
 
-  const seriesResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=series&session=${bestMatch.session}&page=1`);
+  const seriesResponse = await fetch('https://varunaditya.xyz/api/proxy', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      url: `https://animepahe.ru/api?m=release&id=${bestMatch.session}&page=1`,
+      method: 'GET',
+      headers: {
+        'cookie': '__ddg2_=;'
+      }
+    })
+  });
   const seriesData = await seriesResponse.json();
 
-  if (!seriesData.episodes || seriesData.episodes.length === 0) {
+  if (!seriesData.data || seriesData.data.length === 0) {
     window.splashScreen?.hide();
     throw new Error('No episodes found');
   }
 
   const episodeIndex = parseInt(episode) - 1;
-  if (episodeIndex < 0 || episodeIndex >= seriesData.episodes.length) { throw new Error('Episode not found'); }
+  if (episodeIndex < 0 || episodeIndex >= seriesData.data.length) { throw new Error('Episode not found'); }
 
-  const episodeData = seriesData.episodes[episodeIndex];
+  const episodeData = seriesData.data[episodeIndex];
+  
+  window.splashScreen?.completeStep(episodesStep);
+  const linksStep = window.splashScreen?.addStep('Fetching streaming links...');
 
   const linksResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=episode&session=${bestMatch.session}&ep=${episodeData.session}`);
   const linksData = await linksResponse.json();
+
+  window.splashScreen?.completeStep(linksStep);
 
   if (!linksData || linksData.length === 0) {
     throw new Error('No streaming links found');
@@ -169,8 +198,15 @@ async function loadAnimeContent(id, episode, container, params) {
       </div>
     `;
 
+    const m3u8Step = window.splashScreen?.addStep('Preparing video stream...');
+    
     fetchVideoUrl(linksData[0].link)
       .then(videoUrl => {
+        window.splashScreen?.completeStep(m3u8Step);
+        if (window.splashScreen) {
+          window.splashScreen.hide();
+        }
+        
         if (videoUrl) {
           renderVideoPlayer(playerContainer, videoUrl, 'Auto', linksData, id, episode);
         } else {
@@ -182,6 +218,11 @@ async function loadAnimeContent(id, episode, container, params) {
         }
       })
       .catch(error => {
+        window.splashScreen?.completeStep(m3u8Step);
+        if (window.splashScreen) {
+          window.splashScreen.hide();
+        }
+        
         console.error('Error fetching video URL:', error);
         playerContainer.innerHTML = `
           <div class="flex justify-center items-center h-full">
