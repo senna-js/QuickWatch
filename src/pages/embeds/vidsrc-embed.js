@@ -32,6 +32,9 @@ export async function renderVidSrcEmbed(container, params) {
     container.innerHTML = renderError(
       'Error',
       'Failed to load content',
+      '',
+      '',
+      false
     );
     
     if (window.splashScreen) {
@@ -372,6 +375,9 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
           container.innerHTML = renderError(
             'Error',
             'Failed to load source',
+            '',
+            '',
+            false
           );
         }
       }

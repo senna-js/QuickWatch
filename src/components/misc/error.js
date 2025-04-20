@@ -11,7 +11,7 @@
  * @param {string} buttonAction - The JavaScript action for the button
  * @returns {string} The HTML for the error message
  */
-export function renderError(title = 'Error', message = 'Something went wrong', buttonText = '', buttonAction = "window.history.pushState(null, null, '/'); window.dispatchEvent(new PopStateEvent('popstate'))") {
+export function renderError(title = 'Error', message = 'Something went wrong', buttonText = '', buttonAction = "window.history.pushState(null, null, '/'); window.dispatchEvent(new PopStateEvent('popstate'))", showButton = true) {
   const buttonHtml = buttonText ? `
     <button onclick="${buttonAction}" 
         class="px-6 py-3 bg-white text-black rounded-md hover:bg-zinc-200 transition">
@@ -21,10 +21,10 @@ export function renderError(title = 'Error', message = 'Something went wrong', b
 
   return `
     <div class="flex flex-col items-center justify-center h-screen">
-      <i class="fas fa-exclamation-circle text-4xl mb-4 text-red-500"></i>
+      <i class="fas fa-exclamation-circle text-4xl mb-4 text-[#2392EE]"></i>
       <h1 class="text-4xl font-bold mb-4">${title}</h1>
       <p class="text-xl mb-8">${message}</p>
-      ${buttonHtml}
+      ${showButton ? buttonHtml : ''}
     </div>
   `;
 }

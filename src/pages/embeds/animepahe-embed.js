@@ -26,19 +26,71 @@ export async function renderAnimePaheEmbed(container, params) {
   `;
 
   try {
+    const isAnime = await checkIfAnime(id);
+    if (!isAnime) {
+      container.innerHTML = renderError(
+        'Not an Anime',
+        'This show is not an anime. Use a different source.',
+        '',
+        '',
+        false
+      );
+      return false;
+    }
+    
     await loadAnimeContent(id, episode, container, params); // Pass params here
   } catch (error) {
     console.error('Error loading anime content:', error);
     container.innerHTML = renderError(
       'Error',
-      'Failed to load anime content',
-      'Close',
-      'window.close()'
+      error.message || 'Failed to load anime content',
+      '',
+      '',
+      false
     );
     
     if (window.splashScreen) {
       window.splashScreen.hide();
     }
+  }
+}
+
+/**
+ * Checks if the content is anime based on IMDB ID
+ * @param {string} tmdbId - The TMDB ID
+ * @returns {Promise<boolean>} - Whether the content is anime
+ */
+async function checkIfAnime(tmdbId) {
+  try {
+    const tmdbResponse = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/external_ids`, {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q'
+      }
+    });
+    
+    const externalIds = await tmdbResponse.json();
+    const imdbId = externalIds.imdb_id;
+    
+    if (!imdbId) {
+      console.warn('IMDB ID not found for this media');
+      return false;
+    }
+    
+    const animeCheckResponse = await fetch(`https://raw.githubusercontent.com/Fribb/anime-lists/refs/heads/master/anime-list-full.json`);
+    const animeList = await animeCheckResponse.json();
+    
+    for (const item of animeList) {
+      if (item.imdb_id === imdbId) {
+        return true;
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    console.error('Error checking if content is anime:', error);
+    return false;
   }
 }
 
