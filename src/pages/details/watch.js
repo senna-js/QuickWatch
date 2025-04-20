@@ -301,7 +301,14 @@ async function loadMediaDetails(type, id) {
                       return progress && progress.watchedDuration > 0 ? 
                         `<span class="mr-2 font-bold">Continue Watching</span>
                         <span class="mr-2 text-base font-regular text-[#a5abb5]">${formatRemainingTime(progress.fullDuration, progress.watchedDuration)}</span>` :
-                        `<span class="mr-2">Play movie</span>`;
+                        `<span class="mr-2">Play movie</span>
+                        <span class="mr-2 text-base font-regular text-[#a5abb5]">${
+                          data.runtime 
+                            ? data.runtime >= 60
+                              ? `${Math.floor(data.runtime/60)}h${data.runtime % 60}m left`
+                              : `${data.runtime}min left`
+                            : 'N/A'
+                        }</span>`;
                     }
                   })()}
                 </div>
