@@ -6,6 +6,7 @@ import { renderError } from '../../components/misc/error.js';
 import { initTabSwitcher } from '../../components/watch/tabs/tabSwitcher.js';
 import { loadRelatedContent, loadDetailsContent } from '../../components/watch/tabs/tabContent.js';
 import { renderPlayerModal, initPlayerModal } from '../../components/watch/playerModal.js';
+import { initTrailerButton } from '../../components/watch/trailerModal.js';
 import { renderEpisodeList, initEpisodeList } from '../../components/watch/tv/episodeList.js';
 import { renderSeasonSelector, initSeasonSelector } from '../../components/watch/tv/seasonSelector.js';
 import { getProgress } from '../../components/watch/progress/index.js';
@@ -305,7 +306,7 @@ async function loadMediaDetails(type, id) {
                 </div>
               </button>
               
-              <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-film text-3xl"></i></button>
+              <button id="trailer-button" class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-film text-3xl"></i></button>
               <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full add-to-watchlist"><i class="icon-plus text-4xl"></i></button>
               <a href="/dl/${type}/${id}" class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full flex items-center justify-center"><i class="icon-download text-3xl"></i></a>
               <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-share text-3xl"></i></button>
@@ -395,12 +396,13 @@ async function loadMediaDetails(type, id) {
           localStorage.setItem('quickwatch-watchlist', JSON.stringify(watchlist));
           alert('Added to watchlist!');
         } else {
-          alert('Already in your watchlist!');
+          alert('Already in watchlist!');
         }
       });
     }
-
-
+    
+    initTrailerButton(type, id, mediaTitle);
+    
     if (type === 'tv') {
       initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex);
     }

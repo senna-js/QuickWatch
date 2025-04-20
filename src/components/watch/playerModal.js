@@ -27,23 +27,21 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
             </div>
           </div>
           
-          <div class="w-full bg-[#121212] p-3 flex flex-col">
+          <div class="w-full bg-[#12161c] p-3 flex flex-col">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-lg font-medium truncate">${mediaTitle}</h3>
-              <button id="close-modal" class="text-white px-3 py-1 rounded-lg bg-[#32363D]">
-                <i class="icon-x"></i> Close
-              </button>
+              <button id="close-modal" class="absolute -top-3 -right-3 text-white text-3xl z-[8]"><i class="icon-x"></i></button>
             </div>
             
             <div class="source-selector-container overflow-x-auto pb-1">
               <div class="flex gap-2 min-w-max">
                 ${filteredSources
                   .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#32363D]'}" data-index="${index}">
+                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
                       ${source.name}
                     </button>
                   `).join('')}
-                <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#32363D] whitespace-nowrap">
+                <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap">
                   <i class="fas fa-shield-alt mr-2"></i>Disable Popups
                 </button>
               </div>
@@ -56,29 +54,27 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
     return `
       <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
         <div class="relative w-full max-w-6xl">
-          <button id="close-modal" class="absolute -top-10 right-0 text-white text-2xl">
-            <i class="icon-x"></i> Close
-          </button>
+          <button id="close-modal" class="absolute -top-3 -right-3 text-white text-3xl z-[8]"><i class="icon-x"></i></button>
           
-          <div class="iframe-container loading rounded" id="iframe-container">
+          <div class="iframe-container loading rounded-t-lg p-4 bg-[#111419]" id="iframe-container">
             <!-- iframe goes here -->
             <div class="iframe-loader">
               ${renderSpinner('large')}
             </div>
           </div>
           
-          <div class="mt-4 bg-[#121212] p-4 rounded-lg">
+          <div class="bg-[#181c23] p-4 rounded-b-lg">
             <div class="relative flex justify-between items-center gap-3 overflow-auto">
               <div class="h-10 flex items-center gap-3">
                 ${filteredSources
                   .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#32363D]'}" data-index="${index}">
+                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
                       ${source.name}
                     </button>
                   `).join('')}
               </div>
               <span class="text-[#474b52]">｜</span>
-              <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#32363D] whitespace-nowrap">
+              <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap">
                 <i class="fas fa-shield-alt mr-2"></i>Disable Popups
               </button>
             </div>
@@ -209,9 +205,9 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
         // update active button styling
         sourceButtons.forEach(btn => {
           btn.classList.remove('bg-[#2392EE]');
-          btn.classList.add('bg-[#32363D]');
+          btn.classList.add('bg-[#272c36]');
         });
-        button.classList.remove('bg-[#32363D]');
+        button.classList.remove('bg-[#272c36]');
         button.classList.add('bg-[#2392EE]');
         
         if (currentTrackerCleanup) {
@@ -271,13 +267,13 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
       
       if (popupBlockerEnabled) {
         mediaPlayer.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation');
-        popupBlocker.classList.remove('bg-[#32363D]');
+        popupBlocker.classList.remove('bg-[#272c36]');
         popupBlocker.classList.add('bg-[#2392EE]');
         popupBlocker.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>Popups Disabled';
       } else {
         mediaPlayer.removeAttribute('sandbox');
         popupBlocker.classList.remove('bg-[#2392EE]');
-        popupBlocker.classList.add('bg-[#32363D]');
+        popupBlocker.classList.add('bg-[#272c36]');
         popupBlocker.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>Disable Popups';
       }
       
