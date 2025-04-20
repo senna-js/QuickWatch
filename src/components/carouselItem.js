@@ -162,7 +162,6 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     } else if (invertAndDropShadow.includes(logoPath)) {
       logoImg.style.filter = 'invert(1) hue-rotate(180deg) drop-shadow(0 0 0.5rem #000)';
     } else {
-      console.log(`Unknown logo: ${logoPath}`);
       logoImg.style.filter = 'contrast(0.5) brightness(100) drop-shadow(0 0 0.5rem #000)';
     }
   

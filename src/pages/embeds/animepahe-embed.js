@@ -159,7 +159,7 @@ async function loadAnimeContent(id, episode, container, params) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      url: `https://animepahe.ru/api?m=release&id=${bestMatch.session}&page=1`,
+      url: `https://animepahe.ru/api?m=release&id=${bestMatch.session}&sort=episode_asc&page=1`,
       method: 'GET',
       headers: {
         'cookie': '__ddg2_=;'

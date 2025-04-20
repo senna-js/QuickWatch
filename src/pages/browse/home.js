@@ -279,14 +279,6 @@ function removeFromContinueWatching(id, mediaType) {
   const continueWatchingItems = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
   const updatedItems = continueWatchingItems.filter(item => { return !(String(item.id) === String(id) && item.mediaType === mediaType); });
   localStorage.setItem('quickwatch-continue', JSON.stringify(updatedItems));
-  
-  const timestampKeys = Object.keys(localStorage).filter(key => 
-    key.startsWith(`quickwatch_timestamp_${String(id)}_`)
-  );
-  
-  timestampKeys.forEach(key => {
-    localStorage.removeItem(key);
-  });
 }
 
 function updateMovieCarousel(items, carousel, usePoster = false) {
