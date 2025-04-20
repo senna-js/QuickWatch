@@ -122,59 +122,6 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     
   }
   
-  const addLogo = (logoPath) => {
-    const onlyDropShadow = [
-      '/zhD3hhtKB5qyv7ZeL4uLpNxgMVU.png',
-      '/simDvqT8y6jhP530ggUMbikvVKc.png',
-      '/ttANGe4D31vZoMmtmolsHSlZUAy.png',
-      '/abFJGmtPFs6Bq5cBavmrnXDcpf8.png',
-      '/bdQFj7E5yNsir5pMgacux2SoLGQ.png',
-      '/tanmRcGlEgtAZhdcU7kMGZvYFbr.png',
-      '/r3GEPOAXaREH765QVreesBK9mE0.png',
-      '/7DMfyRszb1IVyhNgZB0r6U2poE.png',
-      '/yggDLcQ3huw76ee2tQRfsMrt0Yh.png',
-      '/wVbxJBRSvSdGeLTm4z7WOBgTD1B.png'
-    ];
-  
-    const invertAndDropShadow = [
-      '/hUzeosd33nzE5MCNsZxCGEKTXaQ.png',
-      '/ytQNtv7i4wtkuLyguqRLC0FX8GL.png',
-      '/qwVw2UPwBOQZkhOb3LyHgID5xKQ.png',
-      '/wo1smiXdiwwxai2dwJlRiGwE7rS.png',
-      '/nebkQYtQKhZyHJfh5v0oGpNbPzu.png',
-      '/fqsd09CrijoGu6qfoNIdgUQmVGO.png',
-      '/9Ga8A5QegQmiSVHp4hyusfMfpVk.png',
-      '/2uy2ZWcplrSObIyt4x0Y9rkG6qO.png',
-    ];
-  
-    const logoContainer = document.createElement('div');
-    logoContainer.className = 'absolute bottom-2 right-2 z-[3] p-1';
-    logoContainer.style.display = 'flex';
-    logoContainer.style.justifyContent = 'flex-end';
-    logoContainer.style.alignItems = 'flex-end';
-  
-    const logoImg = document.createElement('img');
-    logoImg.src = `${TMDB_IMAGE_BASE_URL}w500${logoPath}`;
-    logoImg.className = 'max-h-[40px] max-w-[60px] object-contain';
-  
-    if (onlyDropShadow.includes(logoPath)) {
-      logoImg.style.filter = 'grayscale(1) brightness(1.7) drop-shadow(0 0 0.5rem #000)';
-    } else if (invertAndDropShadow.includes(logoPath)) {
-      logoImg.style.filter = 'invert(1) hue-rotate(180deg) drop-shadow(0 0 0.5rem #000)';
-    } else {
-      logoImg.style.filter = 'contrast(0.5) brightness(100) drop-shadow(0 0 0.5rem #000)';
-    }
-  
-    logoContainer.appendChild(logoImg);
-    card.appendChild(logoContainer);
-  };
-  
-  if (item.networks && item.networks.length > 0 && item.networks[0].logo_path) {
-    addLogo(item.networks[0].logo_path);
-  } else if (item.production_companies && item.production_companies.length > 0 && item.production_companies[0].logo_path) {
-    addLogo(item.production_companies[0].logo_path);
-  }
-  
   if (displayProgressData) {
     const progressBar = document.createElement('div');
     progressBar.className = 'absolute inset-x-0 bottom-0 h-1.5 bg-[#666] rounded-b-lg';
