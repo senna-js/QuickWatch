@@ -152,7 +152,6 @@ function displaySearchResults(results, container) {
         
         carouselItem.style.opacity = '0';
         carouselItem.style.transform = 'translateY(16px)';
-        carouselItem.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         
         container.appendChild(carouselItem);
         

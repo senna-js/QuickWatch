@@ -255,6 +255,33 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     }, 150);
   };
 
+  const pageChangeHandler = () => {
+    if (currentInfoPanel) {
+      currentInfoPanel.remove();
+      currentInfoPanel = null;
+    }
+  };
+
+  window.addEventListener('popstate', pageChangeHandler);
+  window.addEventListener('pushstate', pageChangeHandler);
+  
+  const cleanupListeners = () => {
+    window.removeEventListener('popstate', pageChangeHandler);
+    window.removeEventListener('pushstate', pageChangeHandler);
+  };
+  
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.removedNodes.forEach((node) => {
+        if (node === card) {
+          cleanupListeners();
+          observer.disconnect();
+        }
+      });
+    });
+  });
+  
+  observer.observe(document.body, { childList: true, subtree: true });
   let removeButton = null;
   if (onRemove) {
     removeButton = document.createElement('button');
