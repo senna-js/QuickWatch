@@ -30,14 +30,16 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
           <div class="w-full bg-[#12161c] p-3 flex flex-col">
             <div class="flex justify-between items-center mb-2">
               <h3 class="text-lg font-medium truncate">${mediaTitle}</h3>
-              <button id="close-modal" class="absolute -top-3 -right-3 text-white text-3xl z-[8]"><i class="icon-x"></i></button>
+              <button id="close-modal" class="text-white px-3 py-1 rounded-lg bg-[#32363D]">
+                <i class="icon-x"></i> Close
+              </button>
             </div>
             
             <div class="source-selector-container overflow-x-auto pb-1">
               <div class="flex gap-2 min-w-max">
                 ${filteredSources
                   .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
+                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36] hover:bg-[#313845]'}" data-index="${index}">
                       ${source.name}
                     </button>
                   `).join('')}
@@ -68,7 +70,7 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
               <div class="h-10 flex items-center gap-3">
                 ${filteredSources
                   .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
+                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36] hover:bg-[#313845]'}" data-index="${index}">
                       ${source.name}
                     </button>
                   `).join('')}

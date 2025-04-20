@@ -6,6 +6,7 @@ import { renderError } from '../../components/misc/error.js';
 import { loadRelatedContentMobile, loadDetailsContentMobile } from '../../components/watch/tabs/tabContent.js';
 import { initTabSwitcherMobile } from '../../components/watch/tabs/tabSwitcher.js';
 import { renderPlayerModal, initPlayerModal } from '../../components/watch/playerModal.js';
+import { initTrailerButton } from '../../components/watch/trailerModal.js';
 import { renderEpisodeList, initEpisodeList } from '../../components/watch/tv/episodeList.js';
 import { renderSeasonSelector, initSeasonSelector } from '../../components/watch/tv/seasonSelector.js';
 import { getProgress } from '../../components/watch/progress/index.js';
@@ -292,9 +293,13 @@ async function loadMediaDetails(type, id) {
               <i class="icon-plus text-3xl"></i>
               <span class="text-xs font-light">My List</span>
             </button>
-            <button class="h-12 bg-[#00050d] flex flex-col items-center justify-center">
+            <button id="trailer-button" class="h-12 bg-[#00050d] flex flex-col items-center justify-center">
               <i class="icon-film text-2xl mb-1"></i>
               <span class="text-xs font-light">Trailer</span>
+            </button>
+            <button id="share-button" class="h-12 bg-[#00050d] flex flex-col items-center justify-center">
+              <i class="icon-share text-2xl mb-1"></i>
+              <span class="text-xs font-light">Share</span>
             </button>
           </div>
         </div>
@@ -398,10 +403,41 @@ async function loadMediaDetails(type, id) {
         });
       }
     }
+
+    initTrailerButton(type, id, mediaTitle);
     
     if (type === 'tv') {
       initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex);
       initSeasonSelector(id, data, seasonData, initialSeason, initialEpisode, sources, initialSourceIndex, contentRating, true);
+    }
+
+    const shareButton = document.getElementById('share-button');
+    if (shareButton) {
+      shareButton.addEventListener('click', () => {
+        const shareUrl = window.location.href;
+        const shareTitle = data.title || data.name;
+        const shareText = data.overview ? data.overview.substring(0, 100) + '...' : 'Check out this title on QuickWatch!';
+        
+        if (navigator.share) {
+          navigator.share({
+            title: shareTitle,
+            text: shareText,
+            url: shareUrl
+          })
+          .then(() => console.log('Shared successfully'))
+          .catch((error) => console.error('Error sharing:', error));
+        } else {
+          alert(`Share this link: ${shareUrl}`);
+          
+          const textArea = document.createElement('textarea');
+          textArea.value = shareUrl;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          alert('Link copied to clipboard!');
+        }
+      });
     }
 
     initTabSwitcherMobile(type, id, data);
