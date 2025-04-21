@@ -109,6 +109,8 @@ for title in titles_list:
             episode_data["title"] = match.group(4).strip()
             episode_data["multiple_eps"] = list(range(start_ep, end_ep + 1))
             titles_data.append(episode_data)
+    else:
+        print(f"Could not match title: '{raw_title}'")
 
 s = int(input("Enter the season number: "))
 e = int(input("Enter the episode number: "))
@@ -116,8 +118,9 @@ for episode in titles_data:
     if episode["season_number"] == s and episode["episode_number"] == e: href = episode["href"]
     elif episode["season_number"] == s and episode["multiple_eps"] and e in episode["multiple_eps"]: href = episode["href"]
 
+print(href)
 r = requests.get(href)
 soup = BeautifulSoup(r.text, "html.parser")
-iframe = soup.find("iframe", id="frameNewAnimeuploads0")
+iframe = soup.find("iframe", attrs={"data-type": "wco-embed"})
 src = iframe["src"]
-print(src)
+print(iframe)
