@@ -118,7 +118,7 @@ async function loadMediaDetails(type, id) {
         tvUrl: `https://vidlink.pro/tv/${id}/{season}/{episode}?primaryColor=2392EE&secondaryColor=FFFFFF&title=true&poster=false&autoplay=false&nextbutton=true`
       },
       {
-        name: 'Vidsrc.xyz',
+        name: 'VidsrcXYZ',
         movieUrl: `https://vidsrc.xyz/embed/movie?tmdb=${id}`,
         tvUrl: `https://vidsrc.xyz/embed/tv/${id}/{season}-{episode}`
       },
@@ -127,11 +127,11 @@ async function loadMediaDetails(type, id) {
         movieUrl: `https://vidsrc.su/embed/movie/${id}`,
         tvUrl: `https://vidsrc.su/embed/tv/${id}/{season}/{episode}`
       },
-      { // add event listeners
-        name: 'VidsrcCC',
-        movieUrl: `https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false&poster=false`,
-        tvUrl: `https://vidsrc.cc/v3/embed/tv/${id}/{season}/{episode}?autoPlay=false&poster=false`
-      },
+      // {
+      //   name: 'VidsrcCC',
+      //   movieUrl: `https://vidsrc.cc/v3/embed/movie/${id}?autoPlay=false&poster=false`,
+      //   tvUrl: `https://vidsrc.cc/v3/embed/tv/${id}/{season}/{episode}?autoPlay=false&poster=false`
+      // },
       { // add event listeners
         name: 'Vidzee',
         movieUrl: `https://vidzee.wtf/movie/${id}`,

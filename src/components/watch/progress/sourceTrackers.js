@@ -82,9 +82,50 @@ export function setupVidLinkTracking(playerIframe, mediaId, mediaType, season, e
   };
 }
 
+export function setupVidsrcXYZTracking(playerIframe, mediaId, mediaType, season, episode, sourceIndex) {
+  const messageHandler = (event) => {
+    if (event.origin !== 'https://vidsrc.xyz') {
+      return;
+    }
+    
+    if (event.data?.type === 'PLAYER_EVENT') {
+      const playerData = event.data?.data;
+      console.log('VidsrcXYZ player data:', playerData);
+      
+      if (playerData && playerData.tmdbId && playerData.currentTime && playerData.duration) {
+        const continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+        const existingProgress = continueData.find(item => 
+          item.id === parseInt(mediaId) && 
+          item.mediaType === mediaType &&
+          (mediaType === 'movie' || (item.season === season && item.episode === episode))
+        );
+        
+        console.log('Current progress:', existingProgress);
+        
+        saveProgress({
+          id: parseInt(playerData.tmdbId),
+          mediaType: playerData.type || mediaType,
+          season: playerData.season || season || 0,
+          episode: playerData.episode || episode || 0,
+          sourceIndex: sourceIndex,
+          fullDuration: playerData.duration || existingProgress?.fullDuration || 0,
+          watchedDuration: playerData.currentTime || existingProgress?.watchedDuration || 0,
+          timestamp: Date.now()
+        });
+      }
+    }
+  };
+  
+  window.addEventListener('message', messageHandler);
+  
+  return () => {
+    window.removeEventListener('message', messageHandler);
+  };
+}
+
 export function setupVidsrcCCTracking(playerIframe, mediaId, mediaType, season, episode, sourceIndex) {
   const messageHandler = (event) => {
-    // add later
+    // add when vidsrc.cc works again
   };
   
   window.addEventListener('message', messageHandler);

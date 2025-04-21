@@ -237,9 +237,7 @@ function updateProgressIndicators(id, season) {
   episodeItems.forEach(item => {
     const episodeNumber = parseInt(item.dataset.episode);
     const progress = getEpisodeProgress(id, season, episodeNumber);
-    
-    console.log(`Episode ${episodeNumber} progress:`, progress);
-    
+        
     let progressBar = item.querySelector('.progress-bar');
     let progressOverlay = item.querySelector('.progress-overlay');
     let remainingTime = item.querySelector('.remaining-time');

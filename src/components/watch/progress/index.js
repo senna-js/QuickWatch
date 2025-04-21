@@ -4,16 +4,18 @@ import {
   setupVidsrcCCTracking,
   setupVidzeeTracking,
   setupVidFastTracking,
-  setupVideasyTracking
+  setupVideasyTracking,
+  setupVidsrcXYZTracking
 } from './sourceTrackers.js';
 
 export function initializeSourceTracking(playerIframe, source, mediaId, mediaType, season, episode, sourceIndex) {
   const sourceTrackers = {
     'VidLink': setupVidLinkTracking,
-    'vidsrcCC': setupVidsrcCCTracking,
+    'VidsrcXYZ': setupVidsrcXYZTracking,
+    'VidsrcCC': setupVidsrcCCTracking,
     'Vidzee': setupVidzeeTracking,
     'VidFast': setupVidFastTracking,
-    'Videasy': setupVideasyTracking
+    'Videasy': setupVideasyTracking,
   };
   
   const trackerSetup = sourceTrackers[source.name];

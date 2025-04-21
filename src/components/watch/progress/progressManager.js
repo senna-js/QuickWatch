@@ -38,7 +38,6 @@ export function saveProgress(progressData) {
 export function getProgress(mediaId, mediaType, season = 0, episode = 0) {
   try {
     const continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-    console.log('continueData:', continueData);
     
     return continueData.find(item => 
       item.id ===parseInt(mediaId) && 
