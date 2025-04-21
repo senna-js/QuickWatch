@@ -15,14 +15,14 @@ async def test(type, id, season=0, episode=0):
                 
         page.on("request", handle_request)
         if type == 'movie': url = f"https://vidsrc.cc/v3/embed/movie/{id}?autoPlay=true"
-        else: url = f"https://vidsrc.cc/v3/embed/tv/{id}/{season}/{episode}?autoPlay=true"
+        else: url = f"https://vidsrc.cc/v2/embed/tv/{id}/{season}/{episode}?autoPlay=true"
         await page.goto(url)
         while not response_data: await asyncio.sleep(1)
             
         await browser.close()
         return response_data
 
-sources = asyncio.run(test())
+sources = asyncio.run(test('tv', 40075))
 print(sources)
 
 if sources and 'data' in sources:
