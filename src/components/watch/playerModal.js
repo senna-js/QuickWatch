@@ -39,11 +39,11 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
               <div class="flex gap-2 min-w-max">
                 ${filteredSources
                   .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36] hover:bg-[#313845]'}" data-index="${index}">
+                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
                       ${source.name}
                     </button>
                   `).join('')}
-                <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap">
+                <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap hover:bg-[#313845]">
                   <i class="fas fa-shield-alt mr-2"></i>Disable Popups
                 </button>
               </div>
@@ -70,13 +70,13 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
               <div class="h-10 flex items-center gap-3">
                 ${filteredSources
                   .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36] hover:bg-[#313845]'}" data-index="${index}">
+                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
                       ${source.name}
                     </button>
                   `).join('')}
               </div>
               <span class="text-[#474b52]">｜</span>
-              <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap">
+              <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap hover:bg-[#313845]">
                 <i class="fas fa-shield-alt mr-2"></i>Disable Popups
               </button>
             </div>
@@ -97,7 +97,7 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
  * @param {number} initialEpisode - Initial episode number (for TV shows)
  * @param {boolean} isMobile - Whether the modal is for mobile view
  */
-export function initPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, isMobile = false) {
+export function initPlayerModal(id, type, sources, initialSourceIndex, initialSeason, initialEpisode, isMobile = false) {
   // play button and modal
   const playButton = document.getElementById('play-button');
   const playerModal = document.getElementById('player-modal');
@@ -124,8 +124,9 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
     // use current values from global state
     const selectedSource = sources[sourceIndex];
     const iframeUrl = type === 'movie' 
-      ? selectedSource.movieUrl 
+      ? selectedSource.movieUrl.replace('{id}', id)
       : selectedSource.tvUrl
+          .replace('{id}', id)
           .replace('{season}', window.currentPlayerSeason)
           .replace('{episode}', window.currentPlayerEpisode);
     
@@ -145,7 +146,7 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
     });
     
     return iframe;
-  };
+};
   
   import('../watch/progress/index.js').then(module => {
     const { initializeSourceTracking, getProgress } = module;
@@ -269,13 +270,13 @@ export function initPlayerModal(type, id, sources, initialSourceIndex, initialSe
       
       if (popupBlockerEnabled) {
         mediaPlayer.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-presentation');
-        popupBlocker.classList.remove('bg-[#272c36]');
+        popupBlocker.classList.remove('bg-[#272c36]', 'hover:bg-[#313845]');
         popupBlocker.classList.add('bg-[#2392EE]');
         popupBlocker.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>Popups Disabled';
       } else {
         mediaPlayer.removeAttribute('sandbox');
         popupBlocker.classList.remove('bg-[#2392EE]');
-        popupBlocker.classList.add('bg-[#272c36]');
+        popupBlocker.classList.add('bg-[#272c36]', 'hover:bg-[#313845]');
         popupBlocker.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>Disable Popups';
       }
       

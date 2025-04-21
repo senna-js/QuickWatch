@@ -137,7 +137,7 @@ export function setupVidsrcCCTracking(playerIframe, mediaId, mediaType, season, 
 
 export function setupVidzeeTracking(playerIframe, mediaId, mediaType, season, episode, sourceIndex) {
   const messageHandler = (event) => {
-    // add later
+    // add when vidzee works again
   };
   
   window.addEventListener('message', messageHandler);

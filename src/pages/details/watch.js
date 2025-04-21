@@ -11,6 +11,7 @@ import { renderEpisodeList, initEpisodeList } from '../../components/watch/tv/ep
 import { renderSeasonSelector, initSeasonSelector } from '../../components/watch/tv/seasonSelector.js';
 import { getProgress } from '../../components/watch/progress/index.js';
 import { initShareModal } from '../../components/watch/shareModal.js';
+import { sources } from './sources.js'
 
 /**
  * Renders the details page for a movie or TV show
@@ -110,49 +111,6 @@ async function loadMediaDetails(type, id) {
 
     const detailsContainer = document.getElementById('details-container');
     if (!detailsContainer) return;
-    
-    const sources = [
-      { // add event listeners (for progress tracking. check source documentation)
-        name: 'VidLink',
-        movieUrl: `https://vidlink.pro/movie/${id}?primaryColor=FFFFFF&secondaryColor=2392EE&title=true&poster=false&autoplay=false`,
-        tvUrl: `https://vidlink.pro/tv/${id}/{season}/{episode}?primaryColor=2392EE&secondaryColor=FFFFFF&title=true&poster=false&autoplay=false&nextbutton=true`
-      },
-      {
-        name: 'VidsrcXYZ',
-        movieUrl: `https://vidsrc.xyz/embed/movie?tmdb=${id}`,
-        tvUrl: `https://vidsrc.xyz/embed/tv/${id}/{season}-{episode}`
-      },
-      {
-        name: 'VidsrcSU',
-        movieUrl: `https://vidsrc.su/embed/movie/${id}`,
-        tvUrl: `https://vidsrc.su/embed/tv/${id}/{season}/{episode}`
-      },
-      // {
-      //   name: 'VidsrcCC',
-      //   movieUrl: `https://vidsrc.cc/v2/embed/movie/${id}?autoPlay=false&poster=false`,
-      //   tvUrl: `https://vidsrc.cc/v2/embed/tv/${id}/{season}/{episode}?autoPlay=false&poster=false`
-      // },
-      { // add event listeners
-        name: 'Vidzee',
-        movieUrl: `https://vidzee.wtf/movie/${id}`,
-        tvUrl: `https://vidzee.wtf/tv/${id}/{season}/{episode}`
-      },
-      { // add event listeners
-        name: 'VidFast',
-        movieUrl: `https://vidfast.pro/movie/${id}?autoPlay=false&theme=2392EE&poster=false`,
-        tvUrl: `https://vidfast.pro/tv/${id}/{season}/{episode}?autoPlay=false&theme=2392EE&poster=false`
-      },
-      { // add event listeners
-        name: 'Videasy',
-        movieUrl: `https://player.videasy.net/movie/${id}?color=2392EE`,
-        tvUrl: `https://player.videasy.net/tv/${id}/{season}/{episode}?color=2392EE&nextEpisode=true&episodeSelector=true&autoplayNextEpisode=false`
-      },
-      {
-        name: '🤩 AnimePahe',
-        tvOnly: true,
-        tvUrl: `/embed/animepahe/${id}/{season}/{episode}`
-      }
-    ];
 
     let initialSourceIndex = 0;
     if (type === 'tv') {
@@ -174,7 +132,9 @@ async function loadMediaDetails(type, id) {
     const defaultSource = sources[initialSourceIndex];
     const iframeUrl = type === 'movie' 
       ? defaultSource.movieUrl 
+          .replace('{id}', id)
       : defaultSource.tvUrl
+          .replace('{id}', id)
           .replace('{season}', initialSeason)
           .replace('{episode}', initialEpisode);
     
