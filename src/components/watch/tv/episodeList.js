@@ -33,14 +33,17 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
     return `
       <div class="flex flex-col" id="episodes-list">
         ${episodes.map(episode => `
-        <div class="flex flex-row gap-3 p-3 px-5 transition duration-200 ease hover:bg-[#191E25] rounded-lg cursor-pointer episode-item" data-episode="${episode.episode_number}">
+        <div class="flex flex-row gap-3 p-3 px-5 transition duration-200 ease hover:bg-[#191E25] rounded-lg cursor-pointer episode-item" data-episode="${episode.episode_number}" data-season="${episode.season_number}">
           <div class="relative">
-            <div class="bg-zinc-600 w-[8rem] aspect-video rounded-md overflow-hidden relative">
+            <div class="bg-zinc-600 w-[8rem] aspect-video rounded-md overflow-hidden relative episode-thumbnail">
               <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
               <div class="absolute inset-0 flex items-end justify-start">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center">
                   <i class="fas fa-play text-white text-lg" style="filter: drop-shadow(2px 2px 8px black);"></i>
                 </div>
+              </div>
+              <div class="episode-status-overlay absolute inset-0 bg-black bg-opacity-70 hidden items-center justify-center">
+                <span class="text-white font-medium text-sm"></span>
               </div>
               ${(() => {
                 const progress = getEpisodeProgress(showId, episode.season_number, episode.episode_number);
@@ -75,10 +78,13 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
     return `
       <div class="flex flex-col gap-0" id="episodes-list">
         ${episodes.map(episode => `
-        <div class="flex flex-row gap-6 -mx-4 p-4 transition duration-200 ease hover:bg-[#191E25] rounded-xl cursor-pointer episode-item" data-episode="${episode.episode_number}">
+        <div class="flex flex-row gap-6 -mx-4 p-4 transition duration-200 ease hover:bg-[#191E25] rounded-xl cursor-pointer episode-item" data-episode="${episode.episode_number}" data-season="${episode.season_number}">
           <div class="relative">
-            <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative">
+            <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative episode-thumbnail">
               <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
+              <div class="episode-status-overlay absolute inset-0 bg-black bg-opacity-60 hidden items-center justify-center">
+                <span class="text-white font-medium text-lg"></span>
+              </div>
               ${(() => {
                 const progress = getEpisodeProgress(showId, episode.season_number, episode.episode_number);
                 if (progress) {
@@ -112,6 +118,28 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
   }
 }
 
+export function clearAllEpisodeStatus() {
+  document.querySelectorAll('.episode-status-overlay').forEach(overlay => {
+    overlay.classList.remove('flex');
+    overlay.classList.add('hidden');
+    overlay.querySelector('span').textContent = '';
+  });
+}
+
+export function setEpisodeStatus(season, episode, status) {
+  clearAllEpisodeStatus();
+  
+  const episodeItem = document.querySelector(`.episode-item[data-season="${season}"][data-episode="${episode}"]`);
+  if (episodeItem) {
+    const overlay = episodeItem.querySelector('.episode-status-overlay');
+    if (overlay) {
+      overlay.classList.remove('hidden');
+      overlay.classList.add('flex');
+      overlay.querySelector('span').textContent = status;
+    }
+  }
+}
+
 /**
  * Initializes the episode list functionality
  * @param {string} id - The TV show ID
@@ -128,6 +156,13 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
 
   updateProgressIndicators(id, initialSeason);
   
+  const progressUpdateInterval = setInterval(() => {
+    updateProgressIndicators(id, initialSeason);
+  }, 2000);
+  
+  // Store the interval ID for cleanup
+  window.progressUpdateInterval = progressUpdateInterval;
+  
   if (!episodesList) return;
   
   let currentSeason = initialSeason;
@@ -142,9 +177,12 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
     initPlayerModal(id, 'tv', sources, initialSourceIndex, currentSeason, currentEpisode, isMobile);
   }
   
+  window.currentPlayingEpisode = null;
+  
   episodesList.querySelectorAll('.episode-item').forEach(episodeItem => {
     episodeItem.addEventListener('click', () => {
       const episodeNumber = parseInt(episodeItem.dataset.episode);
+      const seasonNumber = parseInt(episodeItem.dataset.season);
       
       if (isNaN(episodeNumber)) return;
       
@@ -152,6 +190,13 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
       
       window.currentPlayerSeason = currentSeason;
       window.currentPlayerEpisode = currentEpisode;
+      
+      window.currentPlayingEpisode = {
+        season: seasonNumber,
+        episode: episodeNumber
+      };
+      
+      setEpisodeStatus(seasonNumber, episodeNumber, 'Now Playing');
       
       const playerModal = document.getElementById('player-modal');
       if (playerModal) {
@@ -214,6 +259,14 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
       if (playerModal) {
         playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
         
+        if (window.currentPlayingEpisode) {
+          setEpisodeStatus(
+            window.currentPlayingEpisode.season, 
+            window.currentPlayingEpisode.episode, 
+            'Just Watched'
+          );
+        }
+        
         setTimeout(() => {
           playerModal.classList.add('hidden');
           
@@ -221,6 +274,8 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
             window.currentTrackerCleanup();
             window.currentTrackerCleanup = null;
           }
+          
+          updateProgressIndicators(id, initialSeason);
           
           if (iframeContainer && iframeContainer.querySelector('iframe')) {
             iframeContainer.querySelector('iframe').remove();
@@ -303,6 +358,13 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
       }
     });
   });
+}
+
+export function cleanupEpisodeList() {
+  if (window.progressUpdateInterval) {
+    clearInterval(window.progressUpdateInterval);
+    window.progressUpdateInterval = null;
+  }
 }
 
 function updateProgressIndicators(id, season) {

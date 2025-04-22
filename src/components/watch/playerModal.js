@@ -1,5 +1,6 @@
 // Player Modal Component
 import { renderSpinner } from '../misc/loading.js';
+import { clearAllEpisodeStatus, setEpisodeStatus } from '../watch/tv/episodeList.js'
 
 /**
  * Renders the player modal for watching movies and TV shows
@@ -171,6 +172,13 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
         window.currentPlayerSeason = initialSeason;
         window.currentPlayerEpisode = initialEpisode;
         
+        window.currentPlayingEpisode = {
+          season: initialSeason,
+          episode: initialEpisode
+        };
+        
+        setEpisodeStatus(initialSeason, initialEpisode, 'Now Playing');
+        
         mediaPlayer = createIframe(initialSourceIndex);
         
         const iframeContainer = document.getElementById('iframe-container');
@@ -207,6 +215,14 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
         }
         
         playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
+        
+        if (window.currentPlayingEpisode) {
+          setEpisodeStatus(
+            window.currentPlayingEpisode.season, 
+            window.currentPlayingEpisode.episode, 
+            'Just Watched'
+          );
+        }
         
         setTimeout(() => {
           playerModal.classList.add('hidden');
