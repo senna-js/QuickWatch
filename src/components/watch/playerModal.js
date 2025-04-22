@@ -2,18 +2,6 @@
 import { renderSpinner } from '../misc/loading.js';
 import { clearAllEpisodeStatus, setEpisodeStatus } from '../watch/tv/episodeList.js'
 
-/**
- * Renders the player modal for watching movies and TV shows
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {Array} sources - Array of video sources
- * @param {number} initialSourceIndex - Index of the initially selected source
- * @param {number} initialSeason - Initial season number (for TV shows)
- * @param {number} initialEpisode - Initial episode number (for TV shows)
- * @param {string} mediaTitle - Title of the media
- * @param {boolean} isMobile - Whether the modal is for mobile view
- * @returns {string} HTML for the player modal
- */
 export function renderPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, mediaTitle, isMobile = false) {
   const filteredSources = sources.filter(source => type === 'movie' ? !source.tvOnly : true);
   
@@ -98,16 +86,6 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
   }
 }
 
-/**
- * Initializes the player modal functionality
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {Array} sources - Array of video sources
- * @param {number} initialSourceIndex - Index of the initially selected source
- * @param {number} initialSeason - Initial season number (for TV shows)
- * @param {number} initialEpisode - Initial episode number (for TV shows)
- * @param {boolean} isMobile - Whether the modal is for mobile view
- */
 export function initPlayerModal(id, type, sources, initialSourceIndex, initialSeason, initialEpisode, isMobile = false) {
   // play button and modal
   const playButton = document.getElementById('play-button');

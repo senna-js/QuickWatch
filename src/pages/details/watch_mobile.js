@@ -12,11 +12,6 @@ import { renderSeasonSelector, initSeasonSelector } from '../../components/watch
 import { getProgress } from '../../components/watch/progress/index.js';
 import { sources } from './sources.js'
 
-/**
- * Renders the details page for a movie or TV show
- * @param {HTMLElement} container
- * @param {Object} params
- */
 export function renderDetailsMobilepage(container, params) {
   if (window.splashScreen) {
     window.splashScreen.show();
@@ -32,11 +27,6 @@ export function renderDetailsMobilepage(container, params) {
   loadMediaDetails(params.type, params.id);
 }
 
-/**
- * Loads and displays details for a specific movie or TV show
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- */
 async function loadMediaDetails(type, id) {
   try {
     const mediaDetailsStep = window.splashScreen?.addStep('Loading media details...');

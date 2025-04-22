@@ -6,10 +6,6 @@ import { renderSearchError } from '../../components/misc/error.js';
 import { renderNoResults } from '../../components/misc/empty.js';
 import { createCarouselItem } from '../../components/carouselItem.js';
 
-/**
- * Renders the search page
- * @param {HTMLElement} container
- */
 export function renderSearchPage(container) {
   container.innerHTML = `
     ${renderHeader()}
@@ -166,11 +162,6 @@ function displaySearchResults(results, container) {
   }
 }
 
-/**
- * Performs a search for movies and TV shows
- * @param {string} query - The search query
- * @param {HTMLElement} resultsContainer - The container to display results in
- */
 async function performSearch(query, resultsContainer) {
   try {
     const searchResults = document.getElementById('search-results');
@@ -225,10 +216,6 @@ async function performSearch(query, resultsContainer) {
   }
 }
 
-/**
- * Shows a no results message
- * @param {HTMLElement} container - The container to display the message in
- */
 function showNoResults(container) {
   container.innerHTML = renderNoResults('No results found', 'Please try a different search term', 'fa-search');
 }

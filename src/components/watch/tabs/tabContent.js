@@ -3,12 +3,6 @@
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../../router.js';
 import { createCarouselItem } from '../../carouselItem.js';
 
-/**
- * Load and display related content for a media item
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {HTMLElement} container - The container element
- */
 export async function loadRelatedContent(type, id, container) {
   try {
     const options = {
@@ -71,12 +65,6 @@ export async function loadRelatedContent(type, id, container) {
   }
 }
 
-/**
- * Load and display related content for a media item on mobile
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {HTMLElement} container - The container element
- */
 export async function loadRelatedContentMobile(type, id, container) {
   try {    
     const options = {
@@ -141,12 +129,6 @@ export async function loadRelatedContentMobile(type, id, container) {
   }
 }
 
-/**
- * Load and display details content for a media item
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {Object} data - The media data object
- * @param {HTMLElement} container - The container element
- */
 export async function loadDetailsContent(type, data, container) {
   try {
     const options = {
@@ -339,12 +321,6 @@ export async function loadDetailsContent(type, data, container) {
   }
 }
 
-/**
- * Load and display details content for a media item on mobile
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {Object} data - The media data object
- * @param {HTMLElement} container - The container element
- */
 export async function loadDetailsContentMobile(type, data, container) {
   try {    
     const options = {
@@ -476,10 +452,6 @@ export async function loadDetailsContentMobile(type, data, container) {
   }
 }
 
-/**
- * Checks if the current device is mobile
- * @returns {boolean} True if the device is mobile
- */
 export function isMobileDevice() {
   return window.innerWidth <= 768;
 }

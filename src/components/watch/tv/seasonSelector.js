@@ -2,13 +2,6 @@
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../../router.js';
 import { renderEpisodeList, initEpisodeList } from './episodeList.js';
 
-/**
- * Renders the season selector for TV shows
- * @param {Object} data - The TV show data
- * @param {number} initialSeason - Initial season number
- * @param {boolean} isMobile - Whether the selector is for mobile view
- * @returns {string} HTML for the season selector
- */
 export function renderSeasonSelector(data, initialSeason, isMobile = false) {
   if (isMobile) {
     return `
@@ -41,19 +34,6 @@ export function renderSeasonSelector(data, initialSeason, isMobile = false) {
   }
 }
 
-/**
- * Initializes the season selector functionality
- * @param {string} id - The TV show ID
- * @param {Object} data - The TV show data
- * @param {Object} seasonData - The current season data
- * @param {number} initialSeason - Initial season number
- * @param {number} initialEpisode - Initial episode number
- * @param {Array} sources - Array of video sources
- * @param {number} initialSourceIndex - Index of the initially selected source
- * @param {string} contentRating - Content rating of the TV show
- * @param {boolean} isMobile - Whether the selector is for mobile view
- * @param {Function} onSeasonChange - Callback function when season changes
- */
 export async function initSeasonSelector(id, data, seasonData, initialSeason, initialEpisode, sources, initialSourceIndex, contentRating, isMobile = false, onSeasonChange = null) {
   const customSelect = document.getElementById('custom-select');
   const seasonOptions = document.getElementById('season-options');

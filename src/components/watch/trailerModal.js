@@ -2,12 +2,6 @@
 import { renderSpinner } from '../misc/loading.js';
 import { TMDB_API_KEY, TMDB_BASE_URL } from '../../router.js';
 
-/**
- * Renders the trailer modal for movies and TV shows
- * @param {string} mediaTitle - Title of the media
- * @param {Object} trailer - Trailer data object
- * @returns {string} HTML for the trailer modal
- */
 export function renderTrailerModal(mediaTitle, trailer) {
   if (!trailer) {
     return `
@@ -55,12 +49,6 @@ export function renderTrailerModal(mediaTitle, trailer) {
   `;
 }
 
-/**
- * Fetches trailer data from TMDB API
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @returns {Promise<Object|null>} - The trailer data or null if not found
- */
 export async function fetchTrailerData(type, id) {
   try {
     const options = {
@@ -108,12 +96,6 @@ export async function fetchTrailerData(type, id) {
   }
 }
 
-/**
- * Initializes the trailer button functionality
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {string} mediaTitle - Title of the media
- */
 export function initTrailerButton(type, id, mediaTitle) {
   const trailerButton = document.getElementById('trailer-button');
   

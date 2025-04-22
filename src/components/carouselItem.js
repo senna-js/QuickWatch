@@ -2,17 +2,6 @@
 
 import { TMDB_IMAGE_BASE_URL } from '../router.js';
 
-/**
- * Renders a carousel item for movies or TV shows
- * @param {Object} item - The movie or TV show data
- * @param {boolean} isFirstItem - Whether this is the first item in the carousel
- * @param {string} context - The context where the item is used ('carousel' or 'grid')
- * @param {Function} onRemove - Optional callback when remove button is clicked
- * @param {boolean} usePoster - Whether to use poster instead of backdrop
- * @param {Object} progressData - Optional progress data {percentage, watchedDuration, fullDuration}
- * @param {Object} episodeInfo - Optional episode info for TV shows {season, episode}
- * @returns {HTMLElement} - The carousel item element
- */
 export function createCarouselItem(item, isFirstItem = false, context = 'carousel', onRemove = null, usePoster = false, progressData = null, episodeInfo = null) {
   const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
   const title = item.title || item.name;
@@ -267,11 +256,6 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   return card;
 }
 
-/**
- * Gets the watch progress for a show or movie
- * @param {string} id - The show or movie ID
- * @returns {Object|null} - The progress data or null if not found
- */
 function getWatchProgress(id) {
   // look for any timestamp keys for the anime
   const keys = Object.keys(localStorage).filter(key => 

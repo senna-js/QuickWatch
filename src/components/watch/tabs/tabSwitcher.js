@@ -2,12 +2,6 @@
 
 import { loadRelatedContent, loadDetailsContent, loadRelatedContentMobile, loadDetailsContentMobile } from './tabContent.js';
 
-/**
- * Initialize tab switching functionality
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {Object} data - The media data object
- */
 export function initTabSwitcher(type, id, data) {
   const tabItems = document.querySelectorAll('.tab-item');
   const tabContents = document.querySelectorAll('.tab-content');
@@ -44,12 +38,6 @@ export function initTabSwitcher(type, id, data) {
   });
 }
 
-/**
- * Initialize tab switching functionality for mobile
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {Object} data - The media data object
- */
 export function initTabSwitcherMobile(type, id, data) {
   const tabItems = document.querySelectorAll('.tab-item');
   const tabContents = document.querySelectorAll('.tab-content');

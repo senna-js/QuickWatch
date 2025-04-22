@@ -1,18 +1,6 @@
 import { renderSpinner } from '../misc/loading.js';
 import { fetchVideoUrl } from '../../pages/embeds/animepahe-embed.js';
 
-/**
- * Sets up quality options for the player
- * @param {HTMLElement} qualityMenu - The quality menu element
- * @param {HTMLElement} iphoneQualityMenu - The iPhone quality menu element
- * @param {HTMLElement} qualityBtn - The quality button element
- * @param {HTMLElement} qualityToggleBtn - The quality toggle button element
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} customPlayer - The custom player container
- * @param {Array} linksData - The available video sources
- * @param {boolean} isIPhone - Whether the device is an iPhone
- * @returns {void}
- */
 export function setupQualityOptions(qualityMenu, iphoneQualityMenu, qualityBtn, qualityToggleBtn, player, customPlayer, linksData, isIPhone) {
   if (!linksData || linksData.length === 0) return;
   
@@ -67,13 +55,6 @@ export function setupQualityOptions(qualityMenu, iphoneQualityMenu, qualityBtn, 
   });
 }
 
-/**
- * Sets up quality option click events
- * @param {HTMLElement} menuElement - The menu element containing quality options
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} customPlayer - The custom player container
- * @param {Array} linksData - The available video sources
- */
 function setupQualityOptionEvents(menuElement, player, customPlayer, linksData) {
   const qualityOptions = menuElement.querySelectorAll('.quality-option');
   qualityOptions.forEach(option => {

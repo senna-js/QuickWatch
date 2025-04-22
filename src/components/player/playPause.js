@@ -1,10 +1,3 @@
-/**
- * Sets up play/pause functionality for the player
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} playPauseBtn - The play/pause button element
- * @param {HTMLElement} centerPlayButton - The center play button element
- * @returns {Object} - Play/pause control functions
- */
 export function setupPlayPause(player, playPauseBtn, centerPlayButton) {
   // toggle play/pause on click
   playPauseBtn.addEventListener('click', () => {

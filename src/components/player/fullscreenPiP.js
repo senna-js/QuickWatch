@@ -1,11 +1,3 @@
-/**
- * Sets up fullscreen and picture-in-picture functionality
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} customPlayer - The custom player container
- * @param {HTMLElement} fullscreenBtn - The fullscreen button element
- * @param {HTMLElement} pipBtn - The picture-in-picture button element
- * @returns {Object} - Fullscreen and PiP control functions
- */
 export function setupFullscreenPiP(player, customPlayer, fullscreenBtn, pipBtn) {
   // toggle fullscreen
   fullscreenBtn.addEventListener('click', () => {

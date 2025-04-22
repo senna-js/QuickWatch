@@ -1,12 +1,3 @@
-/**
- * Sets up keyboard shortcuts for the player
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} customPlayer - The custom player container
- * @param {Function} mute - The mute function
- * @param {Function} showVolumeSlider - The function to show volume slider
- * @param {HTMLElement} volumeLevel - The volume level element
- * @param {Function} updateVolumeIcon - The function to update volume icon
- */
 export function setupKeybinds(player, customPlayer, mute, showVolumeSlider, volumeLevel, updateVolumeIcon) {
   document.addEventListener('keydown', (e) => {
     if (['Space', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'j', 'k', 'l', 'm'].includes(e.key)) {

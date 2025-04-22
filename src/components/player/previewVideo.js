@@ -1,15 +1,5 @@
 import { fetchVideoUrl } from '../../pages/embeds/animepahe-embed.js';
 
-/**
- * Sets up video preview functionality
- * @param {HTMLElement} videoPreview - The video preview container
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} progressContainerHitbox - The progress container hitbox
- * @param {HTMLElement} progressContainer - The progress container
- * @param {HTMLElement} previewTime - The preview time element
- * @param {Array} linksData - The available video sources
- * @returns {Object} - Preview state and functions
- */
 export function setupPreviewVideo(videoPreview, player, progressContainerHitbox, progressContainer, previewTime, linksData) {
   let previewReady = false;
   let isHoveringProgressContainer = false;

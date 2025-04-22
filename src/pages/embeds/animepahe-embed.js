@@ -3,11 +3,6 @@ import { renderFullPageSpinner, renderSpinner } from '../../components/misc/load
 import { renderError } from '../../components/misc/error.js';
 import { initializeCustomPlayer } from '../../components/player/index.js';
 
-/**
- * Renders the AnimePahe embed page for a TV show
- * @param {HTMLElement} container - The container element
- * @param {Object} params - The parameters object containing id and episode
- */
 export async function renderAnimePaheEmbed(container, params) {
   const { id, episode , season } = params;
 
@@ -55,11 +50,6 @@ export async function renderAnimePaheEmbed(container, params) {
   }
 }
 
-/**
- * Checks if the content is anime based on IMDB ID
- * @param {string} tmdbId - The TMDB ID
- * @returns {Promise<boolean>} - Whether the content is anime
- */
 async function checkIfAnime(tmdbId) {
   try {
     const tmdbResponse = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/external_ids`, {
@@ -94,13 +84,6 @@ async function checkIfAnime(tmdbId) {
   }
 }
 
-/**
- * Loads anime content from AnimePahe API
- * @param {string} id - The TMDB ID
- * @param {string} episode - The episode number
- * @param {HTMLElement} container - The container element
- * @param {Object} params - The parameters object containing season
- */
 async function loadAnimeContent(id, episode, container, params) {
   const tmdbStep = window.splashScreen?.addStep('Loading anime details...');
   
@@ -233,11 +216,6 @@ async function loadAnimeContent(id, episode, container, params) {
   }
 }
 
-/**
- * Fetches the actual video URL from the access-kwik API
- * @param {string} kwikLink - The kwik link to fetch the video URL for
- * @returns {Promise<string|null>} - The video URL or null if not found
- */
 export async function fetchVideoUrl(kwikLink) {
   try {
     const response = await fetch('https://access-kwik.apex-cloud.workers.dev/', {
@@ -269,16 +247,6 @@ export async function fetchVideoUrl(kwikLink) {
   }
 }
 
-/**
- * Renders a custom video player
- * @param {HTMLElement} container - The container element
- * @param {string} videoUrl - The URL of the video to play
- * @param {string} initialQuality - The initial quality to display
- * @param {Array} qualityOptions - Array of quality options
- * @param {string} showId - The show ID for saving timestamp
- * @param {string} episodeNumber - The episode number
- * @returns {void}
- */
 function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber) {
   const isIPhone = /iPhone/i.test(navigator.userAgent);
   container.innerHTML = `

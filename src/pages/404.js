@@ -1,9 +1,5 @@
 // 404 Not Found Page
 
-/**
- * Renders the 404 Not Found page
- * @param {HTMLElement} container - The container element to render the page into
- */
 export function render404Page(container) {
   container.innerHTML = `
     <div class="flex flex-col items-center justify-center h-screen">

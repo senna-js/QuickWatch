@@ -44,11 +44,6 @@ const tvGenres = [
   { id: 37, name: "Western" }
 ];
 
-/**
- * Renders the genre details page
- * @param {HTMLElement} container
- * @param {Object} params - Parameters including genre ID
- */
 export function renderGenreDetailsPage(container, params) {
   const { id } = params;
   

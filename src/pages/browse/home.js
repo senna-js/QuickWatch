@@ -3,10 +3,6 @@ import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.j
 import { renderHeader } from '../../components/header.js';
 import { createCarouselItem } from '../../components/carouselItem.js';
 
-/**
- * Renders the home page
- * @param {HTMLElement} container
- */
 export function renderHomePage(container) {
   container.innerHTML = `
     ${renderHeader()}

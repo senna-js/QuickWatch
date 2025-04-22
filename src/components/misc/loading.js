@@ -3,12 +3,6 @@
  * Reusable loading components for the QuickWatch application
  */
 
-/**
- * Renders a loading spinner
- * @param {string} size - The size of the spinner ('small', 'medium', or 'large')
- * @param {boolean} centered - Whether to center the spinner in its container
- * @returns {string} The HTML for the spinner
- */
 export function renderSpinner(size = 'medium', centered = true) {
   const spinnerSize = size === 'large' ? 'ispinner-large' : 
                      size === 'small' ? '' : 'ispinner-medium';
@@ -33,10 +27,6 @@ export function renderSpinner(size = 'medium', centered = true) {
   `;
 }
 
-/**
- * Renders a full-page loading spinner
- * @returns {string} The HTML for the full-page spinner
- */
 export function renderFullPageSpinner() {
   return `
     <div class="flex justify-center items-center h-screen">

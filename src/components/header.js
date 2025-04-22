@@ -1,9 +1,5 @@
 // Header Component
 
-/**
- * Renders the navigation header with both desktop and mobile versions
- * @returns {string} The header HTML
- */
 export function renderHeader() {
   const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent || navigator.vendor || (window.opera && opera.toString() === `[object Opera]`));
   const isStandalone = window.navigator.standalone;

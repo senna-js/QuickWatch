@@ -10,13 +10,6 @@ import { setupPlayPause } from './playPause.js';
 import { setupFullscreenPiP } from './fullscreenPiP.js';
 import { setupDownloadVideo } from './downloadVideo.js';
 
-/**
- * Initializes the custom video player with all components
- * @param {HTMLElement} playerContainer - The player container element
- * @param {Array} linksData - The available video sources
- * @param {string} showId - The show ID for saving timestamp
- * @param {string} episodeNumber - The episode number
- */
 export function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber) {
   // get player elements
   const player = playerContainer.querySelector('#custom-player');

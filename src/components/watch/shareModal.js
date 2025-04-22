@@ -1,14 +1,6 @@
 // Share Modal Component
 import { TMDB_IMAGE_BASE_URL } from '../../router.js';
 
-/**
- * Renders the share modal for movies and TV shows
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {string} title - Title of the media
- * @param {string} posterPath - Path to the poster image
- * @returns {string} HTML for the share modal
- */
 export function renderShareModal(type, id, title, posterPath) {
   const shareUrl = `${window.location.origin}/${type}/${id}`;
   const fullUrl = `${window.location.href}`;
@@ -67,12 +59,6 @@ export function renderShareModal(type, id, title, posterPath) {
   `;
 }
 
-/**
- * Initialize the share modal functionality
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- * @param {string} title - Title of the media
- */
 export function initShareModal(type, id, title) {
   const shareButton = document.getElementById('share-button');
   

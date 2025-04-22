@@ -3,10 +3,6 @@ import { renderHeader } from '../../components/header.js';
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { createCarouselItem } from '../../components/carouselItem.js';
 
-/**
- * Renders the watchlist page
- * @param {HTMLElement} container
- */
 export function renderWatchlistPage(container) {
   container.innerHTML = `
     ${renderHeader()}

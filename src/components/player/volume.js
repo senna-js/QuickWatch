@@ -1,12 +1,3 @@
-/**
- * Sets up volume controls for the player
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} volumeBtn - The volume button element
- * @param {HTMLElement} volumeSlider - The volume slider element
- * @param {HTMLElement} volumeLevel - The volume level element
- * @param {HTMLElement} volumeContainer - The volume container element
- * @returns {Object} - Volume control functions
- */
 export function setupVolumeControls(player, volumeBtn, volumeSlider, volumeLevel, volumeContainer) {
   let isVolumeDragging = false;
   let volumeSliderTimeout;

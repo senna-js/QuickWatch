@@ -2,10 +2,6 @@
 
 import { renderHeader } from '../components/header.js';
 
-/**
- * Renders the iOS app installation instructions page
- * @param {HTMLElement} container
- */
 export function renderIOSAppPage(container) {
   container.innerHTML = `
     <div id="header" class="transition-opacity duration-300">

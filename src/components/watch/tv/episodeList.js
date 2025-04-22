@@ -140,17 +140,6 @@ export function setEpisodeStatus(season, episode, status) {
   }
 }
 
-/**
- * Initializes the episode list functionality
- * @param {string} id - The TV show ID
- * @param {number} initialSeason - Current season number
- * @param {number} initialEpisode - Initial episode number
- * @param {Array} sources - Array of video sources
- * @param {number} initialSourceIndex - Index of the initially selected source
- * @param {Array} episodes - Array of episode data
- * @param {string} mediaTitle - Title of the TV show
- * @param {boolean} isMobile - Whether the view is for mobile
- */
 export function initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex, episodes = [], mediaTitle = '', isMobile = false) {
   const episodesList = document.getElementById('episodes-list');
 

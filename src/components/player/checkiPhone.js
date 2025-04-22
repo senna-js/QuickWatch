@@ -1,10 +1,3 @@
-/**
- * Handles iPhone-specific player functionality
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} customPlayer - The custom player container
- * @param {HTMLElement} topControls - The top controls container
- * @returns {boolean} - Whether the device is an iPhone
- */
 export function setupIPhoneSupport(player, customPlayer, topControls) {
   const isIPhone = /iPhone/i.test(navigator.userAgent);
   

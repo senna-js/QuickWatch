@@ -1,10 +1,3 @@
-/**
- * Sets up the top controls for the player
- * @param {HTMLElement} topControls - The top controls container
- * @param {HTMLElement} aspectToggleBtn - The aspect ratio toggle button
- * @param {HTMLVideoElement} player - The video player element
- * @returns {Object} - Control functions and state
- */
 export function setupTopControls(topControls, aspectToggleBtn, player) {
   let isFilledView = true;
   let controlsTimeout;

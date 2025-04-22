@@ -3,11 +3,6 @@ import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.j
 import { renderHeader } from '../../components/header.js';
 import { renderError, renderAlert } from '../../components/misc/error.js';
 
-/**
- * Renders the download details page for a movie or TV show
- * @param {HTMLElement} container
- * @param {Object} params
- */
 let currentLoadingPromise = null;
 
 export function renderDownloadDetailsPage(container, params) {
@@ -29,11 +24,6 @@ export function renderDownloadDetailsPage(container, params) {
   return currentLoadingPromise;
 }
 
-/**
- * Loads and displays download details for a specific movie or TV show
- * @param {string} type - The media type ('movie' or 'tv')
- * @param {string} id - The media ID
- */
 async function loadMediaDetails(type, id) {
   try {
     const mediaDetailsStep = window.splashScreen?.addStep('Loading media details...');

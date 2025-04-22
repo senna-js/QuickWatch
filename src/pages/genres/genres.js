@@ -72,10 +72,6 @@ const genreColors = {
   "war & politics": "from-red-700 to-gray-900"
 };
 
-/**
- * Renders the genres page
- * @param {HTMLElement} container
- */
 export function renderGenresPage(container) {  
   container.innerHTML = `
     ${renderHeader()}

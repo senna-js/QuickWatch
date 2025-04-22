@@ -1,9 +1,3 @@
-/**
- * Sets up the download functionality for the video player
- * @param {HTMLElement} downloadBtn - The download button element
- * @param {HTMLVideoElement} player - The video player element
- * @param {Array} linksData - The available video sources
- */
 export function setupDownloadVideo(downloadBtn, player, linksData) {
   if (!downloadBtn) return;
   

@@ -3,14 +3,6 @@
  * Reusable error message components for the QuickWatch application
  */
 
-/**
- * Renders an error message
- * @param {string} title - The error title
- * @param {string} message - The error message
- * @param {string} buttonText - The text for the action button
- * @param {string} buttonAction - The JavaScript action for the button
- * @returns {string} The HTML for the error message
- */
 export function renderError(title = 'Error', message = 'Something went wrong', buttonText = '', buttonAction = "window.history.pushState(null, null, '/'); window.dispatchEvent(new PopStateEvent('popstate'))", showButton = true) {
   const buttonHtml = buttonText ? `
     <button onclick="${buttonAction}" 
@@ -29,11 +21,6 @@ export function renderError(title = 'Error', message = 'Something went wrong', b
   `;
 }
 
-/**
- * Renders a search error message
- * @param {string} message - The error message
- * @returns {string} The HTML for the search error message
- */
 export function renderSearchError(message = 'Something went wrong. Please try again later.') {
   return `
     <div class="col-span-5 text-center py-12">
@@ -44,13 +31,6 @@ export function renderSearchError(message = 'Something went wrong. Please try ag
   `;
 }
 
-/**
- * Renders an alert message
- * @param {string} title - The alert title
- * @param {string} message - The alert message
- * @param {string} type - The alert type ('info', 'warning', 'error', or 'success')
- * @returns {string} The HTML for the alert message
- */
 export function renderAlert(title, message, type = 'info') {
   const alertStyles = {
     info: {

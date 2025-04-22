@@ -3,11 +3,6 @@ import { renderFullPageSpinner, renderSpinner } from '../../components/misc/load
 import { renderError } from '../../components/misc/error.js';
 import { initializeCustomPlayer } from '../../components/player/index.js';
 
-/**
- * Renders the VidSrc embed page
- * @param {HTMLElement} container - The container element
- * @param {Object} params - The parameters object containing id, episode, and season
- */
 export async function renderVidSrcEmbed(container, params) {
   const { id, season, episode, type } = params;
 

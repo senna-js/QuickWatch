@@ -1,11 +1,3 @@
-/**
- * Sets up saving and loading player data (volume and timestamp)
- * @param {HTMLVideoElement} player - The video player element
- * @param {HTMLElement} volumeLevel - The volume level element
- * @param {string} showId - The show ID for saving timestamp
- * @param {string} episodeNumber - The episode number
- * @returns {Object} - Functions for saving timestamps and cleaning up
- */
 export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
   const savedVolume = localStorage.getItem('quickwatch_player_volume');
   if (savedVolume !== null) {
