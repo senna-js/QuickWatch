@@ -148,7 +148,36 @@ export function setupVidzeeTracking(playerIframe, mediaId, mediaType, season, ep
 
 export function setupVidFastTracking(playerIframe, mediaId, mediaType, season, episode, sourceIndex) {
   const messageHandler = (event) => {
-    // add later
+    if (event.origin !== 'https://vidfast.pro') {
+      return;
+    }
+    
+    if (event.data?.type === 'PLAYER_EVENT') {
+      const playerData = event.data?.data;
+      console.log('VidFast player data:', playerData);
+      
+      if (playerData && playerData.tmdbId && playerData.currentTime && playerData.duration) {
+        const continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+        const existingProgress = continueData.find(item => 
+          item.id === parseInt(mediaId) && 
+          item.mediaType === mediaType &&
+          (mediaType === 'movie' || (item.season === season && item.episode === episode))
+        );
+        
+        console.log('Current progress:', existingProgress);
+        
+        saveProgress({
+          id: parseInt(playerData.tmdbId),
+          mediaType: playerData.mediaType,
+          season: parseInt(playerData.season) || parseInt(season) || 0,
+          episode: parseInt(playerData.episode) || parseInt(episode) || 0,
+          sourceIndex: parseInt(sourceIndex),
+          fullDuration: parseInt(playerData.duration) || existingProgress?.fullDuration || 0,
+          watchedDuration: parseInt(playerData.currentTime) || existingProgress?.watchedDuration || 0,
+          timestamp: Date.now()
+        });
+      }
+    }
   };
   
   window.addEventListener('message', messageHandler);

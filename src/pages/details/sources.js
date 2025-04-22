@@ -35,11 +35,6 @@ export const sources = [
       tvUrl: `https://player.videasy.net/tv/{id}/{season}/{episode}?color=2392EE&nextEpisode=true&episodeSelector=true&autoplayNextEpisode=false`
     },
     {
-      name: 'EmbedSU',
-      movieUrl: `https://embed.su/embed/movie/{id}`,
-      tvUrl: `https://embed.su/embed/tv/{id}/{season}/{episode}`
-    },
-    {
       name: '🤩 AnimePahe',
       tvOnly: true,
       tvUrl: `/embed/animepahe/{id}/{season}/{episode}`
