@@ -56,30 +56,40 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
     return `
       <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
         <div class="relative w-full max-w-6xl">
-          <button id="close-modal" class="absolute -top-3 -right-3 text-white text-3xl z-[8]"><i class="icon-x"></i></button>
+          <button id="close-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] aspect-square bg-white/30 backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
           
-          <div class="iframe-container loading rounded-t-lg p-4 bg-[#111419]" id="iframe-container">
-            <!-- iframe goes here -->
+          <div class="iframe-container loading rounded-[1.25rem] p-4 bg-[#151920] transition duration-300 ease" id="iframe-container">
+              <button id="sources-button" class="absolute top-8 right-8 px-4 py-2 rounded-lg whitespace-nowrap bg-[#2392EE] text-white">
+                SOURCES
+              </button>
             <div class="iframe-loader">
               ${renderSpinner('large')}
             </div>
           </div>
-          
-          <div class="bg-[#181c23] p-4 rounded-b-lg">
-            <div class="relative flex justify-between items-center gap-3 overflow-auto">
-              <div class="h-10 flex items-center gap-3">
-                ${filteredSources
-                  .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
-                      ${source.name}
-                    </button>
-                  `).join('')}
-              </div>
-              <span class="text-[#474b52]">｜</span>
-              <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap hover:bg-[#313845]">
-                <i class="fas fa-shield-alt mr-2"></i>Disable Popups
-              </button>
+        </div>
+        
+        <!-- Sources Modal -->
+        <div id="sources-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center transition-opacity duration-300 ease-out">
+          <div class="bg-[#181c23] rounded-lg p-4 w-[90%] max-w-md transform transition-all duration-300 ease-out scale-95 opacity-0" id="sources-modal-content">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-lg font-medium">Select Source</h3>
+              <button id="close-sources-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] aspect-square bg-white/30 backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
             </div>
+            
+            <div class="grid grid-cols-2 gap-2 mb-3">
+              ${filteredSources
+                .map((source, index) => `
+                  <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
+                    ${source.name}
+                  </button>
+                `).join('')}
+            </div>
+            
+            <div class="border-t border-[#32363D] my-3"></div>
+            
+            <button id="popup-blocker" class="w-full px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap hover:bg-[#313845]">
+              <i class="fas fa-shield-alt mr-2"></i>Disable Popups
+            </button>
           </div>
         </div>
       </div>
@@ -133,9 +143,7 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
     const iframe = document.createElement('iframe');
     iframe.id = 'media-player';
     iframe.src = iframeUrl;
-    iframe.className = isMobile ? 'w-full h-full rounded-none' : 'w-full rounded-xl';
-    if (!isMobile) iframe.height = '700';
-    iframe.frameBorder = '0';
+    iframe.className = isMobile ? 'w-full h-full rounded-none' : 'w-full rounded-xl aspect-video';
     iframe.allowFullscreen = true;
     
     iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
@@ -146,7 +154,7 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
     });
     
     return iframe;
-};
+  };
   
   import('../watch/progress/index.js').then(module => {
     const { initializeSourceTracking, getProgress } = module;
@@ -195,6 +203,47 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
       });
     }
   
+    const sourcesButton = document.getElementById('sources-button');
+    const sourcesModal = document.getElementById('sources-modal');
+    const closeSourcesModal = document.getElementById('close-sources-modal');
+    
+    if (sourcesButton && sourcesModal && closeSourcesModal) {
+      sourcesButton.addEventListener('click', () => {
+        const iframeContainer = document.getElementById('iframe-container');
+        const modalContent = document.getElementById('sources-modal-content');
+        
+        sourcesModal.classList.remove('hidden');
+        void sourcesModal.offsetWidth;
+        
+        sourcesModal.classList.add('opacity-100');
+        iframeContainer.style.filter = 'brightness(0.3) blur(2px)';
+        closeModal.style.filter = 'brightness(0.3) blur(2px)';
+        
+        if (modalContent) {
+          setTimeout(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+          }, 10);
+        }
+      });
+      
+      closeSourcesModal.addEventListener('click', () => {
+        const iframeContainer = document.getElementById('iframe-container');
+        const modalContent = document.getElementById('sources-modal-content');
+        
+        if (modalContent) {
+          modalContent.classList.remove('scale-100', 'opacity-100');
+          modalContent.classList.add('scale-95', 'opacity-0');
+          iframeContainer.style.filter = '';
+          closeModal.style.filter = '';
+        }
+        
+        setTimeout(() => {
+          sourcesModal.classList.add('hidden');
+        }, 300);
+      });
+    }
+    
     // source selection
     const sourceButtons = document.querySelectorAll('.source-button');
     sourceButtons.forEach(button => {
@@ -252,6 +301,21 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
         });
         
         initialSourceIndex = sourceIndex;
+        
+        const iframeContainer = document.getElementById('iframe-container');
+        const closeModalButton = document.getElementById('close-modal');
+        if (iframeContainer) iframeContainer.style.filter = '';
+        if (closeModalButton) closeModalButton.style.filter = '';
+        
+        const modalContent = document.getElementById('sources-modal-content');
+        if (modalContent) {
+          modalContent.classList.remove('scale-100', 'opacity-100');
+          modalContent.classList.add('scale-95', 'opacity-0');
+        }
+        
+        setTimeout(() => {
+          sourcesModal.classList.add('hidden');
+        }, 300);
       });
     });
   });

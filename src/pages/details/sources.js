@@ -11,8 +11,8 @@ export const sources = [
     },
     {
       name: 'VidsrcSU',
-      movieUrl: `https://vidsrc.su/embed/movie/{id}`,
-      tvUrl: `https://vidsrc.su/embed/tv/{id}/{season}/{episode}`
+      movieUrl: `https://vidsrc.su/embed/movie/{id}?serverselector=false`,
+      tvUrl: `https://vidsrc.su/embed/tv/{id}/{season}/{episode}?serverselector=false`
     },
     // {
     //   name: 'VidsrcCC',
