@@ -1,6 +1,7 @@
 // Episode List Component
 import { TMDB_IMAGE_BASE_URL } from '../../../router.js';
 import { getProgress } from '../../watch/progress/index.js';
+import { renderPlayerModal, initPlayerModal } from '../../watch/playerModal.js';
 
 function getEpisodeProgress(id, season, episode) {
   const savedItem = getProgress(parseInt(id), 'tv', parseInt(season), parseInt(episode));
@@ -118,114 +119,187 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
  * @param {number} initialEpisode - Initial episode number
  * @param {Array} sources - Array of video sources
  * @param {number} initialSourceIndex - Index of the initially selected source
+ * @param {Array} episodes - Array of episode data
+ * @param {string} mediaTitle - Title of the TV show
+ * @param {boolean} isMobile - Whether the view is for mobile
  */
-export function initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex, episodes = []) {
-  const episodeItems = document.querySelectorAll('.episode-item');
-  
+export function initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex, episodes = [], mediaTitle = '', isMobile = false) {
+  const episodesList = document.getElementById('episodes-list');
+
   updateProgressIndicators(id, initialSeason);
   
-  episodeItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const episodeNumber = item.dataset.episode;
-      if (episodeNumber) {
-        // set the current episode in the global state
-        window.currentPlayerSeason = initialSeason;
-        window.currentPlayerEpisode = parseInt(episodeNumber);
+  if (!episodesList) return;
+  
+  let currentSeason = initialSeason;
+  let currentEpisode = initialEpisode;
+  
+  if (!document.getElementById('player-modal')) {
+    const playerModalHTML = renderPlayerModal('tv', id, sources, initialSourceIndex, currentSeason, currentEpisode, mediaTitle, isMobile);
+    const modalContainer = document.createElement('div');
+    modalContainer.innerHTML = playerModalHTML;
+    document.body.appendChild(modalContainer.firstElementChild);
+    
+    initPlayerModal(id, 'tv', sources, initialSourceIndex, currentSeason, currentEpisode, isMobile);
+  }
+  
+  episodesList.querySelectorAll('.episode-item').forEach(episodeItem => {
+    episodeItem.addEventListener('click', () => {
+      const episodeNumber = parseInt(episodeItem.dataset.episode);
+      
+      if (isNaN(episodeNumber)) return;
+      
+      currentEpisode = episodeNumber;
+      
+      window.currentPlayerSeason = currentSeason;
+      window.currentPlayerEpisode = currentEpisode;
+      
+      const playerModal = document.getElementById('player-modal');
+      if (playerModal) {
+        playerModal.classList.remove('hidden');
+        void playerModal.offsetWidth;
+        playerModal.classList.add('bg-[#00050d]', 'bg-opacity-90');
         
-        const selectedSource = sources[initialSourceIndex];
-        const newUrl = selectedSource.tvUrl
-          .replace('{id}', id)
-          .replace('{season}', initialSeason)
-          .replace('{episode}', episodeNumber);
-        
-        const playerModal = document.getElementById('player-modal');
-        if (playerModal) {
-          playerModal.classList.remove('hidden');
+        const iframeContainer = document.getElementById('iframe-container');
+        if (iframeContainer) {
+          while (iframeContainer.querySelector('iframe')) {
+            iframeContainer.querySelector('iframe').remove();
+          }
           
-          const iframeContainer = document.getElementById('iframe-container');
-          if (iframeContainer) {
-            while (iframeContainer.querySelector('iframe')) {
-              iframeContainer.querySelector('iframe').remove();
-            }
+          const selectedSource = sources[initialSourceIndex];
+          const iframeUrl = selectedSource.tvUrl
+            .replace('{id}', id)
+            .replace('{season}', currentSeason)
+            .replace('{episode}', currentEpisode);
+          
+          const iframe = document.createElement('iframe');
+          iframe.id = 'media-player';
+          iframe.src = iframeUrl;
+          iframe.className = isMobile ? 'w-full h-full rounded-none bg-[#272C36]' : 'w-full rounded-xl aspect-video bg-[#272C36]';
+          iframe.allowFullscreen = true;
+          
+          iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
+          iframeContainer.classList.add('loading');
+          
+          iframe.addEventListener('load', () => {
+            iframeContainer.classList.remove('loading');
+          });
+          
+          void iframeContainer.offsetWidth;
+          iframeContainer.classList.remove('scale-50', 'opacity-0');
+          iframeContainer.classList.add('scale-100', 'opacity-100');
+          
+          import('../../watch/progress/index.js').then(module => {
+            const { initializeSourceTracking, getProgress } = module;
             
-            const iframe = document.createElement('iframe');
-            iframe.id = 'media-player';
-            iframe.src = newUrl;
-            iframe.className = window.innerWidth <= 768 ? 'w-full h-full rounded-none' : 'w-full rounded-xl';
-            if (window.innerWidth > 768) iframe.height = '700';
-            iframe.frameBorder = '0';
-            iframe.allowFullscreen = true;
+            const existingProgress = getProgress(parseInt(id), 'tv', currentSeason, currentEpisode);
+            const currentTrackerCleanup = initializeSourceTracking(iframe, selectedSource, parseInt(id), 'tv', currentSeason, currentEpisode, initialSourceIndex, existingProgress );
             
-            iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
-            iframeContainer.classList.add('loading');
-            
-            iframe.addEventListener('load', () => {
-              iframeContainer.classList.remove('loading');
-            });
-
-            import('../progress/index.js').then(module => {
-              const { initializeSourceTracking } = module;
-              const cleanup = initializeSourceTracking(
-                iframe,
-                selectedSource,
-                id,
-                'tv',
-                initialSeason,
-                parseInt(episodeNumber),
-                initialSourceIndex
-              );
-
-              // clean up previous tracking
-              const closeModal = document.getElementById('close-modal');
-              if (closeModal) {
-                const closeHandler = () => {
-                  cleanup();
-                  closeModal.removeEventListener('click', closeHandler);
-                };
-                closeModal.addEventListener('click', closeHandler);
-              }
-            });
+            window.currentTrackerCleanup = currentTrackerCleanup;
+          });
+        }
+      }
+    });
+  });
+  
+  const closeModal = document.getElementById('close-modal');
+  if (closeModal) {
+    closeModal.addEventListener('click', () => {
+      const iframeContainer = document.getElementById('iframe-container');
+      if (iframeContainer) {
+        iframeContainer.classList.remove('scale-100', 'opacity-100');
+        iframeContainer.classList.add('scale-50', 'opacity-0');
+      }
+      
+      const playerModal = document.getElementById('player-modal');
+      if (playerModal) {
+        playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
+        
+        setTimeout(() => {
+          playerModal.classList.add('hidden');
+          
+          if (window.currentTrackerCleanup) {
+            window.currentTrackerCleanup();
+            window.currentTrackerCleanup = null;
           }
-        }
-        
-        // Save progress
-        const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-        
-        const existingIndex = continueWatching.findIndex(item => 
-          item.id === id && item.mediaType === 'tv'
-        );
-        
-        if (existingIndex !== -1) {
-          continueWatching.splice(existingIndex, 1);
-        }
-        
-        // Find episode duration from episodes array if available
-        let episodeDuration = 1800; // Default to 30 minutes
-        if (episodes && episodes.length > 0) {
-          const episode = episodes.find(ep => ep.episode_number === parseInt(episodeNumber));
-          if (episode && episode.runtime) {
-            episodeDuration = episode.runtime * 60;
+          
+          if (iframeContainer && iframeContainer.querySelector('iframe')) {
+            iframeContainer.querySelector('iframe').remove();
           }
+        }, 250);
+      }
+    });
+  }
+  
+  const sourceButtons = document.querySelectorAll('.source-button');
+  sourceButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const sourceIndex = parseInt(button.dataset.index);
+      if (isNaN(sourceIndex) || sourceIndex < 0 || sourceIndex >= sources.length) return;
+      
+      initialSourceIndex = sourceIndex;
+      
+      sourceButtons.forEach(btn => {
+        btn.classList.remove('bg-[#2392EE]');
+        btn.classList.add('bg-[#272c36]');
+      });
+      button.classList.remove('bg-[#272c36]');
+      button.classList.add('bg-[#2392EE]');
+      
+      if (window.currentTrackerCleanup) {
+        window.currentTrackerCleanup();
+        window.currentTrackerCleanup = null;
+      }
+      
+      const iframeContainer = document.getElementById('iframe-container');
+      if (iframeContainer) {
+        while (iframeContainer.querySelector('iframe')) {
+          iframeContainer.querySelector('iframe').remove();
         }
         
-        continueWatching.unshift({
-          id: id,
-          mediaType: 'tv',
-          season: initialSeason,
-          episode: parseInt(episodeNumber),
-          sourceIndex: initialSourceIndex,
-          progress: 0,
-          duration: episodeDuration,
-          fullDuration: episodeDuration,
-          watchedDuration: 0,
-          timestamp: Date.now()
+        const selectedSource = sources[sourceIndex];
+        const iframeUrl = selectedSource.tvUrl
+          .replace('{id}', id)
+          .replace('{season}', currentSeason)
+          .replace('{episode}', currentEpisode);
+        
+        const iframe = document.createElement('iframe');
+        iframe.id = 'media-player';
+        iframe.src = iframeUrl;
+        iframe.className = isMobile ? 'w-full h-full rounded-none bg-[#272C36]' : 'w-full rounded-xl aspect-video bg-[#272C36]';
+        iframe.allowFullscreen = true;
+        
+        iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
+        iframeContainer.classList.add('loading');
+        
+        iframe.addEventListener('load', () => {
+          iframeContainer.classList.remove('loading');
         });
         
-        if (continueWatching.length > 10) {
-          continueWatching.pop();
+        import('../../watch/progress/index.js').then(module => {
+          const { initializeSourceTracking, getProgress, saveProgress } = module;
+          
+          const existingProgress = getProgress(parseInt(id), 'tv', currentSeason, currentEpisode);
+          
+          window.currentTrackerCleanup = initializeSourceTracking(iframe, selectedSource, parseInt(id), 'tv', currentSeason, currentEpisode, sourceIndex, existingProgress);
+          saveProgress({ id: parseInt(id), mediaType: 'tv', season: parseInt(currentSeason) || 0, episode: parseInt(currentEpisode) || 0, sourceIndex: sourceIndex, fullDuration: existingProgress?.fullDuration || 0, watchedDuration: existingProgress?.watchedDuration || 0, timestamp: Date.now() });
+        });
+      }
+      
+      const sourcesModal = document.getElementById('sources-modal');
+      if (sourcesModal) {
+        const modalContent = document.getElementById('sources-modal-content');
+        if (modalContent) {
+          modalContent.classList.remove('scale-100', 'opacity-100');
+          modalContent.classList.add('scale-95', 'opacity-0');
         }
         
-        localStorage.setItem('quickwatch-continue', JSON.stringify(continueWatching));
+        const closeModalButton = document.getElementById('close-modal');
+        if (iframeContainer) iframeContainer.style.filter = '';
+        if (closeModalButton) closeModalButton.style.filter = '';
+        
+        setTimeout(() => {
+          sourcesModal.classList.add('hidden');
+        }, 300);
       }
     });
   });

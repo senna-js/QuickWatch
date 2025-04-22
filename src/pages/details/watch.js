@@ -125,37 +125,11 @@ async function loadMediaDetails(type, id) {
         .filter(item => item.id === parseInt(id) && item.mediaType === type)
         .sort((a, b) => parseInt(b.timestamp) - parseInt(a.timestamp));
       
-      if (showItems.length > 0) {
-        const mostRecentItem = showItems[0];
-        
-        if (mostRecentItem.sourceIndex !== undefined && 
-            mostRecentItem.sourceIndex >= 0 && 
-            mostRecentItem.sourceIndex < sources.length) {
-          initialSourceIndex = parseInt(mostRecentItem.sourceIndex);
-        }
-      }
-    } else {
-      const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-      
-      const groupedItems = continueWatching.reduce((acc, item) => {
-        const key = `${item.id}_${item.mediaType}`;
-        if (!acc[key]) {
-          acc[key] = item;
-        } else {
-          if (item.timestamp > acc[key].timestamp) {
-            acc[key] = item;
-          }
-        }
-        return acc;
-      }, {});
-      
-      const savedItem = Object.values(groupedItems).find(item => item.id === id && item.mediaType === type);
-    
-      if (savedItem && savedItem.sourceIndex !== undefined && savedItem.sourceIndex >= 0 && savedItem.sourceIndex < sources.length) {
-        initialSourceIndex = savedItem.sourceIndex;
+      if (showItems.length > 0 && showItems[0].sourceIndex !== undefined) {
+        initialSourceIndex = parseInt(showItems[0].sourceIndex);
       }
     }
-
+    
     const defaultSource = sources[initialSourceIndex];
     const iframeUrl = type === 'movie' 
       ? defaultSource.movieUrl 
@@ -427,16 +401,12 @@ async function loadMediaDetails(type, id) {
     
   } catch (error) {
     console.error('Error loading media details:', error);
-    document.getElementById('details-container').innerHTML = renderError(
-      'Error', 
-      'Failed to load details', 
-      'Back to Home',
-      "window.history.pushState(null, null, '/'); window.dispatchEvent(new PopStateEvent('popstate'))"
-    );
-    
-    if (window.splashScreen) {
-      window.splashScreen.hide();
+    const detailsContainer = document.getElementById('details-container');
+    if (detailsContainer) {
+      detailsContainer.innerHTML = renderError('Failed to load media details. Please try again later.');
     }
+    
+    window.splashScreen?.hide();
   }
 }
 
