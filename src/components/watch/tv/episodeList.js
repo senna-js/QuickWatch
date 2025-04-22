@@ -134,6 +134,7 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
         
         const selectedSource = sources[initialSourceIndex];
         const newUrl = selectedSource.tvUrl
+          .replace('{id}', id)
           .replace('{season}', initialSeason)
           .replace('{episode}', episodeNumber);
         

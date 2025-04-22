@@ -49,7 +49,7 @@ export function injectVidLinkListener() {
 }
 
 export function getProgressPercentage(mediaId, mediaType, season = 0, episode = 0) {
-  const progress = getProgress(mediaId, mediaType, season, episode);
+  const progress = getProgress(parseInt(mediaId), mediaType, parseInt(season), parseInt(episode));
   
   if (progress && progress.fullDuration > 0) {
     return Math.min(100, Math.round((progress.watchedDuration / progress.fullDuration) * 100));
@@ -59,17 +59,17 @@ export function getProgressPercentage(mediaId, mediaType, season = 0, episode = 
 }
 
 export function hasStartedWatching(mediaId, mediaType, season = 0, episode = 0) {
-  const progress = getProgress(mediaId, mediaType, season, episode);
+  const progress = getProgress(parseInt(mediaId), mediaType, parseInt(season), parseInt(episode));
   return progress !== null && progress.watchedDuration > 0;
 }
 
 export function hasCompletedWatching(mediaId, mediaType, season = 0, episode = 0) {
-  const progressPercent = getProgressPercentage(mediaId, mediaType, season, episode);
+  const progressPercent = getProgressPercentage(parseInt(mediaId), mediaType, parseInt(season), parseInt(episode));
   return progressPercent >= 90;
 }
 
 export function getMostRecentEpisode(mediaId) {
-  const allProgress = getAllProgress(mediaId, 'tv');
+  const allProgress = getAllProgress(parseInt(mediaId), 'tv');
   
   if (allProgress.length === 0) return null;
   return allProgress[allProgress.length - 1];

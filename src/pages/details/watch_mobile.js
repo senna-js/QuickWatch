@@ -93,11 +93,16 @@ async function loadMediaDetails(type, id) {
     
     if (type === 'tv') {
       const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-      const savedItem = continueWatching.find(item => item.id === id && item.mediaType === type);
       
-      if (savedItem && savedItem.season && savedItem.episode) {
-        initialSeason = savedItem.season;
-        initialEpisode = savedItem.episode;
+      const showItems = continueWatching
+        .filter(item => item.id === parseInt(id) && item.mediaType === type)
+        .sort((a, b) => parseInt(b.timestamp) - parseInt(a.timestamp));
+      
+      if (showItems.length > 0) {
+        const mostRecentItem = showItems[0];
+        initialSeason = parseInt(mostRecentItem.season);
+        initialEpisode = parseInt(mostRecentItem.episode);
+        
         if (initialSeason !== 1) {
           const seasonResponse = await fetch(`${TMDB_BASE_URL}/tv/${id}/season/${initialSeason}?language=en-US`, options);
           seasonData = await seasonResponse.json();
@@ -115,15 +120,37 @@ async function loadMediaDetails(type, id) {
     let initialSourceIndex = 0;
     if (type === 'tv') {
       const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-      const savedItem = continueWatching.find(item => item.id === id && item.mediaType === type);
       
-      if (savedItem && savedItem.sourceIndex !== undefined && savedItem.sourceIndex >= 0 && savedItem.sourceIndex < sources.length) {
-        initialSourceIndex = savedItem.sourceIndex;
+      const showItems = continueWatching
+        .filter(item => item.id === parseInt(id) && item.mediaType === type)
+        .sort((a, b) => parseInt(b.timestamp) - parseInt(a.timestamp));
+      
+      if (showItems.length > 0) {
+        const mostRecentItem = showItems[0];
+        
+        if (mostRecentItem.sourceIndex !== undefined && 
+            mostRecentItem.sourceIndex >= 0 && 
+            mostRecentItem.sourceIndex < sources.length) {
+          initialSourceIndex = parseInt(mostRecentItem.sourceIndex);
+        }
       }
     } else {
       const continueWatching = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
-      const savedItem = continueWatching.find(item => item.id === id && item.mediaType === type);
       
+      const groupedItems = continueWatching.reduce((acc, item) => {
+        const key = `${item.id}_${item.mediaType}`;
+        if (!acc[key]) {
+          acc[key] = item;
+        } else {
+          if (item.timestamp > acc[key].timestamp) {
+            acc[key] = item;
+          }
+        }
+        return acc;
+      }, {});
+      
+      const savedItem = Object.values(groupedItems).find(item => item.id === id && item.mediaType === type);
+    
       if (savedItem && savedItem.sourceIndex !== undefined && savedItem.sourceIndex >= 0 && savedItem.sourceIndex < sources.length) {
         initialSourceIndex = savedItem.sourceIndex;
       }
@@ -131,12 +158,12 @@ async function loadMediaDetails(type, id) {
 
     const defaultSource = sources[initialSourceIndex];
     const iframeUrl = type === 'movie' 
-      ? defaultSource.movieUrl
-          .replace('{id}', id)
+      ? defaultSource.movieUrl 
+          .replace('{id}', String(id))
       : defaultSource.tvUrl
-          .replace('{id}', id)
-          .replace('{season}', initialSeason)
-          .replace('{episode}', initialEpisode);
+          .replace('{id}', String(id))
+          .replace('{season}', String(initialSeason))
+          .replace('{episode}', String(initialEpisode));
     
     // genres
     const genresText = data.genres?.slice(0, 2).map(genre => genre.name.toUpperCase()).join('  ') || '';

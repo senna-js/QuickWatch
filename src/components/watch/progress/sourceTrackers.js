@@ -1,6 +1,5 @@
 import { saveProgress } from './progressManager.js';
 
-
 export function setupVidLinkTracking(playerIframe, mediaId, mediaType, season, episode, sourceIndex) {
   const messageHandler = (event) => {
     if (event.origin !== 'https://vidlink.pro') return;
@@ -14,7 +13,7 @@ export function setupVidLinkTracking(playerIframe, mediaId, mediaType, season, e
       const existingProgress = continueData.find(item => 
         item.id === parseInt(mediaId) && 
         item.mediaType === mediaType &&
-        (mediaType === 'movie' || (item.season === season && item.episode === episode))
+        (mediaType === 'movie' || (item.season === parseInt(season) && item.episode === parseInt(episode)))
       );
 
       console.log('Current progress:', existingProgress);
@@ -30,10 +29,10 @@ export function setupVidLinkTracking(playerIframe, mediaId, mediaType, season, e
                 mediaType: 'tv',
                 season: parseInt(episodeData.season),
                 episode: parseInt(episodeData.episode),
-                sourceIndex: sourceIndex,
-                fullDuration: episodeData.progress.duration || 0,
-                watchedDuration: episodeData.progress.watched || 0,
-                timestamp: Date.now()
+                sourceIndex: parseInt(sourceIndex),
+                fullDuration: parseInt(episodeData.progress.duration || 0),
+                watchedDuration: parseInt(episodeData.progress.watched || 0),
+                timestamp: parseInt(Date.now())
               });
             }
           });
@@ -44,10 +43,10 @@ export function setupVidLinkTracking(playerIframe, mediaId, mediaType, season, e
             mediaType: 'movie',
             season: 0,
             episode: 0,
-            sourceIndex: sourceIndex,
-            fullDuration: mediaItem.progress.duration || existingProgress?.fullDuration || 0,
-            watchedDuration: mediaItem.progress.watched || existingProgress?.watchedDuration || 0,
-            timestamp: mediaItem.last_updated || Date.now()
+            sourceIndex: parseInt(sourceIndex),
+            fullDuration: parseInt(mediaItem.progress.duration || existingProgress?.fullDuration || 0),
+            watchedDuration: parseInt(mediaItem.progress.watched || existingProgress?.watchedDuration || 0),
+            timestamp: parseInt(mediaItem.last_updated || Date.now())
           });
         }
       });
@@ -64,10 +63,10 @@ export function setupVidLinkTracking(playerIframe, mediaId, mediaType, season, e
               mediaType: mediaType,
               season: parseInt(season),
               episode: parseInt(episode),
-              sourceIndex: sourceIndex,
-              fullDuration: episodeData.progress.duration || 0,
-              watchedDuration: episodeData.progress.watched || 0,
-              timestamp: Date.now()
+              sourceIndex: parseInt(sourceIndex),
+              fullDuration: parseInt(episodeData.progress.duration || 0),
+              watchedDuration: parseInt(episodeData.progress.watched || 0),
+              timestamp: parseInt(Date.now())
             });
           }
         }

@@ -1,19 +1,30 @@
 
 export function saveProgress(progressData) {
   try {
+    const sanitizedData = {
+      ...progressData,
+      id: parseInt(progressData.id),
+      season: parseInt(progressData.season || 0),
+      episode: parseInt(progressData.episode || 0),
+      sourceIndex: parseInt(progressData.sourceIndex || 0),
+      fullDuration: parseInt(progressData.fullDuration || 0),
+      watchedDuration: parseInt(progressData.watchedDuration || 0),
+      timestamp: parseInt(progressData.timestamp || Date.now())
+    };
+    
     let continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
     
     const existingIndex = continueData.findIndex(item => 
-      item.id === progressData.id && 
-      item.mediaType === progressData.mediaType &&
-      (progressData.mediaType === 'movie' || 
-       (item.season === progressData.season && item.episode === progressData.episode))
+      item.id === sanitizedData.id && 
+      item.mediaType === sanitizedData.mediaType &&
+      (sanitizedData.mediaType === 'movie' || 
+       (item.season === sanitizedData.season && item.episode === sanitizedData.episode))
     );
     
     if (existingIndex >= 0) {
-      continueData[existingIndex] = progressData;
+      continueData[existingIndex] = sanitizedData;
     } else {
-      continueData.push(progressData);
+      continueData.push(sanitizedData);
     }
     
     if (continueData.length > 50) {
@@ -22,14 +33,14 @@ export function saveProgress(progressData) {
     
     localStorage.setItem('quickwatch-continue', JSON.stringify(continueData));
     
-    if (progressData.mediaType === 'tv') {
-      const oldKey = `tv-progress-${progressData.id}`;
+    if (sanitizedData.mediaType === 'tv') {
+      const oldKey = `tv-progress-${sanitizedData.id}`;
       if (localStorage.getItem(oldKey)) {
         localStorage.removeItem(oldKey);
       }
     }
     
-    console.log('Progress saved:', progressData);
+    console.log('Progress saved:', sanitizedData);
   } catch (error) {
     console.error('Error saving progress:', error);
   }
@@ -40,7 +51,7 @@ export function getProgress(mediaId, mediaType, season = 0, episode = 0) {
     const continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
     
     return continueData.find(item => 
-      item.id ===parseInt(mediaId) && 
+      item.id === parseInt(mediaId) && 
       item.mediaType === String(mediaType) &&
       (mediaType === 'movie' || 
        (item.season === parseInt(season) && item.episode === parseInt(episode)))
@@ -56,7 +67,7 @@ export function getAllProgress(mediaId, mediaType) {
     const continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
     
     return continueData.filter(item => 
-      item.id === mediaId && 
+      item.id === parseInt(mediaId) && 
       item.mediaType === mediaType
     );
   } catch (error) {
