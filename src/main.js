@@ -7,24 +7,59 @@ window.splashScreen = {
   element: null,
   stepsContainer: null,
   steps: [],
+  progressBar: null,
+  progressFill: null,
+  totalSteps: 0,
+  completedSteps: 0,
+  isHiding: false,
+  
   show: function() {
     if (!this.element) {
       this.element = document.createElement('div');
       this.element.className = 'splash-screen';
       this.element.innerHTML = `
         <div class="splash-container">
-          <h1 class="splash-title text-6xl mb-4" style="font-family: 'Instrument Serif';">quickwatch</h1>
           <div class="splash-spinner"></div>
-          <div class="splash-steps"></div>
+          <div class="splash-progress-container">
+            <div class="splash-progress-bar">
+              <div class="splash-progress-fill"></div>
+            </div>
+            <div class="splash-progress-text">Loading...</div>
+          </div>
+          <div class="splash-steps hidden"></div>
         </div>
       `;
       document.body.appendChild(this.element);
       this.stepsContainer = this.element.querySelector('.splash-steps');
+      this.progressBar = this.element.querySelector('.splash-progress-bar');
+      this.progressFill = this.element.querySelector('.splash-progress-fill');
+      this.progressText = this.element.querySelector('.splash-progress-text');
     } else {
       this.element.classList.remove('hidden');
     }
+    
+    this.totalSteps = 0;
+    this.completedSteps = 0;
+    this.updateProgress();
   },
+  
   hide: function() {
+    if (this.isHiding) return;
+    
+    if (this.totalSteps > 0 && this.completedSteps < this.totalSteps) {
+      this.isHiding = true;
+      this.completedSteps = this.totalSteps;
+      this.updateProgress();
+      
+      setTimeout(() => {
+        this._performHide();
+      }, 500);
+    } else {
+      this._performHide();
+    }
+  },
+  
+  _performHide: function() {
     if (this.element && document.body.contains(this.element)) {
       this.element.classList.add('hidden');
       setTimeout(() => {
@@ -33,24 +68,38 @@ window.splashScreen = {
           this.element.remove();
           this.element = null;
           this.stepsContainer = null;
+          this.progressBar = null;
+          this.progressFill = null;
+          this.progressText = null;
           this.steps = [];
+          this.totalSteps = 0;
+          this.completedSteps = 0;
+          this.isHiding = false;
         }
       }, 500);
     }
   },
+  
+  updateProgress: function() {
+    if (!this.progressFill) return;
+    
+    const percent = this.totalSteps > 0 ? (this.completedSteps / this.totalSteps) * 100 : 0;
+    this.progressFill.style.width = `${percent}%`;
+    
+    if (this.progressText) {
+      if (this.totalSteps === 0) {
+        this.progressText.textContent = 'Loading...';
+      } else {
+        this.progressText.textContent = `Fully loaded`;
+      }
+    }
+  },
+  
   addStep: function(stepText) {
-    if (!this.stepsContainer) return;
+    this.totalSteps++;
+    this.updateProgress();
     
     const stepId = `step-${this.steps.length}`;
-    const stepElement = document.createElement('div');
-    stepElement.className = 'splash-step';
-    stepElement.id = stepId;
-    stepElement.innerHTML = `
-      <div class="step-loader"></div>
-      <span>${stepText}</span>
-    `;
-    
-    this.stepsContainer.appendChild(stepElement);
     const step = { 
       id: stepId, 
       text: stepText, 
@@ -60,44 +109,30 @@ window.splashScreen = {
     };
     this.steps.push(step);
     
+    if (this.progressText) {
+      this.progressText.textContent = stepText;
+    }
+    
     return stepId;
   },
+  
   completeStep: function(stepId) {
-    if (!this.stepsContainer) return;
-    
-    const stepElement = document.getElementById(stepId);
-    if (stepElement) {
-      const loader = stepElement.querySelector('.step-loader');
-      if (loader) {
-        loader.innerHTML = '<i class="fas fa-check"></i>';
-        loader.classList.add('completed');
-      }
+    const stepIndex = this.steps.findIndex(step => step.id === stepId);
+    if (stepIndex !== -1) {
+      // Clear the timeout since the step completed successfully
+      clearTimeout(this.steps[stepIndex].timeout);
+      this.steps[stepIndex].completed = true;
       
-      const stepIndex = this.steps.findIndex(step => step.id === stepId);
-      if (stepIndex !== -1) {
-        // Clear the timeout since the step completed successfully
-        clearTimeout(this.steps[stepIndex].timeout);
-        this.steps[stepIndex].completed = true;
-      }
+      this.completedSteps++;
+      this.updateProgress();
     }
   },
+  
   failStep: function(stepId) {
-    if (!this.stepsContainer) return;
-    
-    const stepElement = document.getElementById(stepId);
-    if (stepElement) {
-      const loader = stepElement.querySelector('.step-loader');
-      if (loader) {
-        loader.innerHTML = '<i class="fas fa-times"></i>'; // Use X icon
-        loader.classList.add('failed');                    // Add failed class
-      }
+    const stepIndex = this.steps.findIndex(step => step.id === stepId);
+    if (stepIndex !== -1) {
+      this.steps[stepIndex].failed = true;
       
-      const stepIndex = this.steps.findIndex(step => step.id === stepId);
-      if (stepIndex !== -1) {
-        this.steps[stepIndex].failed = true;
-      }
-      
-      // Add this: Hide splash screen after a short delay when a step fails
       setTimeout(() => this.hide(), 500);
     }
   }

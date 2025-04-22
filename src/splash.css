@@ -24,46 +24,56 @@
   justify-content: center;
 }
 
-.splash-steps {
-  margin-top: 20px;
+.splash-progress-container {
   width: 300px;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  align-items: center;
+}
+
+.splash-progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.splash-progress-fill {
+  height: 100%;
+  width: 0%;
+  background-color: #2392EE;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  position: relative;
+  box-shadow: 0 0 15px rgba(35, 146, 238, 0.7),
+              -2px -2px 15px rgba(255, 255, 255, 0.5);
+  background-image: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0) 50%
+  );
+}
+
+.splash-progress-text {
+  margin-top: 10px;
+  color: #f0f0f0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.splash-steps.hidden {
+  display: none;
 }
 
 .splash-step {
-  display: flex;
-  align-items: center;
-  color: #f0f0f0;
-  font-size: 14px;
+  display: none;
 }
 
 .step-loader {
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
-  border: 2px solid #555;
-  border-radius: 50%;
-  border-top-color: #f0f0f0;
-  animation: spin 1s linear infinite;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.step-loader.completed {
-  animation: none;
-  border: 2px solid #4CAF50;
-  background-color: #4CAF50;
-  color: white;
-}
-
-.step-loader.failed {
-  animation: none;
-  border: 2px solid #d74d4d;
-  background-color: #d74d4d;
-  color: white;
+  display: none;
 }
 
 @keyframes spin {
