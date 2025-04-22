@@ -88,7 +88,7 @@ export async function initSeasonSelector(id, data, seasonData, initialSeason, in
               renderEpisodeList(seasonData.episodes, contentRating);
 
             // Initialize episode list with new season data
-            initEpisodeList(id, selectedSeason, initialEpisode, sources, initialSourceIndex, seasonData.episodes);
+            initEpisodeList(id, selectedSeason, initialEpisode, sources, initialSourceIndex, '', isMobile);
           }
           
           // Call the callback function if provided

@@ -4,7 +4,7 @@ import { renderHeader } from '../../components/header.js';
 import { renderSpinner, renderFullPageSpinner } from '../../components/misc/loading.js';
 import { renderError } from '../../components/misc/error.js';
 import { initTabSwitcher } from '../../components/watch/tabs/tabSwitcher.js';
-import { loadRelatedContent, loadDetailsContent } from '../../components/watch/tabs/tabContent.js';
+import { loadRelatedContent, loadDetailsContent, isMobileDevice } from '../../components/watch/tabs/tabContent.js';
 import { renderPlayerModal, initPlayerModal } from '../../components/watch/playerModal.js';
 import { initTrailerButton } from '../../components/watch/trailerModal.js';
 import { renderEpisodeList, initEpisodeList } from '../../components/watch/tv/episodeList.js';
@@ -365,7 +365,7 @@ async function loadMediaDetails(type, id) {
     if (type === 'tv') {
       window.currentPlayingEpisode = null;
       
-      initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex);
+      initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex, '', false);
       initSeasonSelector(id, data, seasonData, initialSeason, initialEpisode, sources, initialSourceIndex, contentRating);
     }
     

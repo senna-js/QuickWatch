@@ -140,7 +140,7 @@ export function setEpisodeStatus(season, episode, status) {
   }
 }
 
-export function initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex, episodes = [], mediaTitle = '', isMobile = false) {
+export function initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex, mediaTitle = '', isMobile = false) {
   const episodesList = document.getElementById('episodes-list');
 
   updateProgressIndicators(id, initialSeason);

@@ -384,7 +384,7 @@ async function loadMediaDetails(type, id) {
     initTrailerButton(type, id, mediaTitle);
     
     if (type === 'tv') {
-      initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex);
+      initEpisodeList(id, initialSeason, initialEpisode, sources, initialSourceIndex, '', true);
       initSeasonSelector(id, data, seasonData, initialSeason, initialEpisode, sources, initialSourceIndex, contentRating, true);
     }
 
