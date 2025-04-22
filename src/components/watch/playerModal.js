@@ -18,9 +18,9 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
   
   if (isMobile) {
     return `
-      <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex flex-col items-center justify-between p-0">
+      <div id="player-modal" class="fixed inset-0 bg-transparent z-50 hidden flex flex-col items-center justify-between p-0 transition-all duration-300 ease-out">
         <div class="relative w-full h-full flex flex-col">
-          <div class="iframe-container loading rounded-none flex-grow" id="iframe-container">
+          <div class="iframe-container loading rounded-none flex-grow transform scale-50 opacity-0 transition-all duration-300 ease-out" id="iframe-container">
             <!-- iframe goes here -->
             <div class="iframe-loader">
               ${renderSpinner('large')}
@@ -54,12 +54,12 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
     `;
   } else {
     return `
-      <div id="player-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
+      <div id="player-modal" class="fixed inset-0 bg-transparent z-50 hidden flex items-center justify-center p-4 transition-all duration-300 ease-out">
         <div class="relative w-full max-w-6xl">
-          <button id="close-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] aspect-square bg-white/30 backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
+          <button id="close-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
           
-          <div class="iframe-container loading rounded-[1.25rem] p-4 bg-[#151920] transition duration-300 ease" id="iframe-container">
-              <button id="sources-button" class="absolute top-8 right-8 px-4 py-2 rounded-lg whitespace-nowrap bg-[#2392EE] text-white">
+          <div class="iframe-container loading rounded-[1.25rem] p-4 bg-[#151920] transform scale-50 opacity-0 transition-all duration-300 ease-out" id="iframe-container">
+              <button id="sources-button" class="absolute top-8 right-8 px-4 pt-2 pb-1.5 rounded-full whitespace-nowrap bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-md hover:scale-[107%] active:scale-90 text-white select-none" style="font-family: Inter;">
                 SOURCES
               </button>
             <div class="iframe-loader">
@@ -73,7 +73,7 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
           <div class="bg-[#181c23] rounded-lg p-4 w-[90%] max-w-md transform transition-all duration-300 ease-out scale-95 opacity-0" id="sources-modal-content">
             <div class="flex justify-between items-center mb-3">
               <h3 class="text-lg font-medium">Select Source</h3>
-              <button id="close-sources-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] aspect-square bg-white/30 backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
+              <button id="close-sources-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
             </div>
             
             <div class="grid grid-cols-2 gap-2 mb-3">
@@ -143,7 +143,7 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
     const iframe = document.createElement('iframe');
     iframe.id = 'media-player';
     iframe.src = iframeUrl;
-    iframe.className = isMobile ? 'w-full h-full rounded-none' : 'w-full rounded-xl aspect-video';
+    iframe.className = isMobile ? 'w-full h-full rounded-none bg-[#272C36]' : 'w-full rounded-xl aspect-video bg-[#272C36]';
     iframe.allowFullscreen = true;
     
     iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
@@ -163,11 +163,23 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
       playButton.addEventListener('click', () => {
         playerModal.classList.remove('hidden');
         
+        void playerModal.offsetWidth;
+        
+        playerModal.classList.add('bg-[#00050d]', 'bg-opacity-90');
+        
         // update global current values to initial values when play button clicked
         window.currentPlayerSeason = initialSeason;
         window.currentPlayerEpisode = initialEpisode;
         
         mediaPlayer = createIframe(initialSourceIndex);
+        
+        const iframeContainer = document.getElementById('iframe-container');
+        if (iframeContainer) {
+          void iframeContainer.offsetWidth;
+          
+          iframeContainer.classList.remove('scale-50', 'opacity-0');
+          iframeContainer.classList.add('scale-100', 'opacity-100');
+        }
         
         if (mediaPlayer) {
           const currentSource = sources[initialSourceIndex];
@@ -188,18 +200,27 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
       });
       
       closeModal.addEventListener('click', () => {
-        playerModal.classList.add('hidden');
-        
-        if (currentTrackerCleanup) {
-          currentTrackerCleanup();
-          currentTrackerCleanup = null;
-        }
-        
         const iframeContainer = document.getElementById('iframe-container');
-        if (iframeContainer && iframeContainer.querySelector('iframe')) {
-          iframeContainer.querySelector('iframe').remove();
-          mediaPlayer = null;
+        if (iframeContainer) {
+          iframeContainer.classList.remove('scale-100', 'opacity-100');
+          iframeContainer.classList.add('scale-50', 'opacity-0');
         }
+        
+        playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
+        
+        setTimeout(() => {
+          playerModal.classList.add('hidden');
+          
+          if (currentTrackerCleanup) {
+            currentTrackerCleanup();
+            currentTrackerCleanup = null;
+          }
+          
+          if (iframeContainer && iframeContainer.querySelector('iframe')) {
+            iframeContainer.querySelector('iframe').remove();
+            mediaPlayer = null;
+          }
+        }, 250);
       });
     }
   
