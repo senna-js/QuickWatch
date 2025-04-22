@@ -14,29 +14,37 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
             <div class="iframe-loader">
               ${renderSpinner('large')}
             </div>
+            <div class="absolute top-2 right-2 flex flex-row gap-2">
+              <button id="sources-button" class="px-4 pt-2 pb-[0.45rem] rounded-full whitespace-nowrap bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-md hover:scale-[107%] active:scale-90 text-white select-none" style="font-family: Inter;">Sources</button>
+              <button id="close-modal" class="text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
+            </div>
           </div>
-          
-          <div class="w-full bg-[#12161c] p-3 flex flex-col">
-            <div class="flex justify-between items-center mb-2">
-              <h3 class="text-lg font-medium truncate">${mediaTitle}</h3>
-              <button id="close-modal" class="text-white px-3 py-1 rounded-lg bg-[#32363D]">
-                <i class="icon-x"></i> Close
-              </button>
+        </div>
+
+        <div id="sources-modal" class="fixed inset-x-0 bottom-0 z-[60] hidden transition-all duration-300 ease-out">
+          <div class="bg-[#181c23] rounded-t-2xl p-4 w-full transform transition-all duration-300 ease-out opacity-0" id="sources-modal-content">
+            <!-- Drag handle -->
+            <div class="w-12 h-1 bg-gray-500 rounded-full mx-auto mb-4"></div>
+            
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="text-lg font-medium">Select Source</h3>
+              <button id="close-sources-modal" class="text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
             </div>
             
-            <div class="source-selector-container overflow-x-auto pb-1">
-              <div class="flex gap-2 min-w-max">
-                ${filteredSources
-                  .map((source, index) => `
-                    <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
-                      ${source.name}
-                    </button>
-                  `).join('')}
-                <button id="popup-blocker" class="px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap hover:bg-[#313845]">
-                  <i class="fas fa-shield-alt mr-2"></i>Disable Popups
-                </button>
-              </div>
+            <div class="grid grid-cols-2 gap-2 mb-3">
+              ${filteredSources
+                .map((source, index) => `
+                  <button class="source-button px-4 py-2 rounded-lg whitespace-nowrap ${index === initialSourceIndex ? 'bg-[#2392EE]' : 'bg-[#272c36]'}" data-index="${index}">
+                    ${source.name}
+                  </button>
+                `).join('')}
             </div>
+            
+            <div class="border-t border-[#32363D] my-3"></div>
+            
+            <button id="popup-blocker" class="w-full px-4 py-2 rounded-lg bg-[#272c36] whitespace-nowrap hover:bg-[#313845]">
+              <i class="fas fa-shield-alt mr-2"></i>Disable Popups
+            </button>
           </div>
         </div>
       </div>
