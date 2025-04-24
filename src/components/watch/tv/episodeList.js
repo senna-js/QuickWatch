@@ -189,8 +189,14 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
       
       const playerModal = document.getElementById('player-modal');
       if (playerModal) {
+        playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
+        playerModal.classList.add('bg-transparent');
+        
         playerModal.classList.remove('hidden');
+        
         void playerModal.offsetWidth;
+        
+        playerModal.classList.remove('bg-transparent');
         playerModal.classList.add('bg-[#00050d]', 'bg-opacity-90');
         
         const iframeContainer = document.getElementById('iframe-container');

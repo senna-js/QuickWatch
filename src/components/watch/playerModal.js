@@ -148,10 +148,14 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
     
     if (playButton && playerModal && closeModal) {
       playButton.addEventListener('click', () => {
+        playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
+        playerModal.classList.add('bg-transparent');
+        
         playerModal.classList.remove('hidden');
         
         void playerModal.offsetWidth;
         
+        playerModal.classList.remove('bg-transparent');
         playerModal.classList.add('bg-[#00050d]', 'bg-opacity-90');
         
         // update global current values to initial values when play button clicked
