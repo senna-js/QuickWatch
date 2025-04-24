@@ -17,30 +17,6 @@
   font-weight: 500;
 }
 
-.titlebar {
-  z-index: 1000;
-  height: 30px;
-  user-select: none;
-  display: flex;
-  justify-content: flex-end;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-.titlebar-button {
-  display: inline-flex;
-  justify-content: flex-end;
-  align-items: center;
-  width: 30px;
-  height: 30px;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.titlebar-button:hover {
-  background: #5bbec3;
-}
-
 body {
   background-color: #00050d;
   color: white;
