@@ -9,7 +9,6 @@ import { render404Page } from './pages/404.js';
 import { renderDownloadDetailsPage } from './pages/details/download.js';
 import { renderIOSAppPage } from './pages/iosapp.js';
 import { renderAnimePaheEmbed } from './pages/embeds/animepahe-embed.js';
-import { renderVidSrcEmbed } from './pages/embeds/vidsrc-embed.js';
 import { renderMoviesPage } from './pages/browse/movies.js';
 import { renderTvPage } from './pages/browse/tv.js';
 import { renderGenresPage } from './pages/genres/genres.js';
@@ -120,15 +119,6 @@ function handleRoute() {
     const episode = parts[5];
     const season = parts[4];
     currentPagePromise = Promise.resolve(renderAnimePaheEmbed(appContainer, { id, episode, season }));
-  }
-  else if (path.match(/^\/embed\/vidsrc\/[^\/]+\/[\d]+\/[\d]+\/[\d]+$/)) {
-    document.title = 'VidSrc Embed';
-    const parts = path.split('/');
-    const type = parts[3];
-    const id = parts[4];
-    const season = parts[5];
-    const episode = parts[6];
-    currentPagePromise = Promise.resolve(renderVidSrcEmbed(appContainer, { id, episode, season, type }));
   }
   else if (path === '/movies') {
     document.title = 'Movies';
