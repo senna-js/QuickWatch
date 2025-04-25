@@ -210,6 +210,18 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
             .replace('{id}', id)
             .replace('{season}', currentSeason)
             .replace('{episode}', currentEpisode);
+
+          let episodeTitle = '';
+          const titleElement = episodeItem.querySelector('h3');
+          if (titleElement) {
+            const titleText = titleElement.textContent;
+            episodeTitle = titleText.includes('-') ? 
+              titleText.split('-')[1].trim() : 
+              titleText.replace(/^S\d+\s*E\d+\s*-\s*/, '').trim();
+          }
+
+          document.getElementById('current-media-indicator').innerText = 
+            `S${currentSeason}E${currentEpisode}${episodeTitle ? ' - ' + episodeTitle : ''}`;
           
           const iframe = document.createElement('iframe');
           iframe.id = 'media-player';
@@ -311,6 +323,21 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
           .replace('{id}', id)
           .replace('{season}', currentSeason)
           .replace('{episode}', currentEpisode);
+
+        let episodeTitle = '';
+        const episodeItem = document.querySelector(`.episode-item[data-season="${currentSeason}"][data-episode="${currentEpisode}"]`);
+        if (episodeItem) {
+          const titleElement = episodeItem.querySelector('h3');
+          if (titleElement) {
+            const titleText = titleElement.textContent;
+            episodeTitle = titleText.includes('-') ? 
+              titleText.split('-')[1].trim() : 
+              titleText.replace(/^S\d+\s*E\d+\s*-\s*/, '').trim();
+          }
+        }
+
+        document.getElementById('current-media-indicator').innerText = 
+          `S${currentSeason}E${currentEpisode}${episodeTitle ? ' - ' + episodeTitle : ''}`;
         
         const iframe = document.createElement('iframe');
         iframe.id = 'media-player';

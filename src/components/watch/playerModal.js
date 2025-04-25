@@ -51,14 +51,28 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
     `;
   } else {
     return `
-      <div id="player-modal" class="fixed inset-0 bg-transparent z-50 hidden flex items-center justify-center p-4 transition-all duration-300 ease-out">
+      <div id="player-modal" class="fixed inset-0 bg-transparent z-50 hidden flex gap-2 items-center justify-center p-4 transition-all duration-300 ease-out">
         <div class="relative w-full max-w-6xl">
           <button id="close-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
           
-          <div class="iframe-container loading rounded-[1.25rem] p-4 bg-[#151920] transform scale-50 opacity-0 transition-all duration-300 ease-out" id="iframe-container">
-              <button id="sources-button" class="absolute top-8 right-8 px-4 pt-2 pb-1.5 rounded-full whitespace-nowrap bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-md hover:scale-[107%] active:scale-90 text-white select-none" style="font-family: Inter;">
+          <div class="iframe-container loading rounded-[1.25rem] p-4 pt-2 bg-[#151920] transform scale-50 opacity-0 transition-all duration-300 ease-out flex flex-col-reverse" id="iframe-container">
+            <div id="topbar" class="w-full bg-[#151920] p-2 px-0 rounded-t-lg flex items-center justify-between">
+              <div class="flex gap-1.5 ml-2">
+                <div class="w-3 h-3 rounded-full bg-[#2392EE] hover:opacity-80 cursor-pointer"></div>
+                <div class="w-3 h-3 rounded-full bg-[#2392EE] hover:opacity-80 cursor-pointer"></div>
+                <div class="w-3 h-3 rounded-full bg-[#2392EE] hover:opacity-80 cursor-pointer"></div>
+              </div>
+              
+              <div class="flex items-center gap-4">
+                ${type === 'tv' ? `<button id="previous-episode-btn" class="text-white cursor-pointer hover:scale-[1.2] transition duration-[250ms] ease">←</button>` : ''}
+                <div id="current-media-indicator" class="text-white font-medium">S${initialSeason}E${initialEpisode}</div>
+                ${type === 'tv' ? `<button id="next-episode-btn" class="text-white cursor-pointer hover:scale-[1.2] transition duration-[250ms] ease">→</button>` : ''}
+              </div>
+              
+              <button id="sources-button" class="px-4 py-1.5 mr-2 rounded-md whitespace-nowrap transition-colors text-white text-sm font-medium select-none cursor-poiter hover:text-[#2392EE]">
                 SOURCES
               </button>
+            </div>
             <div class="iframe-loader">
               ${renderSpinner('large')}
             </div>
@@ -126,11 +140,28 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
           .replace('{id}', id)
           .replace('{season}', window.currentPlayerSeason)
           .replace('{episode}', window.currentPlayerEpisode);
+
+    let episodeTitle = '';
+    if (type === 'tv') {
+      const episodeItem = document.querySelector(`.episode-item[data-season="${window.currentPlayerSeason}"][data-episode="${window.currentPlayerEpisode}"]`);
+      if (episodeItem) {
+        const titleElement = episodeItem.querySelector('h3');
+        if (titleElement) {
+          const titleText = titleElement.textContent;
+          episodeTitle = titleText.includes('-') ? 
+            titleText.split('-')[1].trim() : 
+            titleText.replace(/^S\d+\s*E\d+\s*-\s*/, '').trim();
+        }
+      }
+    }
+
+    document.getElementById('current-media-indicator').innerText = 
+      `S${window.currentPlayerSeason}E${window.currentPlayerEpisode}${episodeTitle ? ' - ' + episodeTitle : ''}`;
     
     const iframe = document.createElement('iframe');
     iframe.id = 'media-player';
     iframe.src = iframeUrl;
-    iframe.className = isMobile ? 'w-full h-full rounded-none bg-[#272C36]' : 'w-full rounded-xl aspect-video bg-[#272C36]';
+    iframe.className = isMobile ? 'w-full h-full rounded-none bg-[#11151c]' : 'w-full rounded-xl aspect-video bg-[#11151c]';
     iframe.allowFullscreen = true;
     
     iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
@@ -345,6 +376,135 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
         }, 300);
       });
     });
+    
+    if (type === 'tv') {
+      const previousEpisodeBtn = document.getElementById('previous-episode-btn');
+      const nextEpisodeBtn = document.getElementById('next-episode-btn');
+
+      const options = { method: 'GET', headers: { 'accept': 'application/json', 'Authorization': TMDB_API_KEY } };
+      
+      const fetchSeasonData = async (seasonNumber) => {
+        try {
+          const response = await fetch(`https://api.themoviedb.org/3/tv/${id}/season/${seasonNumber}?language=en-US`, options);
+          return await response.json();
+        } catch (error) { console.error('Error fetching season data:', error); return null; }
+      };
+      
+      const fetchTVShowDetails = async () => {
+        try {
+          const response = await fetch(`https://api.themoviedb.org/3/tv/${id}?language=en-US`, options);
+          return await response.json();
+        } catch (error) { console.error('Error fetching TV show details:', error); return null; }
+      };
+      
+      const updatePlayer = (season, episode) => {
+        window.currentPlayerSeason = season;
+        window.currentPlayerEpisode = episode;
+        window.currentPlayingEpisode = { season: season, episode: episode };
+        
+        setEpisodeStatus(season, episode, 'Now Playing');
+        
+        if (currentTrackerCleanup) {
+          currentTrackerCleanup();
+          currentTrackerCleanup = null;
+        }
+        
+        mediaPlayer = createIframe(initialSourceIndex);
+        
+        if (mediaPlayer) {
+          const currentSource = sources[initialSourceIndex];
+          const existingProgress = getProgress(parseInt(id), type, season, episode);
+          
+          currentTrackerCleanup = initializeSourceTracking(mediaPlayer, currentSource, parseInt(id), type, season, episode, initialSourceIndex, existingProgress);
+        }
+        
+        updateNavigationButtonsState(season, episode);
+      };
+      
+      const updateNavigationButtons = async () => {
+        const tvDetails = await fetchTVShowDetails();
+        if (!tvDetails) return;
+        
+        const totalSeasons = tvDetails.number_of_seasons;
+        updateNavigationButtonsState(window.currentPlayerSeason, window.currentPlayerEpisode, totalSeasons);
+      };
+      
+      const updateNavigationButtonsState = async (currentSeason, currentEpisode, cachedTotalSeasons = null) => {
+        if (!previousEpisodeBtn || !nextEpisodeBtn) return;
+        
+        let totalSeasons = cachedTotalSeasons;
+        if (!totalSeasons) {
+          const tvDetails = await fetchTVShowDetails();
+          if (!tvDetails) return;
+          totalSeasons = tvDetails.number_of_seasons;
+        }
+        
+        const seasonData = await fetchSeasonData(currentSeason);
+        if (!seasonData || !seasonData.episodes) return;
+        
+        const totalEpisodes = seasonData.episodes.length;
+        
+        if (currentEpisode <= 1 && currentSeason <= 1) {
+          previousEpisodeBtn.classList.add('opacity-30', 'cursor-not-allowed');
+          previousEpisodeBtn.classList.remove('cursor-pointer', 'hover:scale-[1.2]');
+        } else {
+          previousEpisodeBtn.classList.remove('opacity-30', 'cursor-not-allowed');
+          previousEpisodeBtn.classList.add('cursor-pointer', 'hover:scale-[1.2]');
+        }
+        
+        if (currentEpisode >= totalEpisodes && currentSeason >= totalSeasons) {
+          nextEpisodeBtn.classList.add('opacity-30', 'cursor-not-allowed');
+          nextEpisodeBtn.classList.remove('cursor-pointer', 'hover:scale-[1.2]');
+        } else {
+          nextEpisodeBtn.classList.remove('opacity-30', 'cursor-not-allowed');
+          nextEpisodeBtn.classList.add('cursor-pointer', 'hover:scale-[1.2]');
+        }
+      };
+      
+      playButton.addEventListener('click', () => {
+        if (type === 'tv') { updateNavigationButtons(); }
+      });
+      
+      if (previousEpisodeBtn) {
+        previousEpisodeBtn.addEventListener('click', async () => {
+          let newSeason = parseInt(window.currentPlayerSeason);
+          let newEpisode = parseInt(window.currentPlayerEpisode) - 1;
+          
+          if (newEpisode < 1) {
+            newSeason -= 1;
+            if (newSeason < 1) { return; }
+            
+            const seasonData = await fetchSeasonData(newSeason);
+            if (!seasonData || !seasonData.episodes) return;
+            
+            newEpisode = seasonData.episodes.length;
+          }
+          
+          updatePlayer(newSeason, newEpisode);
+        });
+      }
+      
+      if (nextEpisodeBtn) {
+        nextEpisodeBtn.addEventListener('click', async () => {
+          let newSeason = parseInt(window.currentPlayerSeason);
+          let newEpisode = parseInt(window.currentPlayerEpisode) + 1;
+          
+          const seasonData = await fetchSeasonData(newSeason);
+          if (!seasonData || !seasonData.episodes) return;
+          
+          if (newEpisode > seasonData.episodes.length) {
+            newSeason += 1;
+            
+            const tvDetails = await fetchTVShowDetails();
+            if (!tvDetails || newSeason > tvDetails.number_of_seasons) { return; }
+            
+            newEpisode = 1;
+          }
+          
+          updatePlayer(newSeason, newEpisode);
+        });
+      }
+    }
   });
 
   const popupBlocker = document.getElementById('popup-blocker');
