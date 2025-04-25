@@ -58,9 +58,9 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
           <div class="iframe-container loading rounded-[1.25rem] p-4 pt-2 bg-[#151920] transform scale-50 opacity-0 transition-all duration-300 ease-out flex flex-col-reverse" id="iframe-container">
             <div id="topbar" class="w-full bg-[#151920] p-2 px-0 rounded-t-lg flex items-center justify-between">
               <div class="flex gap-1.5 ml-2">
-                <div class="w-3 h-3 rounded-full bg-[#2392EE] hover:opacity-80 cursor-pointer"></div>
-                <div class="w-3 h-3 rounded-full bg-[#2392EE] hover:opacity-80 cursor-pointer"></div>
-                <div class="w-3 h-3 rounded-full bg-[#2392EE] hover:opacity-80 cursor-pointer"></div>
+                <div id="close-button" class="w-3 h-3 rounded-full bg-[#FE5F57] hover:opacity-80 cursor-pointer"></div>
+                <div id="minimize-button" class="w-3 h-3 rounded-full bg-[#FEBC2E] hover:opacity-80 cursor-pointer"></div>
+                <div id="maximize-button" class="w-3 h-3 rounded-full bg-[#28C840] hover:opacity-80 cursor-pointer"></div>
               </div>
               
               <div class="flex items-center gap-4">
@@ -225,6 +225,24 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
             initialSourceIndex,
             existingProgress
           );
+        }
+        
+        const closeButton = document.getElementById('close-button');
+        const maximizeButton = document.getElementById('maximize-button');
+        const playerModalContainer = document.querySelector('#player-modal > div');
+        
+        if (closeButton) {
+          closeButton.addEventListener('click', () => {
+            if (closeModal) {
+              closeModal.click();
+            }
+          });
+        }
+        
+        if (maximizeButton && playerModalContainer) {
+          maximizeButton.addEventListener('click', () => {
+            playerModalContainer.classList.toggle('max-w-6xl');
+          });
         }
       });
       
