@@ -1,7 +1,8 @@
 // Player Modal Component
 import { renderSpinner } from '../misc/loading.js';
 import { clearAllEpisodeStatus, setEpisodeStatus } from '../watch/tv/episodeList.js'
-
+import { TMDB_API_KEY } from '../../router.js'
+  
 export function renderPlayerModal(type, id, sources, initialSourceIndex, initialSeason, initialEpisode, mediaTitle, isMobile = false) {
   const filteredSources = sources.filter(source => type === 'movie' ? !source.tvOnly : true);
   
