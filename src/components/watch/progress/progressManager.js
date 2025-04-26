@@ -40,7 +40,6 @@ export function saveProgress(progressData) {
       }
     }
     
-    console.log('Progress saved:', sanitizedData);
   } catch (error) {
     console.error('Error saving progress:', error);
   }

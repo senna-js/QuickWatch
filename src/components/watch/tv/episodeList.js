@@ -390,7 +390,6 @@ export function cleanupEpisodeList() {
 }
 
 function updateProgressIndicators(id, season) {
-  console.log(`Updating progress indicators for show ${id}, season ${season}`);
   const episodeItems = document.querySelectorAll('.episode-item');
   
   episodeItems.forEach(item => {
@@ -406,7 +405,6 @@ function updateProgressIndicators(id, season) {
     if (remainingTime) remainingTime.remove();
     
     if (progress) {
-      console.log(`Adding progress for episode ${episodeNumber}`);
       const thumbnailContainer = item.querySelector('.bg-zinc-600');
       if (thumbnailContainer) {
         progressOverlay = document.createElement('div');

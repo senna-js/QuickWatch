@@ -141,8 +141,8 @@ async function loadMediaDetails(type, id) {
     
     // title logo with title fallback
     const titleDisplay = data.images?.logos && data.images.logos.length > 0 ?
-      `<img src="${TMDB_IMAGE_BASE_URL}w500${data.images.logos[0].file_path}" class="max-w-[26rem] max-h-[15rem] mb-8">` :
-      `<h1 class="text-4xl font-bold mb-8">${data.title || data.name}</h1>`;
+      `<img src="${TMDB_IMAGE_BASE_URL}w500${data.images.logos[0].file_path}" id="titleofmedia" alt="${data.title || data.name}" class="max-w-[26rem] max-h-[15rem] mb-8">` :
+      `<h1 id="titleofmedia" class="text-4xl font-bold mb-8" alt="${data.title || data.name}">${data.title || data.name}</h1>`;
 
       function formatRemainingTime(duration, watched) {
         const remainingMinutes = Math.round((duration - watched) / 60);
