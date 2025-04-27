@@ -54,25 +54,18 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
     return `
       <div id="player-modal" class="fixed inset-0 bg-transparent z-50 hidden flex gap-2 items-center justify-center p-4 transition-all duration-300 ease-out">
         <div class="relative w-full max-w-6xl">
-          <button id="close-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
+          <button id="close-modal" class="absolute -top-2.5 -right-2.5 text-white text-[1.7rem] z-[8] w-10 h-10 flex items-center justify-center bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-75"><i class="icon-x"></i></button>
+          <button id="sources-button" class="absolute -top-2.5 right-9 text-white text-[1.7rem] z-[8] w-10 h-10 flex items-center justify-center bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-75"><i class="icon-tv text-[1.45rem]"></i></button>
           
           <div class="iframe-container loading rounded-[1.25rem] p-4 pt-2 bg-[#151920] transform scale-50 opacity-0 transition-all duration-300 ease-out flex flex-col-reverse" id="iframe-container">
-            <div id="topbar" class="w-full bg-[#151920] p-2 px-0 rounded-t-lg flex items-center justify-between">
-              <div class="flex gap-1.5 ml-2">
-                <div id="close-button" class="w-3 h-3 rounded-full bg-[#FE5F57] hover:opacity-80 cursor-pointer"></div>
-                <div id="minimize-button" class="w-3 h-3 rounded-full bg-[#FEBC2E] hover:opacity-80 cursor-pointer"></div>
-                <div id="maximize-button" class="w-3 h-3 rounded-full bg-[#28C840] hover:opacity-80 cursor-pointer"></div>
-              </div>
-              
+            <div id="topbar" class="w-full bg-[#151920] pb-2 pt-1 px-0 rounded-t-lg flex items-center justify-center">
+
               <div class="flex items-center gap-4">
                 ${type === 'tv' ? `<button id="previous-episode-btn" class="text-white cursor-pointer hover:scale-[1.2] transition duration-[250ms] ease">←</button>` : ''}
                 <div id="current-media-indicator" class="text-white font-medium">S${initialSeason}E${initialEpisode}</div>
                 ${type === 'tv' ? `<button id="next-episode-btn" class="text-white cursor-pointer hover:scale-[1.2] transition duration-[250ms] ease">→</button>` : ''}
               </div>
-              
-              <button id="sources-button" class="px-4 py-1.5 mr-2 rounded-md whitespace-nowrap transition-colors text-white text-sm font-medium select-none cursor-poiter hover:text-[#2392EE]">
-                SOURCES
-              </button>
+
             </div>
             <div class="iframe-loader">
               ${renderSpinner('large')}
@@ -116,7 +109,6 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
   const closeModal = document.getElementById('close-modal');
   let mediaPlayer = null;
   let currentTrackerCleanup = null;
-  let miniPlayer = null; // Add this line to declare miniPlayer variable
   
   // track current episode and season
   let currentSeason = initialSeason;
@@ -235,24 +227,6 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
             existingProgress
           );
         }
-        
-        const closeButton = document.getElementById('close-button');
-        const maximizeButton = document.getElementById('maximize-button');
-        const playerModalContainer = document.querySelector('#player-modal > div');
-        
-        if (closeButton) {
-          closeButton.addEventListener('click', () => {
-            if (closeModal) {
-              closeModal.click();
-            }
-          });
-        }
-        
-        if (maximizeButton && playerModalContainer) {
-          maximizeButton.addEventListener('click', () => {
-            playerModalContainer.classList.toggle('max-w-6xl');
-          });
-        }
       });
       
       closeModal.addEventListener('click', () => {
@@ -303,6 +277,7 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
         sourcesModal.classList.add('opacity-100');
         iframeContainer.style.filter = 'brightness(0.3) blur(2px)';
         closeModal.style.filter = 'brightness(0.3) blur(2px)';
+        sourcesButton.style.filter = 'brightness(0.3) blur(2px)';
         
         if (modalContent) {
           setTimeout(() => {
@@ -321,6 +296,7 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
           modalContent.classList.add('scale-95', 'opacity-0');
           iframeContainer.style.filter = '';
           closeModal.style.filter = '';
+          sourcesButton.style.filter = '';
         }
         
         setTimeout(() => {
