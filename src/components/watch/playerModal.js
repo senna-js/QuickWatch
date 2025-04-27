@@ -49,19 +49,6 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
           </div>
         </div>
       </div>
-      
-      <!-- Mini Player Container -->
-      <div id="mini-player-container" class="fixed bottom-4 right-4 z-50 hidden">
-        <div class="relative">
-          <div id="mini-iframe-container" class="mini-iframe-container rounded-lg overflow-hidden shadow-lg" style="width: 320px; height: 180px;">
-            <!-- mini iframe goes here -->
-          </div>
-          <div class="absolute top-2 right-2 flex gap-2">
-            <button id="expand-pip" class="text-white flex w-8 h-8 items-center justify-center text-[1.4rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-tv-2 text-2xl"></i></button>
-            <button id="close-pip" class="text-white flex w-8 h-8 items-center justify-center text-[1.4rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
-          </div>
-        </div>
-      </div>
     `;
   } else {
     return `
@@ -118,19 +105,6 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
           </div>
         </div>
       </div>
-      
-      <!-- Mini Player Container -->
-      <div id="mini-player-container" class="fixed bottom-4 right-4 z-50 hidden">
-        <div class="relative">
-          <div class="mini-iframe-container rounded-lg overflow-hidden shadow-lg" style="width: 320px; height: 180px;">
-            <!-- mini iframe goes here -->
-          </div>
-          <div class="absolute top-2 right-2 flex gap-2">
-            <button id="expand-pip" class="text-white flex w-8 h-8 items-center justify-center z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-tv-2 text-lg"></i></button>
-            <button id="close-pip" class="text-white flex w-8 h-8 items-center justify-center text-[1.4rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
-          </div>
-        </div>
-      </div>
     `;
   }
 }
@@ -184,15 +158,19 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
     }
 
     const currentMediaIndicator = document.getElementById('current-media-indicator');
+    const titleofmedia = document.getElementById('titleofmedia');
     if (currentMediaIndicator) {
-      currentMediaIndicator.innerText = 
-        `S${window.currentPlayerSeason}E${window.currentPlayerEpisode}${episodeTitle ? ' - ' + episodeTitle : ''}`;
+      if (type === 'tv') {
+        currentMediaIndicator.innerText = `S${window.currentPlayerSeason}E${window.currentPlayerEpisode}${episodeTitle ? ' - ' + episodeTitle : ''}`
+      } else {
+        currentMediaIndicator.innerText = titleofmedia.getAttribute('alt');
+      };
     }
     
     const iframe = document.createElement('iframe');
-    iframe.id = container === 'iframe-container' ? 'media-player' : 'mini-media-player';
+    iframe.id = 'media-player';
     iframe.src = iframeUrl;
-    iframe.className = className;
+    iframe.className = isMobile ? 'w-full h-full rounded-none bg-[#11151c]' : 'w-full rounded-xl aspect-video bg-[#11151c]';
     iframe.allowFullscreen = true;
     
     iframeContainer.insertBefore(iframe, iframeContainer.firstChild);
@@ -259,7 +237,6 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
         }
         
         const closeButton = document.getElementById('close-button');
-        const minimizeButton = document.getElementById('minimize-button');
         const maximizeButton = document.getElementById('maximize-button');
         const playerModalContainer = document.querySelector('#player-modal > div');
         
@@ -267,56 +244,6 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
           closeButton.addEventListener('click', () => {
             if (closeModal) {
               closeModal.click();
-            }
-          });
-        }
-        
-        if (minimizeButton) {
-          minimizeButton.addEventListener('click', () => {
-            const miniPlayerContainer = document.getElementById('mini-player-container');
-            if (miniPlayerContainer) {
-              let miniIframeContainer = document.getElementById('mini-iframe-container');
-              if (!miniIframeContainer) {
-                miniIframeContainer = miniPlayerContainer.querySelector('.mini-iframe-container');
-                miniIframeContainer.id = 'mini-iframe-container';
-              }
-              
-              miniPlayer = createIframe(initialSourceIndex, 'mini-iframe-container', 'w-full h-full bg-[#11151c]');
-              
-              const iframeContainer = document.getElementById('iframe-container');
-              if (iframeContainer) {
-                iframeContainer.classList.remove('scale-100', 'opacity-100');
-                iframeContainer.classList.add('scale-50', 'opacity-0');
-              }
-              
-              playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
-              
-              setTimeout(() => {
-                playerModal.classList.add('hidden');
-                
-                miniPlayerContainer.classList.remove('hidden');
-                
-                if (currentTrackerCleanup) {
-                  currentTrackerCleanup();
-                  currentTrackerCleanup = null;
-                }
-                
-                if (miniPlayer) {
-                  const currentSource = sources[initialSourceIndex];
-                  const existingProgress = getProgress(parseInt(id), type, window.currentPlayerSeason, window.currentPlayerEpisode);
-                  
-                  currentTrackerCleanup = initializeSourceTracking(
-                    miniPlayer,
-                    currentSource,
-                    parseInt(id),
-                    type,
-                    window.currentPlayerSeason,
-                    window.currentPlayerEpisode,
-                    initialSourceIndex,
-                    existingProgress
-                  );
-                }
-              }, 250);
             }
           });
         }
@@ -425,37 +352,19 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
           currentTrackerCleanup = null;
         }
         
-        // Check if we're in mini player mode
-        const miniPlayerContainer = document.getElementById('mini-player-container');
-        if (!miniPlayerContainer.classList.contains('hidden')) {
-          miniPlayer = createIframe(sourceIndex, 'mini-iframe-container', 'w-full h-full bg-[#11151c]');
-          
-          if (miniPlayer) {
-            currentTrackerCleanup = initializeSourceTracking(
-              miniPlayer,
-              selectedSource,
-              id,
-              type,
-              window.currentPlayerSeason,
-              window.currentPlayerEpisode,
-              sourceIndex
-            );
-          }
-        } else {
-          mediaPlayer = createIframe(sourceIndex);
-          
-          if (mediaPlayer) {
-            currentTrackerCleanup = initializeSourceTracking(
-              mediaPlayer,
-              selectedSource,
-              id,
-              type,
-              window.currentPlayerSeason,
-              window.currentPlayerEpisode,
-              sourceIndex
-            );
-          }
-        }
+        mediaPlayer = createIframe(sourceIndex);
+        
+        if (mediaPlayer) {
+          currentTrackerCleanup = initializeSourceTracking(
+            mediaPlayer,
+            selectedSource,
+            id,
+            type,
+            window.currentPlayerSeason,
+            window.currentPlayerEpisode,
+            sourceIndex
+          );
+      }
         
         // replace the progress data section in the source button click handler
         import('../watch/progress/index.js').then(module => {
@@ -494,80 +403,6 @@ export function initPlayerModal(id, type, sources, initialSourceIndex, initialSe
         }, 300);
       });
     });
-    
-    // Mini player controls
-    const expandPipButton = document.getElementById('expand-pip');
-    const closePipButton = document.getElementById('close-pip');
-    const miniPlayerContainer = document.getElementById('mini-player-container');
-    
-    if (expandPipButton && miniPlayerContainer) {
-      expandPipButton.addEventListener('click', () => {
-        miniPlayerContainer.classList.add('hidden');
-        
-        playerModal.classList.remove('hidden');
-        
-        void playerModal.offsetWidth;
-        
-        playerModal.classList.add('bg-[#00050d]', 'bg-opacity-90');
-        
-        mediaPlayer = createIframe(initialSourceIndex);
-        
-        const iframeContainer = document.getElementById('iframe-container');
-        if (iframeContainer) {
-          void iframeContainer.offsetWidth;
-          
-          iframeContainer.classList.remove('scale-50', 'opacity-0');
-          iframeContainer.classList.add('scale-100', 'opacity-100');
-        }
-        
-        if (currentTrackerCleanup) {
-          currentTrackerCleanup();
-          currentTrackerCleanup = null;
-        }
-        
-        if (mediaPlayer) {
-          const currentSource = sources[initialSourceIndex];
-          const existingProgress = getProgress(parseInt(id), type, window.currentPlayerSeason, window.currentPlayerEpisode);
-          
-          currentTrackerCleanup = initializeSourceTracking(
-            mediaPlayer,
-            currentSource,
-            parseInt(id),
-            type,
-            window.currentPlayerSeason,
-            window.currentPlayerEpisode,
-            initialSourceIndex,
-            existingProgress
-          );
-        }
-      });
-    }
-    
-    if (closePipButton && miniPlayerContainer) {
-      closePipButton.addEventListener('click', () => {
-        miniPlayerContainer.classList.add('hidden');
-        
-        if (currentTrackerCleanup) {
-          currentTrackerCleanup();
-          currentTrackerCleanup = null;
-        }
-        
-        if (window.currentPlayingEpisode) {
-          setEpisodeStatus(
-            window.currentPlayingEpisode.season, 
-            window.currentPlayingEpisode.episode, 
-            'Just Watched'
-          );
-        }
-        
-        // Remove mini iframe
-        const miniIframeContainer = document.querySelector('.mini-iframe-container');
-        if (miniIframeContainer && miniIframeContainer.querySelector('iframe')) {
-          miniIframeContainer.querySelector('iframe').remove();
-          miniPlayer = null;
-        }
-      });
-    }
     
     if (type === 'tv') {
       const previousEpisodeBtn = document.getElementById('previous-episode-btn');
