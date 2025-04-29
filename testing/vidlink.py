@@ -24,4 +24,5 @@ async def get_data(type, id):
             
         finally: await browser.close()
 
-print(asyncio.run(get_data('tv', 66573)))
+source = asyncio.run(get_data('tv', 66573))
+print(source)
