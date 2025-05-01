@@ -21,8 +21,8 @@ export const sources = [
     },
     {
       name: 'Vidora',
-      movieUrl: `https://vidora.su/movie/{id}?autoplay=true&colour=2392EE&autonextepisode=true&pausescreen=true`,
-      tvUrl: `https://vidora.su/movie/tv/{id}/{season}/{episode}?autoplay=true&colour=2392EE&autonextepisode=true&pausescreen=true`,
+      movieUrl: `https://vidora.su/movie/{id}?autoplay=true&colour=2392EE&autonextepisode=true&pausescreen=false`,
+      tvUrl: `https://vidora.su/tv/{id}/{season}/{episode}?autoplay=true&colour=2392EE&autonextepisode=true&pausescreen=false`,
     },
     {
       name: 'VidsrcCC',

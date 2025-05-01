@@ -136,7 +136,66 @@ export function setupVidsrcCCTracking(playerIframe, mediaId, mediaType, season, 
 
 export function setupVidoraTracking(playerIframe, mediaId, mediaType, season, episode, sourceIndex) {
   const messageHandler = (event) => {
-    // add when i want to
+    if (event.origin !== 'https://vidora.su') return;
+    
+    if (event.data?.type === 'MEDIA_DATA') {
+      const mediaData = event.data.data;
+      console.log('Vidora media data:', mediaData);
+      
+      const continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+      const existingProgress = continueData.find(item => 
+        item.id === parseInt(mediaId) && 
+        item.mediaType === mediaType &&
+        (mediaType === 'movie' || (item.season === parseInt(season) && item.episode === parseInt(episode)))
+      );
+      
+      if (mediaData) {
+        if (mediaData.type === 'tv' && mediaData.show_progress) {
+          Object.entries(mediaData.show_progress).forEach(([episodeKey, episodeData]) => {
+            if (episodeData.progress) {
+              saveProgress({
+                id: parseInt(mediaData.id),
+                mediaType: 'tv',
+                season: parseInt(episodeData.season),
+                episode: parseInt(episodeData.episode),
+                sourceIndex: parseInt(sourceIndex),
+                fullDuration: parseInt(episodeData.progress.duration || 0),
+                watchedDuration: parseInt(episodeData.progress.watched || 0),
+                timestamp: parseInt(episodeData.last_updated || Date.now())
+              });
+            }
+          });
+          
+          if (mediaData.id === mediaId) {
+            const episodeKey = `s${season}e${episode}`;
+            const episodeData = mediaData.show_progress?.[episodeKey];
+            if (episodeData?.progress) {
+              saveProgress({
+                id: parseInt(mediaId),
+                mediaType: 'tv',
+                season: parseInt(season),
+                episode: parseInt(episode),
+                sourceIndex: parseInt(sourceIndex),
+                fullDuration: parseInt(episodeData.progress.duration || 0),
+                watchedDuration: parseInt(episodeData.progress.watched || 0),
+                timestamp: parseInt(episodeData.last_updated || Date.now())
+              });
+            }
+          }
+        } else if (mediaData.type === 'movie' && mediaData.progress) {
+          saveProgress({
+            id: parseInt(mediaData.id),
+            mediaType: 'movie',
+            season: 0,
+            episode: 0,
+            sourceIndex: parseInt(sourceIndex),
+            fullDuration: parseInt(mediaData.progress.duration || existingProgress?.fullDuration || 0),
+            watchedDuration: parseInt(mediaData.progress.watched || existingProgress?.watchedDuration || 0),
+            timestamp: parseInt(mediaData.last_updated || Date.now())
+          });
+        }
+      }
+    }
   };
   
   window.addEventListener('message', messageHandler);
