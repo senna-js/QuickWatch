@@ -2,7 +2,7 @@ import { saveProgress, getProgress, getAllProgress } from './progressManager.js'
 import {
   setupVidLinkTracking,
   setupVidsrcCCTracking,
-  setupVidzeeTracking,
+  setupVidoraTracking,
   setupVidFastTracking,
   setupVideasyTracking,
   setupVidsrcXYZTracking
@@ -13,7 +13,7 @@ export function initializeSourceTracking(playerIframe, source, mediaId, mediaTyp
     'VidLink': setupVidLinkTracking,
     'VidsrcXYZ': setupVidsrcXYZTracking,
     'VidsrcCC': setupVidsrcCCTracking,
-    'Vidzee': setupVidzeeTracking,
+    'Vidora': setupVidoraTracking,
     'VidFast': setupVidFastTracking,
     'Videasy': setupVideasyTracking,
   };

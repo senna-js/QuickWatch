@@ -1,5 +1,10 @@
 export const sources = [
-    { // add event listeners (for progress tracking. check source documentation)
+    {
+      name: 'Native',
+      movieUrl: `/embed/native/{id}`,
+      tvUrl: `/embed/native/{id}/{season}/{episode}`
+    },
+    {
       name: 'VidLink',
       movieUrl: `https://vidlink.pro/movie/{id}?primaryColor=FFFFFF&secondaryColor=2392EE&title=true&poster=false&autoplay=false`,
       tvUrl: `https://vidlink.pro/tv/{id}/{season}/{episode}?primaryColor=2392EE&secondaryColor=FFFFFF&title=true&poster=false&autoplay=false&nextbutton=true`
@@ -14,28 +19,28 @@ export const sources = [
       movieUrl: `https://vidsrc.su/embed/movie/{id}?serverselector=false`,
       tvUrl: `https://vidsrc.su/embed/tv/{id}/{season}/{episode}?serverselector=false`
     },
-    // {
-    //   name: 'VidsrcCC',
-    //   movieUrl: `https://vidsrc.cc/v2/embed/movie/{id}?autoPlay=false&poster=false`,
-    //   tvUrl: `https://vidsrc.cc/v2/embed/tv/{id}/{season}/{episode}?autoPlay=false&poster=false`
-    // },
-    // {
-    //   name: 'Vidzee',
-    //   movieUrl: `https://vidzee.wtf/movie/{id}`,
-    //   tvUrl: `https://vidzee.wtf/tv/{id}/{season}/{episode}`
-    // },
-    { // add event listeners
+    {
+      name: 'Vidora',
+      movieUrl: `https://vidora.su/movie/{id}?autoplay=true&colour=2392EE&autonextepisode=true&pausescreen=true`,
+      tvUrl: `https://vidora.su/movie/tv/{id}/{season}/{episode}?autoplay=true&colour=2392EE&autonextepisode=true&pausescreen=true`,
+    },
+    {
+      name: 'VidsrcCC',
+      movieUrl: `https://vidsrc.cc/v3/embed/movie/{id}?autoPlay=false&poster=false`,
+      tvUrl: `https://vidsrc.cc/v3/embed/tv/{id}/{season}/{episode}?autoPlay=false&poster=false`
+    },
+    {
       name: 'VidFast',
       movieUrl: `https://vidfast.pro/movie/{id}?autoPlay=false&theme=2392EE&poster=false`,
       tvUrl: `https://vidfast.pro/tv/{id}/{season}/{episode}?autoPlay=false&theme=2392EE&poster=false`
     },
-    { // add event listeners
+    {
       name: 'Videasy',
       movieUrl: `https://player.videasy.net/movie/{id}?color=2392EE`,
       tvUrl: `https://player.videasy.net/tv/{id}/{season}/{episode}?color=2392EE&nextEpisode=true&episodeSelector=true&autoplayNextEpisode=false`
     },
     {
-      name: '🤩 AnimePahe',
+      name: 'Pahe (Anime)',
       tvOnly: true,
       tvUrl: `/embed/animepahe/{id}/{season}/{episode}`
     }
