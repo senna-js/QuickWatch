@@ -340,5 +340,5 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
     </div>
   `;
   
-  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber);
+  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, false);
 }

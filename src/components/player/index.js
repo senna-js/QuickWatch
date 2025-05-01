@@ -9,8 +9,9 @@ import { setupVolumeControls } from './volume.js';
 import { setupPlayPause } from './playPause.js';
 import { setupFullscreenPiP } from './fullscreenPiP.js';
 import { setupDownloadVideo } from './downloadVideo.js';
+import { setupSubtitles } from './subtitles.js';
 
-export function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber) {
+export function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber, isNativeEmbed = false, subtitleTracks = []) {
   // get player elements
   const player = playerContainer.querySelector('#custom-player');
   const customPlayer = playerContainer.querySelector('.custom-player');
@@ -30,6 +31,8 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   const iphoneQualityMenu = playerContainer.querySelector('.iphone-quality-menu');
   const qualityBtn = playerContainer.querySelector('.quality-btn');
   const qualityMenu = playerContainer.querySelector('.quality-menu');
+  const subtitleBtn = playerContainer.querySelector('.subtitle-btn');
+  const subtitleMenu = playerContainer.querySelector('.subtitle-menu');
   const bufferBar = playerContainer.querySelector('.buffer-bar');
   const videoPreview = playerContainer.querySelector('.video-preview');
   const previewTime = playerContainer.querySelector('.preview-time');
@@ -72,11 +75,22 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   // setup fullscreen and PiP
   setupFullscreenPiP(player, customPlayer, fullscreenBtn, pipBtn);
   
-  // setup quality options
-  setupQualityOptions(
-    qualityMenu, iphoneQualityMenu, qualityBtn, qualityToggleBtn, 
-    player, customPlayer, linksData, isIPhone
-  );
+  // setup quality options or subtitles
+  if (isNativeEmbed) {
+    if (subtitleBtn && subtitleMenu) {
+      const { loadSubtitles } = setupSubtitles(player, subtitleBtn, subtitleMenu);
+      loadSubtitles(subtitleTracks);
+      
+      if (qualityBtn) { qualityBtn.parentElement.classList.add('hidden'); }
+    }
+  } else {
+    setupQualityOptions(
+      qualityMenu, iphoneQualityMenu, qualityBtn, qualityToggleBtn, 
+      player, customPlayer, linksData, isIPhone
+    );
+    
+    if (subtitleBtn) { subtitleBtn.parentElement.classList.add('hidden'); }
+  }
   
   const downloadBtn = playerContainer.querySelector('.download-btn');
   setupDownloadVideo(downloadBtn, player, linksData);
