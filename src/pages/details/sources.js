@@ -26,13 +26,13 @@ export const sources = [
     },
     {
       name: 'VidsrcCC',
-      movieUrl: `https://vidsrc.cc/v3/embed/movie/{id}?autoPlay=false&poster=false`,
-      tvUrl: `https://vidsrc.cc/v3/embed/tv/{id}/{season}/{episode}?autoPlay=false&poster=false`
+      movieUrl: `https://vidsrc.cc/v3/embed/movie/{id}?autoPlay=true&poster=false`,
+      tvUrl: `https://vidsrc.cc/v3/embed/tv/{id}/{season}/{episode}?autoPlay=true&poster=false`
     },
     {
       name: 'VidFast',
-      movieUrl: `https://vidfast.pro/movie/{id}?autoPlay=false&theme=2392EE&poster=false`,
-      tvUrl: `https://vidfast.pro/tv/{id}/{season}/{episode}?autoPlay=false&theme=2392EE&poster=false`
+      movieUrl: `https://vidfast.pro/movie/{id}?autoPlay=true&theme=2392EE&poster=false`,
+      tvUrl: `https://vidfast.pro/tv/{id}/{season}/{episode}?autoPlay=true&theme=2392EE&poster=false`
     },
     {
       name: 'Videasy',
