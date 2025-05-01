@@ -75,11 +75,14 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   // setup fullscreen and PiP
   setupFullscreenPiP(player, customPlayer, fullscreenBtn, pipBtn);
   
+  // store subtitle handler for cleanup
+  let subtitleHandler = null;
+  
   // setup quality options or subtitles
   if (isNativeEmbed) {
     if (subtitleBtn && subtitleMenu) {
-      const { loadSubtitles } = setupSubtitles(player, subtitleBtn, subtitleMenu);
-      loadSubtitles(subtitleTracks);
+      subtitleHandler = setupSubtitles(player, subtitleBtn, subtitleMenu);
+      subtitleHandler.loadSubtitles(subtitleTracks);
       
       if (qualityBtn) { qualityBtn.parentElement.classList.add('hidden'); }
     }
@@ -119,4 +122,18 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   
   // initially show controls 
   showControls();
+  
+  // clean up function for when player is destroyed
+  const cleanup = () => {
+    if (subtitleHandler && subtitleHandler.cleanup) {
+      subtitleHandler.cleanup();
+    }
+  };
+  
+  player.cleanup = cleanup;
+  
+  return {
+    player,
+    cleanup
+  };
 }

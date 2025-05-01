@@ -217,5 +217,22 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
     </div>
   `;
   
-  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, true, subtitleTracks);
+  const playerInstance = initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, true, subtitleTracks);
+  
+  container.playerCleanup = playerInstance?.cleanup;
+  
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.removedNodes.forEach((node) => {
+        if (node === container && container.playerCleanup) {
+          container.playerCleanup();
+          observer.disconnect();
+        }
+      });
+    });
+  });
+  
+  if (container.parentNode) {
+    observer.observe(container.parentNode, { childList: true });
+  }
 }

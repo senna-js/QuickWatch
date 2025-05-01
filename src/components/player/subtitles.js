@@ -1,10 +1,149 @@
 export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
   if (!subtitleBtn || !subtitleMenu) return;
   
-  let currentTrack = null;
+  let currentSubtitleIndex = -1;
   let subtitles = [];
-  
+
   // load subtitles from tracks data
+  let subtitleData = null;
+  let subtitleContainer = null;
+  let subtitleUpdateInterval = null;
+  
+  const createSubtitleContainer = () => {
+    if (subtitleContainer) return subtitleContainer;
+    
+    const container = document.createElement('div');
+    container.className = 'subtitle-container absolute left-0 right-0 bottom-16 z-30 text-center';
+    container.style.cssText = 'text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none;';
+    player.parentNode.appendChild(container);
+    
+    return container;
+  };
+  
+  const parseSubtitle = async (url) => {
+    try {
+      const response = await fetch('https://varunaditya.xyz/api/proxy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          url: url,
+          method: 'GET'
+        })
+      });
+      
+      const subtitleText = await response.text();
+      
+      if (typeof window.Subtitle === 'undefined') {
+        return parseSubtitleManually(subtitleText);
+      }
+      
+      return window.Subtitle.parse(subtitleText);
+    } catch (error) {
+      console.error('Error parsing subtitle:', error);
+      return [];
+    }
+  };
+  
+  const parseSubtitleManually = (subtitleText) => {
+    const cues = [];
+    
+    const isVTT = subtitleText.trim().startsWith('WEBVTT');
+    const entries = subtitleText.split(/\r?\n\r?\n/);
+    
+    entries.forEach(entry => {
+      if (!entry.trim()) return;
+      
+      if (isVTT && entry.trim() === 'WEBVTT') return;
+      const lines = entry.split(/\r?\n/);
+      if (lines.length < 2) return;
+      
+      const timingLineIndex = lines.findIndex(line => line.includes('-->'));
+      if (timingLineIndex === -1) return;
+      
+      const timingLine = lines[timingLineIndex];
+      const timeParts = timingLine.split('-->').map(t => t.trim());
+      if (timeParts.length !== 2) return;
+      
+      const start = parseTimeToMs(timeParts[0]);
+      const end = parseTimeToMs(timeParts[1]);
+      
+      if (isNaN(start) || isNaN(end)) return;
+      
+      const text = lines.slice(timingLineIndex + 1).join('\n');
+      
+      cues.push({ start, end, text });
+    });
+    
+    return cues;
+  };
+  
+  const parseTimeToMs = (timeString) => {
+    timeString = timeString.replace(',', '.');
+    timeString = timeString.split(' ')[0];
+    
+    const parts = timeString.split(':');
+    if (parts.length === 3) {
+      const hours = parseInt(parts[0], 10);
+      const minutes = parseInt(parts[1], 10);
+      const seconds = parseFloat(parts[2]);
+      
+      return (hours * 3600 + minutes * 60 + seconds) * 1000;
+    } else if (parts.length === 2) {
+      const minutes = parseInt(parts[0], 10);
+      const seconds = parseFloat(parts[1]);
+      
+      return (minutes * 60 + seconds) * 1000;
+    }
+    
+    return NaN;
+  };
+  
+  const updateSubtitle = (time) => {
+    if (!subtitleData || !subtitleContainer) return;
+    
+    const currentTime = time * 1000;
+    let text = '';
+    
+    for (const cue of subtitleData) {
+      if (currentTime >= cue.start && currentTime <= cue.end) {
+        text = cue.text;
+        break;
+      }
+    }
+    
+    subtitleContainer.innerHTML = text ? `<p class="text-white text-xl font-medium px-4 py-2 inline-block bg-black bg-opacity-50 rounded">${text}</p>` : '';
+  };
+  
+  const startSubtitleDisplay = async (subtitle) => {
+    stopSubtitleDisplay();
+    
+    subtitleContainer = createSubtitleContainer();
+    subtitleData = await parseSubtitle(subtitle.url);
+    
+    subtitleUpdateInterval = setInterval(() => {
+      if (player && !player.paused) {
+        updateSubtitle(player.currentTime);
+      }
+    }, 100);
+    
+    player.addEventListener('seeked', () => updateSubtitle(player.currentTime));
+  };
+  
+  const stopSubtitleDisplay = () => {
+    if (subtitleUpdateInterval) {
+      clearInterval(subtitleUpdateInterval);
+      subtitleUpdateInterval = null;
+    }
+    
+    if (subtitleContainer) {
+      subtitleContainer.innerHTML = '';
+    }
+    
+    subtitleData = null;
+  };
+  
   const loadSubtitles = (tracks) => {
     if (!tracks || !Array.isArray(tracks) || tracks.length === 0) {
       subtitleBtn.parentElement.classList.add('hidden');
@@ -48,7 +187,7 @@ export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
   const setupSubtitleOptionEvents = () => {
     const options = subtitleMenu.querySelectorAll('.subtitle-option');
     options.forEach(option => {
-      option.addEventListener('click', () => {
+      option.addEventListener('click', async () => {
         const index = parseInt(option.dataset.index);
         
         while (player.textTracks.length > 0) {
@@ -57,32 +196,22 @@ export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
           player.removeChild(player.querySelector('track'));
         }
         
+        stopSubtitleDisplay();
+        
         if (index === -1) {
-          currentTrack = null;
+          currentSubtitleIndex = -1;
           subtitleBtn.innerHTML = '<i class="icon-type"></i>';
           subtitleBtn.style.backgroundColor = '';
           subtitleBtn.style.color = '';
         } else {
           const subtitle = subtitles[index];
-          const track = document.createElement('track');
-          track.kind = 'subtitles';
-          track.label = subtitle.lang;
-          track.srclang = subtitle.lang.split(' ')[0].toLowerCase();
-          track.src = subtitle.url;
-          track.default = true;
+          currentSubtitleIndex = index;
           
-          player.appendChild(track);
-          currentTrack = track;
+          await startSubtitleDisplay(subtitle);
           
           subtitleBtn.innerHTML = '<i class="icon-type"></i>';
           subtitleBtn.style.backgroundColor = '#fff';
           subtitleBtn.style.color = '#000';
-          
-          setTimeout(() => {
-            if (player.textTracks && player.textTracks[0]) {
-              player.textTracks[0].mode = 'showing';
-            }
-          }, 100);
         }
         
         subtitleMenu.classList.add('hidden');
@@ -101,9 +230,17 @@ export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
     }
   });
   
+  const cleanup = () => {
+    stopSubtitleDisplay();
+    if (subtitleContainer && subtitleContainer.parentNode) {
+      subtitleContainer.parentNode.removeChild(subtitleContainer);
+    }
+  };
+  
   return {
     loadSubtitles,
     renderSubtitleOptions,
-    setupSubtitleOptionEvents
+    setupSubtitleOptionEvents,
+    cleanup
   };
 }
