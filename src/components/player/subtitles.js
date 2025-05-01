@@ -14,7 +14,7 @@ export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
     
     const container = document.createElement('div');
     container.className = 'subtitle-container absolute left-0 right-0 bottom-16 z-30 text-center';
-    container.style.cssText = 'text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none;';
+    container.style.cssText = 'pointer-events: none;';
     player.parentNode.appendChild(container);
     
     return container;
@@ -113,7 +113,7 @@ export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
       }
     }
     
-    subtitleContainer.innerHTML = text ? `<p class="text-white text-xl font-medium px-4 py-2 inline-block bg-black bg-opacity-50 rounded">${text}</p>` : '';
+    subtitleContainer.innerHTML = text ? `<p class="text-white text-xl font-normal px-4 py-2 inline-block font-['Inter'] backdrop-filter backdrop-blur-[10px] bg-[#00000069] rounded-lg">${text}</p>` : '';
   };
   
   const startSubtitleDisplay = async (subtitle) => {
@@ -159,7 +159,7 @@ export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
   const renderSubtitleOptions = () => {
     let subtitleOptionsHTML = `
       <button 
-        class="subtitle-option w-full text-left px-3 py-1.5 text-white text-sm hover:bg-zinc-700 rounded transition"
+        class="subtitle-option min-w-[8rem] w-full text-left px-3 py-1.5 text-white text-sm hover:bg-zinc-700 rounded transition"
         data-index="-1"
       >
         Off
@@ -170,7 +170,7 @@ export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
     subtitleOptionsHTML += subtitles.map((subtitle, index) => {
       return `
         <button 
-          class="subtitle-option w-full text-left px-3 py-1.5 text-white text-sm hover:bg-zinc-700 rounded transition"
+          class="subtitle-option min-w-[8rem] w-full text-left px-3 py-1.5 text-white text-sm hover:bg-zinc-700 rounded transition"
           data-index="${index}"
           data-url="${subtitle.url}"
           data-lang="${subtitle.lang}"

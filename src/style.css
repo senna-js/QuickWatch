@@ -105,7 +105,7 @@ button {
   transform: scale(1.2);
 }
 
-.play-pause-btn, .volume-btn, .fullscreen-btn, .pip-btn, .quality-btn {
+.play-pause-btn, .volume-btn, .fullscreen-btn, .pip-btn, .quality-btn, .subtitle-btn, .download-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,11 +115,11 @@ button {
   border-radius: 0.3rem;
 }
 
-.play-pause-btn:hover, .volume-btn:hover, .fullscreen-btn:hover, .quality-btn:hover, .pip-btn:hover {
+.play-pause-btn:hover, .volume-btn:hover, .fullscreen-btn:hover, .quality-btn:hover, .pip-btn:hover, .subtitle-btn:hover, .download-btn:hover {
   transform: scale(1.15);
 }
 
-.play-pause-btn:active, .volume-btn:active, .fullscreen-btn:active, .quality-btn:active, .pip-btn:active {
+.play-pause-btn:active, .volume-btn:active, .fullscreen-btn:active, .quality-btn:active, .pip-btn:active, .subtitle-btn:active, .download-btn:active {
   transform: scale(0.9);
 }
 
