@@ -138,7 +138,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
       <div class="top-controls absolute top-4 right-4 flex space-x-2 z-20">
         ${isIPhone ? `
         <button class="subtitle-toggle-btn bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-opacity duration-300 opacity-0 w-8 h-8 flex items-center justify-center">
-          <i class="icon-type"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-icon lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
         </button>
         <div class="iphone-subtitle-menu absolute top-10 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden z-30">
         </div>
@@ -195,7 +195,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
           
           <div class="subtitle-selector relative">
             <button class="subtitle-btn text-zinc-300 hover:text-white transition text-lg">
-              <i class="icon-type"></i>
+              <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-captions-icon lucide-captions"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
             </button>
             <div class="subtitle-menu absolute bottom-12 right-0 bg-zinc-900 rounded shadow-lg p-2 hidden">
             </div>
