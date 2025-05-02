@@ -10,14 +10,22 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
     return `
       <div id="player-modal" class="fixed inset-0 bg-transparent z-50 hidden flex flex-col items-center justify-between p-0 transition-all duration-300 ease-out">
         <div class="relative w-full h-full flex flex-col">
-          <div class="iframe-container loading rounded-none flex-grow transform scale-50 opacity-0 transition-all duration-300 ease-out" id="iframe-container">
+          <div class="iframe-container loading rounded-none flex-grow flex flex-col-reverse transform scale-50 opacity-0 transition-all duration-300 ease-out" id="iframe-container">
             <!-- iframe goes here -->
             <div class="iframe-loader">
               ${renderSpinner('large')}
             </div>
-            <div class="absolute top-2 right-2 flex flex-row gap-2">
-              <button id="sources-button" class="px-4 pt-2 pb-[0.45rem] rounded-full whitespace-nowrap bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-md hover:scale-[107%] active:scale-90 text-white select-none" style="font-family: Inter;">Sources</button>
-              <button id="close-modal" class="text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x"></i></button>
+
+            <div id="mobile-topbar" class="bg-black p-3 flex items-center justify-between">
+              <button id="sources-button" class="px-3 py-[0.3rem] rounded-full whitespace-nowrap bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-md hover:scale-[107%] active:scale-90 text-white select-none text-sm" style="font-family: Inter;">Sources</button>
+              
+              <div class="flex items-center gap-3 text-white">
+                ${type === 'tv' ? `<button id="previous-episode-btn" class="text-white cursor-pointer hover:scale-[1.2] transition duration-[250ms] ease">←</button>` : ''}
+                <div id="current-media-indicator" class="text-white font-medium">S${initialSeason}E${initialEpisode}</div>
+                ${type === 'tv' ? `<button id="next-episode-btn" class="text-white cursor-pointer hover:scale-[1.2] transition duration-[250ms] ease">→</button>` : ''}
+              </div>
+              
+              <button id="close-modal" class="text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x text-xl"></i></button>
             </div>
           </div>
         </div>

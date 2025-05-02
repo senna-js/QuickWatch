@@ -61,7 +61,7 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
           </div>
           <div class="flex flex-col justify-center flex-1">
             <div class="flex justify-between items-start">
-              <h3 class="text-base font-medium text-white leading-tight w-[90%]">${episode.episode_number}. ${episode.name}</h3>
+              <h3 class="text-base font-medium text-white leading-tight w-[90%]">S${episode.season_number} E${episode.episode_number} - ${episode.name}</h3>
             </div>
             <div class="flex flex-row gap-2 text-sm text-zinc-400 font-light">
               <span>${episode.runtime || 0}m</span>
