@@ -11,7 +11,7 @@ import { setupFullscreenPiP } from './fullscreenPiP.js';
 import { setupDownloadVideo } from './downloadVideo.js';
 import { setupSubtitles } from './subtitles.js';
 
-export function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber, isNativeEmbed = false, subtitleTracks = []) {
+export function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber, isNativeEmbed = false, subtitleTracks = [], mediaType = 'tv') {
   // get player elements
   const player = playerContainer.querySelector('#custom-player');
   const customPlayer = playerContainer.querySelector('.custom-player');
@@ -47,7 +47,7 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   const isIPhone = setupIPhoneSupport(player, customPlayer, topControls);
   
   // set saved player data (volume, timestamp)
-  setupPlayerData(player, volumeLevel, showId, episodeNumber);
+  setupPlayerData(player, volumeLevel, showId, episodeNumber, mediaType);
   
   // set top controls
   const { showTopControls } = setupTopControls(topControls, aspectToggleBtn, player);

@@ -121,19 +121,21 @@ function handleRoute() {
     const season = parts[4];
     currentPagePromise = Promise.resolve(renderAnimePaheEmbed(appContainer, { id, episode, season }));
   }
-  else if (path.match(/^\/embed\/native\/[\d]+\/[\d]+\/[\d]+$/)) {
+  else if (path.match(/^\/embed\/native\/[\d]+\/[\d]+\/[\d]+\/\w+$/)) {
     document.title = 'Native Embed';
     const parts = path.split('/');
     const id = parts[3];
-    const episode = parts[5];
     const season = parts[4];
-    currentPagePromise = Promise.resolve(renderNativeEmbed(appContainer, { id, episode, season, type: 'tv' }));
+    const episode = parts[5];
+    const type = parts[6];
+    currentPagePromise = Promise.resolve(renderNativeEmbed(appContainer, { id, episode, season, type }));
   }
-  else if (path.match(/^\/embed\/native\/[\d]+$/)) {
+  else if (path.match(/^\/embed\/native\/[\d]+\/\w+$/)) {
     document.title = 'Native Embed';
     const parts = path.split('/');
     const id = parts[3];
-    currentPagePromise = Promise.resolve(renderNativeEmbed(appContainer, { id, type: 'movie' }));
+    const type = parts[4];
+    currentPagePromise = Promise.resolve(renderNativeEmbed(appContainer, { id, type }));
   }
   else if (path === '/movies') {
     document.title = 'Movies';

@@ -1,4 +1,4 @@
-export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
+export function setupPlayerData(player, volumeLevel, showId, episodeNumber, mediaType = 'tv') {
   const savedVolume = localStorage.getItem('quickwatch_player_volume');
   if (savedVolume !== null) {
     player.volume = parseFloat(savedVolume);
@@ -24,11 +24,23 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
   try {
     const url = window.location.href;
     const animepaheMatch = url.match(/\/embed\/animepahe\/\d+\/(\d+)\/(\d+)/);
+    const nativeMatch = url.match(/\/embed\/native\/(\d+)\/(\d+)\/(\d+)\/(\w+)/);
+    const nativeMovieMatch = url.match(/\/embed\/native\/(\d+)\/(\w+)/);
     
     if (animepaheMatch && animepaheMatch[1] && animepaheMatch[2]) {
       season = parseInt(animepaheMatch[1]);
       episode = parseInt(animepaheMatch[2]);
       console.log(`Parsed from URL: Season ${season}, Episode ${episode}`);
+    } else if (nativeMatch && nativeMatch[2] && nativeMatch[3] && nativeMatch[4]) {
+      season = parseInt(nativeMatch[2]);
+      episode = parseInt(nativeMatch[3]);
+      mediaType = nativeMatch[4];
+      console.log(`Parsed from Native URL: Season ${season}, Episode ${episode}, Type ${mediaType}`);
+    } else if (nativeMovieMatch && nativeMovieMatch[1] && nativeMovieMatch[2]) {
+      mediaType = nativeMovieMatch[2];
+      season = 0;
+      episode = 0;
+      console.log(`Parsed from Native Movie URL: ID ${nativeMovieMatch[1]}, Type ${mediaType}`);
     } else if (episodeNumber) {
       const seasonMatch = episodeNumber.match(/S(\d+)/i);
       const episodeMatch = episodeNumber.match(/E(\d+)/i);
@@ -64,7 +76,7 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
     continueData = continueData.map(item => ({
       ...item,
       id: typeof item.id === 'string' ? parseInt(item.id) : item.id,
-      mediaType: 'tv',
+      mediaType: item.mediaType || 'tv',
       season: item.season || 1,
       episode: item.episode || 1
     }));
@@ -74,8 +86,8 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
   
   const existingProgress = continueData.find(item => 
     item.id === parsedShowId && 
-    item.season === season && 
-    item.episode === episode
+    item.mediaType === mediaType &&
+    (mediaType === 'movie' || (item.season === season && item.episode === episode))
   );
   
   if (existingProgress && typeof existingProgress.watchedDuration === 'number') {
@@ -99,7 +111,7 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
         ).map(item => ({
           ...item,
           id: typeof item.id === 'string' ? parseInt(item.id) : item.id,
-          mediaType: 'tv'
+          mediaType: item.mediaType || 'tv'
         }));
       } catch (e) {
         console.error('Error parsing continue data:', e);
@@ -107,9 +119,9 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
       
       const progressData = {
         id: parsedShowId,
-        mediaType: 'tv',
-        season: season,
-        episode: episode,
+        mediaType: mediaType,
+        season: mediaType === 'movie' ? 0 : season,
+        episode: mediaType === 'movie' ? 0 : episode,
         sourceIndex: 0,
         fullDuration: player.duration || 0,
         watchedDuration: player.currentTime || 0,
@@ -118,8 +130,8 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber) {
       
       const existingIndex = continueData.findIndex(item => 
         item.id === progressData.id && 
-        item.season === progressData.season && 
-        item.episode === progressData.episode
+        item.mediaType === progressData.mediaType &&
+        (mediaType === 'movie' || (item.season === progressData.season && item.episode === progressData.episode))
       );
       
       if (existingIndex >= 0) {

@@ -217,7 +217,11 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
     </div>
   `;
   
-  const playerInstance = initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, true, subtitleTracks);
+  const url = window.location.href;
+  const typeMatch = url.match(/\/embed\/native\/\d+\/\d+\/\d+\/(\w+)/);
+  const mediaType = typeMatch ? typeMatch[1] : 'tv';
+  
+  const playerInstance = initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, true, subtitleTracks, mediaType);
   
   container.playerCleanup = playerInstance?.cleanup;
   
