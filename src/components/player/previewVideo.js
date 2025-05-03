@@ -1,6 +1,6 @@
-import { fetchVideoUrl } from '../../pages/embeds/animepahe-embed.js';
+import { fetchKwikVideoUrl } from '../player/videoUtils.js';
 
-export function setupPreviewVideo(videoPreview, player, progressContainerHitbox, progressContainer, previewTime, linksData) {
+export function setupPreviewVideo(videoPreview, player, progressContainerHitbox, progressContainer, previewTime, linksData, isNativeEmbed = false) {
   let previewReady = false;
   let isHoveringProgressContainer = false;
   
@@ -25,6 +25,16 @@ export function setupPreviewVideo(videoPreview, player, progressContainerHitbox,
   const getLowestSizeVideoLink = () => {
     if (!linksData || linksData.length === 0) return null;
     
+    if (isNativeEmbed) {
+      const sortedOptions = [...linksData].sort((a, b) => {
+        const resA = parseInt(a.name.replace(/[Pp]/g, '')) || 0;
+        const resB = parseInt(b.name.replace(/[Pp]/g, '')) || 0;
+        return resA - resB;
+      });
+      
+      return sortedOptions[0]?.url || null;
+    } 
+    
     let lowestSizeLink = linksData[0];
     let lowestSize = Infinity;
     
@@ -44,9 +54,16 @@ export function setupPreviewVideo(videoPreview, player, progressContainerHitbox,
   
   const loadPreviewVideo = async () => {
     try {
-      const lowestSizeLink = getLowestSizeVideoLink();
-      if (lowestSizeLink) {
-        const previewVideoUrl = await fetchVideoUrl(lowestSizeLink);
+      const videoSource = getLowestSizeVideoLink();
+      if (!videoSource) return;
+      
+      if (isNativeEmbed) {
+        previewVideo.src = videoSource;
+        previewVideo.addEventListener('loadedmetadata', () => {
+          previewReady = true;
+        });
+      } else {
+        const previewVideoUrl = await fetchKwikVideoUrl(videoSource);
         if (previewVideoUrl) {
           previewVideo.src = previewVideoUrl;
           previewVideo.addEventListener('loadedmetadata', () => {
@@ -59,7 +76,9 @@ export function setupPreviewVideo(videoPreview, player, progressContainerHitbox,
     }
   };
   
-  loadPreviewVideo();
+  if (linksData && linksData.length > 0) {
+    loadPreviewVideo();
+  }
   
   const showPreview = (posX, time) => {
     videoPreview.classList.remove('hidden');

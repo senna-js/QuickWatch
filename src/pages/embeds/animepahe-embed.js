@@ -2,6 +2,7 @@
 import { renderFullPageSpinner, renderSpinner } from '../../components/misc/loading.js';
 import { renderError } from '../../components/misc/error.js';
 import { initializeCustomPlayer } from '../../components/player/index.js';
+import { fetchKwikVideoUrl } from '../../components/player/videoUtils.js';
 
 export async function renderAnimePaheEmbed(container, params) {
   const { id, episode , season } = params;
@@ -183,7 +184,7 @@ async function loadAnimeContent(id, episode, container, params) {
 
     const m3u8Step = window.splashScreen?.addStep('Preparing video stream...');
     
-    fetchVideoUrl(linksData[0].link)
+    fetchKwikVideoUrl(linksData[0].link)
       .then(videoUrl => {
         window.splashScreen?.completeStep(m3u8Step);
         if (window.splashScreen) {
@@ -216,36 +217,6 @@ async function loadAnimeContent(id, episode, container, params) {
   }
 }
 
-export async function fetchVideoUrl(kwikLink) {
-  try {
-    const response = await fetch('https://access-kwik.apex-cloud.workers.dev/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        "service": "kwik",
-        "action": "fetch",
-        "content": {
-          "kwik": kwikLink
-        },
-        "auth": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.O0FKaqhJjEZgCAVfZoLz6Pjd7Gs9Kv6qi0P8RyATjaE"
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.status && data.content && data.content.url) {
-      return data.content.url;
-    } else {
-      console.error('Invalid response from access-kwik API:', data);
-      return null;
-    }
-  } catch (error) {
-    console.error('Error fetching video URL:', error);
-    return null;
-  }
-}
 
 function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber) {
   const isIPhone = /iPhone/i.test(navigator.userAgent);

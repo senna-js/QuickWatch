@@ -1,32 +1,35 @@
 import { renderSpinner } from '../misc/loading.js';
-import { fetchVideoUrl } from '../../pages/embeds/animepahe-embed.js';
+import { fetchKwikVideoUrl } from './videoUtils.js';
 
-export function setupQualityOptions(qualityMenu, iphoneQualityMenu, qualityBtn, qualityToggleBtn, player, customPlayer, linksData, isIPhone) {
-  if (!linksData || linksData.length === 0) return;
+export function setupQualityOptions(qualityMenu, iphoneQualityMenu, qualityBtn, qualityToggleBtn, player, customPlayer, linksData, isIPhone, isNativeEmbed = false) {
+  if (!linksData || linksData.length === 0) {
+    if (qualityBtn) {
+      qualityBtn.parentElement.classList.add('hidden');
+    }
+    if (qualityToggleBtn) {
+      qualityToggleBtn.classList.add('hidden');
+    }
+    return;
+  }
   
-  // generate quality options HTML
-  const qualityOptionsHTML = linksData.map((link, index) => {
-    const cleanedName = link.name.replace(/\s*\([^)]*\)/g, '');
-    
+  let qualityOptionsHTML = '';
+  
+  qualityOptionsHTML = linksData.map((quality, index) => {
     return `
-    <button 
-      class="quality-option w-full text-left px-3 py-1.5 text-white text-sm hover:bg-zinc-700 rounded transition"
-      data-link="${link.link}"
-      data-index="${index}"
-    >
-      ${cleanedName}
-    </button>
-  `}).join('');
+      <div class="quality-option cursor-pointer hover:bg-zinc-800 p-2 rounded text-white text-sm" data-index="${index}">
+        ${quality.name || 'Auto'}
+      </div>
+    `;
+  }).join('');
   
-  // set quality options in menu
   if (qualityMenu) {
     qualityMenu.innerHTML = qualityOptionsHTML;
-    setupQualityOptionEvents(qualityMenu, player, customPlayer, linksData);
+    setupQualityOptionEvents(qualityMenu, player, customPlayer, linksData, isNativeEmbed);
   }
   
   if (isIPhone && iphoneQualityMenu) {
     iphoneQualityMenu.innerHTML = qualityOptionsHTML;
-    setupQualityOptionEvents(iphoneQualityMenu, player, customPlayer, linksData);
+    setupQualityOptionEvents(iphoneQualityMenu, player, customPlayer, linksData, isNativeEmbed);
   }
   
   // setup quality button click events
@@ -55,13 +58,13 @@ export function setupQualityOptions(qualityMenu, iphoneQualityMenu, qualityBtn, 
   });
 }
 
-function setupQualityOptionEvents(menuElement, player, customPlayer, linksData) {
+function setupQualityOptionEvents(menuElement, player, customPlayer, linksData, isNativeEmbed = false) {
   const qualityOptions = menuElement.querySelectorAll('.quality-option');
   qualityOptions.forEach(option => {
     option.addEventListener('click', async () => {
       const currentTime = player.currentTime;
       const isPaused = player.paused;
-      const link = linksData[option.dataset.index];
+      const index = option.dataset.index;
       
       const loadingOverlay = document.createElement('div');
       loadingOverlay.className = 'absolute inset-0 flex justify-center items-center bg-black bg-opacity-70 z-10';
@@ -69,7 +72,16 @@ function setupQualityOptionEvents(menuElement, player, customPlayer, linksData) 
       customPlayer.appendChild(loadingOverlay);
       
       try {
-        const videoUrl = await fetchVideoUrl(link.link);
+        let videoUrl;
+        
+        if (isNativeEmbed) {
+          // For native embed, use the URL directly
+          videoUrl = linksData[index].url;
+        } else {
+          // For other embeds like AnimePahe, fetch the URL
+          const link = linksData[index];
+          videoUrl = await fetchKwikVideoUrl(link.link);
+        }
         
         if (videoUrl) {
           player.src = videoUrl;

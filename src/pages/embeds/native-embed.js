@@ -2,6 +2,7 @@
 import { renderFullPageSpinner, renderSpinner } from '../../components/misc/loading.js';
 import { renderError } from '../../components/misc/error.js';
 import { initializeCustomPlayer } from '../../components/player/index.js';
+import { fetchVidSrcContent } from '../../components/player/videoUtils.js';
 
 export async function renderNativeEmbed(container, params) {
   const { id, episode, season, type } = params;
@@ -41,83 +42,79 @@ export async function renderNativeEmbed(container, params) {
 async function loadVideoContent(id, episode, season, type, container) {
   const detailsStep = window.splashScreen?.addStep('Loading media details...');
   
-  let apiUrl;
-  if (type === 'movie') {
-    apiUrl = `https://player.vidsrc.co/api/server?id=${id}&sr=1`;
-  } else {
-    apiUrl = `https://player.vidsrc.co/api/server?id=${id}&sr=1&ep=${episode}&ss=${season}`;
-  }
-  
   window.splashScreen?.completeStep(detailsStep);
   const streamStep = window.splashScreen?.addStep('Fetching streaming source...');
   
-  const streamResponse = await fetch('https://varunaditya.xyz/api/proxy', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      url: apiUrl,
-      method: 'GET'
-    })
-  });
-  
-  const streamData = await streamResponse.json();
-  window.splashScreen?.completeStep(streamStep);
-  
-  if (!streamData || !streamData.url) {
-    if (window.splashScreen) {
-      window.splashScreen.hide();
-    }
-    throw new Error('No streaming source found');
-  }
-  
-  const playerContainer = container.querySelector('#player-container');
-  if (playerContainer) {
-    playerContainer.innerHTML = `
-      <div class="flex justify-center items-center h-full">
-        ${renderSpinner('large')}
-      </div>
-    `;
+  try {
+    const streamData = await fetchVidSrcContent(id, episode, season, type);
+    window.splashScreen?.completeStep(streamStep);
     
-    const videoStep = window.splashScreen?.addStep('Preparing video player...');
-    
-    try {
-      const videoUrl = streamData.url;
-      const subtitleTracks = streamData.tracks || [];
+    const playerContainer = container.querySelector('#player-container');
+    if (playerContainer) {
+      playerContainer.innerHTML = `
+        <div class="flex justify-center items-center h-full">
+          ${renderSpinner('large')}
+        </div>
+      `;
       
-      window.splashScreen?.completeStep(videoStep);
-      if (window.splashScreen) {
-        window.splashScreen.hide();
-      }
+      const videoStep = window.splashScreen?.addStep('Preparing video player...');
       
-      if (videoUrl) {
-        renderVideoPlayer(playerContainer, videoUrl, 'Auto', [], id, episode, subtitleTracks);
-      } else {
+      try {
+        const videoUrl = streamData.url;
+        const subtitleTracks = streamData.tracks || [];
+        
+        const hasMultiQuality = streamData.hasMultiQuality === true;
+        const qualityOptions = streamData.quality || [];
+        
+        window.splashScreen?.completeStep(videoStep);
+        if (window.splashScreen) {
+          window.splashScreen.hide();
+        }
+        
+        if (videoUrl) {
+          renderVideoPlayer(
+            playerContainer, 
+            videoUrl, 
+            hasMultiQuality && qualityOptions.length > 0 ? qualityOptions[qualityOptions.length - 1].quality : 'Auto', 
+            hasMultiQuality ? qualityOptions : [], 
+            id, 
+            episode, 
+            subtitleTracks
+          );
+        } else {
+          playerContainer.innerHTML = `
+            <div class="flex justify-center items-center h-full">
+              <p class="text-white text-xl">Failed to load video. Please try another source.</p>
+            </div>
+          `;
+        }
+      } catch (error) {
+        window.splashScreen?.completeStep(videoStep);
+        if (window.splashScreen) {
+          window.splashScreen.hide();
+        }
+        
+        console.error('Error preparing video player:', error);
         playerContainer.innerHTML = `
           <div class="flex justify-center items-center h-full">
             <p class="text-white text-xl">Failed to load video. Please try another source.</p>
           </div>
         `;
       }
-    } catch (error) {
-      window.splashScreen?.completeStep(videoStep);
-      if (window.splashScreen) {
-        window.splashScreen.hide();
-      }
-      
-      console.error('Error preparing video player:', error);
-      playerContainer.innerHTML = `
-        <div class="flex justify-center items-center h-full">
-          <p class="text-white text-xl">Failed to load video. Please try another source.</p>
-        </div>
-      `;
     }
+  } catch (error) {
+    window.splashScreen?.completeStep(streamStep);
+    if (window.splashScreen) {
+      window.splashScreen.hide();
+    }
+    throw error;
   }
 }
 
 function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber, subtitleTracks = []) {
   const isIPhone = /iPhone/i.test(navigator.userAgent);
+  const hasQualityOptions = qualityOptions && qualityOptions.length > 0;
+  
   container.innerHTML = `
     <div class="custom-player relative w-full h-full bg-black">
       <video 
@@ -185,7 +182,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
             </div>
           </div>
           
-          <div class="quality-selector relative hidden">
+          <div class="quality-selector relative ${hasQualityOptions ? '' : 'hidden'}">
             <button class="quality-btn text-zinc-300 hover:text-white transition text-lg">
               <i class="icon-sliders"></i>
             </button>
@@ -221,7 +218,12 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
   const typeMatch = url.match(/\/embed\/native\/\d+\/\d+\/\d+\/(\w+)/);
   const mediaType = typeMatch ? typeMatch[1] : 'tv';
   
-  const playerInstance = initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, true, subtitleTracks, mediaType);
+  const customQualityOptions = hasQualityOptions ? qualityOptions.map(q => ({
+    url: q.url,
+    name: q.quality
+  })) : [];
+  
+  const playerInstance = initializeCustomPlayer(container, customQualityOptions, showId, episodeNumber, true, subtitleTracks, mediaType);
   
   container.playerCleanup = playerInstance?.cleanup;
   

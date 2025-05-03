@@ -61,7 +61,7 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   setupKeybinds(player, customPlayer, mute, showVolumeSlider, volumeLevel, updateVolumeIcon);
   
   // srtup preview video
-  setupPreviewVideo(videoPreview, player, progressContainerHitbox, progressContainer, previewTime, linksData);
+  setupPreviewVideo(videoPreview, player, progressContainerHitbox, progressContainer, previewTime, linksData, isNativeEmbed);
   
   // setup progress bar
   setupProgressBar(
@@ -80,16 +80,28 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   
   // setup quality options or subtitles
   if (isNativeEmbed) {
+    // check if we have quality options in linksData
+    const hasQualityOptions = Array.isArray(linksData) && linksData.length > 0;
+    
     if (subtitleBtn && subtitleMenu) {
       subtitleHandler = setupSubtitles(player, subtitleBtn, subtitleMenu);
       subtitleHandler.loadSubtitles(subtitleTracks);
       
-      if (qualityBtn) { qualityBtn.parentElement.classList.add('hidden'); }
+      if (qualityBtn && !hasQualityOptions) { 
+        qualityBtn.parentElement.classList.add('hidden'); 
+      }
+    }
+    
+    if (hasQualityOptions && qualityBtn && qualityMenu) {
+      setupQualityOptions(
+        qualityMenu, iphoneQualityMenu, qualityBtn, qualityToggleBtn, 
+        player, customPlayer, linksData, isIPhone, true // isNativeEmbed=true
+      );
     }
   } else {
     setupQualityOptions(
       qualityMenu, iphoneQualityMenu, qualityBtn, qualityToggleBtn, 
-      player, customPlayer, linksData, isIPhone
+      player, customPlayer, linksData, isIPhone, false // isNativeEmbed=false
     );
     
     if (subtitleBtn) { subtitleBtn.parentElement.classList.add('hidden'); }
