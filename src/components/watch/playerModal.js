@@ -16,13 +16,13 @@ export function renderPlayerModal(type, id, sources, initialSourceIndex, initial
               ${renderSpinner('large')}
             </div>
 
-            <div id="mobile-topbar" class="bg-black p-3 flex items-center justify-between">
+            <div id="mobile-topbar" class="bg-black p-3 flex items-center gap-6 justify-between">
               <button id="sources-button" class="px-3 py-[0.3rem] rounded-full whitespace-nowrap bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-md hover:scale-[107%] active:scale-90 text-white select-none text-sm" style="font-family: Inter;">Sources</button>
               
               <div class="flex items-center gap-3 text-white">
-                ${type === 'tv' ? `<button id="previous-episode-btn" class="text-white cursor-pointer hover:scale-[1.2] transition duration-[250ms] ease">←</button>` : ''}
-                <div id="current-media-indicator" class="text-white font-medium">S${initialSeason}E${initialEpisode}</div>
-                ${type === 'tv' ? `<button id="next-episode-btn" class="text-white cursor-pointer hover:scale-[1.2] transition duration-[250ms] ease">→</button>` : ''}
+                ${type === 'tv' ? `<button id="previous-episode-btn" class="text-white cursor-pointer transition duration-[250ms] ease text-sm z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90">←</button>` : ''}
+                <div id="current-media-indicator" class="text-white font-medium overflow-hidden line-clamp-1 text-ellipsis">S${initialSeason}E${initialEpisode}</div>
+                ${type === 'tv' ? `<button id="next-episode-btn" class="text-white cursor-pointer transition duration-[250ms] ease text-sm z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90">→</button>` : ''}
               </div>
               
               <button id="close-modal" class="text-white text-[1.7rem] z-[8] aspect-square bg-[#ffffff29] hover:bg-[#ffffff40] border border-[#ffffff0f] backdrop-blur-sm rounded-full p-[0.3rem] leading-[0] hover:scale-[115%] active:scale-90"><i class="icon-x text-xl"></i></button>
