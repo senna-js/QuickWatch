@@ -1,5 +1,5 @@
-import { renderSpinner } from '../misc/loading.js';
-import { fetchKwikVideoUrl } from './videoUtils.js';
+import { renderSpinner } from '../../misc/loading.js';
+import { fetchKwikVideoUrl } from '../videoUtils.js';
 
 export function setupQualityOptions(qualityMenu, iphoneQualityMenu, qualityBtn, qualityToggleBtn, player, customPlayer, linksData, isIPhone, isNativeEmbed = false) {
   if (!linksData || linksData.length === 0) {

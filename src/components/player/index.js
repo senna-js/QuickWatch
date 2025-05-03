@@ -1,15 +1,15 @@
 import { setupIPhoneSupport } from './checkiPhone.js';
 import { setupPlayerData } from './savePlayerData.js';
-import { setupTopControls } from './topControls.js';
+import { setupTopControls } from './ui/topControls.js';
 import { setupKeybinds } from './keybinds.js';
-import { setupPreviewVideo } from './previewVideo.js';
-import { setupProgressBar, formatTime } from './progressBar.js';
-import { setupQualityOptions } from './qualityOptions.js';
-import { setupVolumeControls } from './volume.js';
-import { setupPlayPause } from './playPause.js';
-import { setupFullscreenPiP } from './fullscreenPiP.js';
+import { setupPreviewVideo } from './ui/previewVideo.js';
+import { setupProgressBar, formatTime } from './ui/progressBar.js';
+import { setupQualityOptions } from './ui/qualityOptions.js';
+import { setupVolumeControls } from './ui/volume.js';
+import { setupPlayPause } from './ui/playPause.js';
+import { setupFullscreenPiP } from './ui/fullscreenPiP.js';
 import { setupDownloadVideo } from './downloadVideo.js';
-import { setupSubtitles } from './subtitles.js';
+import { setupSubtitles } from './ui/subtitles.js';
 
 export function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber, isNativeEmbed = false, subtitleTracks = [], mediaType = 'tv') {
   // get player elements

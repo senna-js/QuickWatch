@@ -1,4 +1,4 @@
-import { fetchKwikVideoUrl } from '../player/videoUtils.js';
+import { fetchKwikVideoUrl } from '../videoUtils.js';
 
 export function setupPreviewVideo(videoPreview, player, progressContainerHitbox, progressContainer, previewTime, linksData, isNativeEmbed = false) {
   let previewReady = false;
