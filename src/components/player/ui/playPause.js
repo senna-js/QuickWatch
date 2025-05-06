@@ -3,12 +3,12 @@ export function setupPlayPause(player, playPauseBtn, centerPlayButton) {
   playPauseBtn.addEventListener('click', () => {
     if (player.paused) {
       player.play();
-      playPauseBtn.innerHTML = '<i class="fas fa-pause text-xl"></i>';
+      playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
       playPauseBtn.style.backgroundColor = '#fff';
       playPauseBtn.style.color = '#000';
     } else {
       player.pause();
-      playPauseBtn.innerHTML = '<i class="fas fa-play text-xl"></i>';
+      playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
       playPauseBtn.style.backgroundColor = '';
       playPauseBtn.style.color = '';
     }
@@ -16,7 +16,7 @@ export function setupPlayPause(player, playPauseBtn, centerPlayButton) {
   
   // update button on play
   player.addEventListener('play', () => {
-    playPauseBtn.innerHTML = '<i class="fas fa-pause text-xl"></i>';
+    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
     playPauseBtn.style.backgroundColor = '#fff';
     playPauseBtn.style.color = '#000';
     
@@ -27,7 +27,7 @@ export function setupPlayPause(player, playPauseBtn, centerPlayButton) {
   
   // update button on pause
   player.addEventListener('pause', () => {
-    playPauseBtn.innerHTML = '<i class="fas fa-play text-xl"></i>';
+    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
     playPauseBtn.style.backgroundColor = '';
     playPauseBtn.style.color = '';
     

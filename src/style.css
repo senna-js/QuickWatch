@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
 
 @font-face {
@@ -87,7 +87,6 @@ button {
 }
 
 .player-controls {
-  backdrop-filter: blur(4px);
   transition: opacity 0.3s ease;
 }
 
@@ -105,21 +104,23 @@ button {
   transform: scale(1.2);
 }
 
-.play-pause-btn, .volume-btn, .fullscreen-btn, .pip-btn, .quality-btn, .subtitle-btn, .download-btn {
+.play-pause-btn, .volume-btn, .fullscreen-btn, .pip-btn, .quality-btn, .subtitle-btn, .download-btn, .forwards-10s, .back-10s {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 2.5rem;
+  height: 2.5rem;
   transition: background-color 0.2s ease, transform 0.2s ease;
-  border-radius: 0.3rem;
+  padding: 0.5rem;
+  border-radius: 9999px;
 }
 
-.play-pause-btn:hover, .volume-btn:hover, .fullscreen-btn:hover, .quality-btn:hover, .pip-btn:hover, .subtitle-btn:hover, .download-btn:hover {
-  transform: scale(1.15);
+.play-pause-btn:hover, .volume-btn:hover, .fullscreen-btn:hover, .quality-btn:hover, .pip-btn:hover, .subtitle-btn:hover, .download-btn:hover, .forwards-10s:hover, .back-10s:hover {
+  transform: scale(1.05);
+  background-color: #44546480;
 }
 
-.play-pause-btn:active, .volume-btn:active, .fullscreen-btn:active, .quality-btn:active, .pip-btn:active, .subtitle-btn:active, .download-btn:active {
+.play-pause-btn:active, .volume-btn:active, .fullscreen-btn:active, .quality-btn:active, .pip-btn:active, .subtitle-btn:active, .download-btn:active, .forwards-10s:active, .back-10s:active {
   transform: scale(0.9);
 }
 
@@ -172,4 +173,8 @@ button {
 
 .source-button:first-of-type {
   grid-column: span 2;
+}
+
+.video-preview > video {
+  border-radius: 0.5rem;
 }
