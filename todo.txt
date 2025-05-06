@@ -1,2 +1,0 @@
-- finish all progress trackers in sourceTrackers.js
-- port all code in react WITH TYPESCRIPT (i understand types now 🙏 god help me)
