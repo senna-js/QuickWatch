@@ -5,6 +5,11 @@ export const sources = [
       tvUrl: `/embed/native/{id}/{season}/{episode}/tv`
     },
     {
+      name: 'PStream',
+      movieUrl: `https://iframe.pstream.org/embed/tmdb-movie-{id}?theme=default&language=en&logo=false&downloads=true&allinone=true&fedapi=false&interface-settings=false&tips=false`,
+      tvUrl: `https://iframe.pstream.org/embed/tmdb-tv-{id}/{season}/{episode}?theme=default&language=en&logo=false&downloads=true&allinone=true&fedapi=false&interface-settings=false&tips=false`
+    },
+    {
       name: 'VidLink',
       movieUrl: `https://vidlink.pro/movie/{id}?primaryColor=FFFFFF&secondaryColor=2392EE&title=true&poster=false&autoplay=false`,
       tvUrl: `https://vidlink.pro/tv/{id}/{season}/{episode}?primaryColor=2392EE&secondaryColor=FFFFFF&title=true&poster=false&autoplay=false&nextbutton=true`

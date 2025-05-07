@@ -171,10 +171,6 @@ button {
   color: #fff;
 }
 
-.source-button:first-of-type {
-  grid-column: span 2;
-}
-
 .video-preview > video {
   border-radius: 0.5rem;
 }
