@@ -11,6 +11,7 @@ import { renderEpisodeList, initEpisodeList } from '../../components/watch/tv/ep
 import { renderSeasonSelector, initSeasonSelector } from '../../components/watch/tv/seasonSelector.js';
 import { getProgress } from '../../components/watch/progress/index.js';
 import { sources } from './sources.js'
+import { showToast } from '../../components/toast.js';
 
 export function renderDetailsMobilepage(container, params) {
   if (window.splashScreen) {
@@ -337,9 +338,9 @@ async function loadMediaDetails(type, id) {
           });
           
           localStorage.setItem('quickwatch-watchlist', JSON.stringify(watchlist));
-          alert('Added to watchlist!');
+          showToast('Added to watchlist', 'success');
         } else {
-          alert('Already in your watchlist!');
+          showToast('Already in your watchlist!', 'error');
         }
       });
     }

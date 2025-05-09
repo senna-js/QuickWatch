@@ -12,6 +12,7 @@ import { renderSeasonSelector, initSeasonSelector } from '../../components/watch
 import { getProgress } from '../../components/watch/progress/index.js';
 import { initShareModal } from '../../components/watch/shareModal.js';
 import { sources } from './sources.js'
+import { showToast } from '../../components/toast.js';
 
 export function renderDetailsPage(container, params) {
   if (window.splashScreen) {
@@ -157,7 +158,7 @@ async function loadMediaDetails(type, id) {
       }
     
     detailsContainer.innerHTML = `
-      <section class="w-full mt-16 relative" style="height: calc(100vh - 4rem);">
+      <section class="w-full relative" style="height: calc(100vh - 4rem);">
         <img class="object-cover w-full h-full object-right-top" src="${TMDB_IMAGE_BASE_URL}original${data.backdrop_path}">
         
         <div class="absolute inset-0 bg-gradient-to-t from-[#00050D] via-transparent to-transparent"></div>
@@ -353,9 +354,9 @@ async function loadMediaDetails(type, id) {
           });
           
           localStorage.setItem('quickwatch-watchlist', JSON.stringify(watchlist));
-          alert('Added to watchlist!');
+          showToast('Added to watchlist', 'success');
         } else {
-          alert('Already in watchlist!');
+          showToast('Already in your watchlist!', 'error');
         }
       });
     }

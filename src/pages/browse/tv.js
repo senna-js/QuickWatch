@@ -2,6 +2,7 @@
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
 import { createCarouselItem } from '../../components/carouselItem.js';
+import { showToast } from '../../components/toast.js';
 
 export function renderTvPage(container) {
   container.innerHTML = `
@@ -335,9 +336,9 @@ function initButtonListeners() {
           });
           
           localStorage.setItem('quickwatch-watchlist', JSON.stringify(watchlist));
-          alert('Added to watchlist!');
+          showToast('Added to watchlist', 'success');
         } else {
-          alert('Already in your watchlist!');
+          showToast('Already in your watchlist!', 'error');
         }
       }
     });

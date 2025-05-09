@@ -149,7 +149,7 @@ button {
   display: block;
 }
 
-.pagebtn { transition: all .1s ease-in-out; }
+.pagebtn { transition: all .1s ease-in-out; cursor: pointer; }
 .pagebtn.active { background: radial-gradient(50% 50% at 50% 0,rgba(var(--action-background-color,255,255,255),.2) 0,transparent 100%),#39404e; }
 .pagebtn:hover { background: #e7eaee; color: #00050d !important; box-shadow: 0 0 30px #e7eaee50 }
 .pagebtn:hover .text-\[\#a5abb5\] { color: #00050d !important; transition: 0.2s ease; }
