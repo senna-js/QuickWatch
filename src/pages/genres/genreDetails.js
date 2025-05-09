@@ -62,7 +62,7 @@ export function renderGenreDetailsPage(container, params) {
     <div class="pt-24 pb-20 md:pb-0 bg-[#00050d] min-h-screen">
       <div class="px-[4.4rem]">
         <div class="flex items-center mb-8">
-          <h1 class="text-4xl font-bold font-medium">${genreName}</h1>
+          <h1 class="text-xl md:text-2xl text-white font-medium">${genreName}</h1>
         </div>
         
         <div id="content-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>

@@ -8,7 +8,7 @@ export function renderHomePage(container) {
     ${renderHeader()}
     
     <div class="pb-32 md:pb-64">
-      <div id="hero-section" class="h-[550px] w-full flex items-end justify-end relative">
+      <div id="hero-section" class="h-[700px] w-full flex items-end justify-end relative">
         <div class="absolute inset-x-0 md:inset-x-auto md:left-[4.4rem] text-white z-[6] flex flex-col items-center md:items-start opacity-0" style="transform: translateY(30px);">
           <img id="logo" class="w-[250px] md:w-[400px] opacity-0" style="transform: translateY(20px);">
           <span id="overview" class="text-[14px] md:text-[18px] mt-4 w-[80%] md:w-[37%] line-clamp-3 md:line-clamp-2 font-light text-center md:text-left">
@@ -20,9 +20,9 @@ export function renderHomePage(container) {
             <button id="add-watchlist-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-3xl md:text-4xl flex items-center justify-center pagebtn font-medium opacity-0"><i class="icon-plus"></i></button>
           </div>
         </div>
-        <div class="absolute inset-y-0 left-0 md:left-[30%] w-full md:w-[40%] bg-gradient-to-r from-[#00050d] to-transparent z-[3]"></div>
-        <div class="absolute inset-x-0 bottom-0 h-[100px] bg-gradient-to-t from-[#00050d] to-transparent z-[3]"></div>
-        <img id="herobk" class="h-[550px] w-full md:w-[70%] object-cover items-center ml-auto opacity-0">
+        <div class="absolute inset-y-0 left-0 w-full md:w-[50%] bg-gradient-to-r from-[#00050d] to-transparent z-[3]"></div>
+        <div class="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-[#00050d] to-transparent z-[3]"></div>
+        <img id="herobk" class="h-[700px] w-full md:w-full object-cover items-center ml-auto opacity-0">
       </div>
       
       <div class="bg-[#00050d]">
@@ -334,7 +334,7 @@ async function updateHeroSection(item) {
       heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.poster_path}`;
       heroBackground.classList.add('object-contain');
     } else if (item.images && item.images.backdrops && item.images.backdrops.length > 0) {
-      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.images.backdrops[0].file_path}`;
+      heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.backdrop_path}`;
       heroBackground.classList.remove('object-contain');
     } else if (item.backdrop_path) {
       heroBackground.src = `${TMDB_IMAGE_BASE_URL}original${item.backdrop_path}`;
