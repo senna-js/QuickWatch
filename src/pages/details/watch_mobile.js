@@ -30,6 +30,9 @@ export function renderDetailsMobilepage(container, params) {
 
 async function loadMediaDetails(type, id) {
   try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoPlay = urlParams.get('w') === 'true';
+    
     const mediaDetailsStep = window.splashScreen?.addStep('Loading media details...');
     
     const options = {
@@ -436,6 +439,13 @@ async function loadMediaDetails(type, id) {
     if (window.splashScreen) {
       setTimeout(() => {
         window.splashScreen.hide();
+        
+        if (autoPlay) {
+          const playButton = document.getElementById('play-button');
+          if (playButton) {
+            playButton.click();
+          }
+        }
       }, 800);
     }
 

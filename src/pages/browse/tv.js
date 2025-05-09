@@ -291,7 +291,7 @@ function initButtonListeners() {
       const id = heroSection.dataset.id;
       
       if (mediaType && id) {
-        window.history.pushState(null, null, `/${mediaType}/${id}`);
+        window.history.pushState(null, null, `/${mediaType}/${id}?w=true`);
         window.dispatchEvent(new PopStateEvent('popstate'));
       }
     });

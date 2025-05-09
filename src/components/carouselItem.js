@@ -92,7 +92,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   playButton.addEventListener('click', (e) => {
     e.stopPropagation();
     setTimeout(() => {
-      window.history.pushState(null, null, `/${mediaType}/${item.id}`);
+      window.history.pushState(null, null, `/${mediaType}/${item.id}?w=true`);
       window.dispatchEvent(new PopStateEvent('popstate'));
     }, 50);
   });
