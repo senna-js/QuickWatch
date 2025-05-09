@@ -1,4 +1,5 @@
 // Utility functions for video quality options
+import CryptoJS from 'crypto-js';
 
 export async function fetchKwikVideoUrl(kwikLink) {
   try {
@@ -51,15 +52,48 @@ export async function fetchVidSrcContent(id, episode, season, type) {
       })
     });
     
-    const streamData = await streamResponse.json();
+    const responseData = await streamResponse.json();
     
-    if (!streamData || !streamData.url) {
-      throw new Error('No streaming source found');
+    if (responseData && responseData.data) {
+      const decodedData = atob(responseData.data);
+      const encryptedData = JSON.parse(decodedData);
+      
+      const decryptedData = decryptWithPassword(encryptedData);
+      const streamData = JSON.parse(decryptedData);
+      
+
+      if (!streamData || !streamData.url) {
+        throw new Error('No streaming source found');
+      }
+      
+      return streamData;
+    } else {
+      if (!responseData || !responseData.url) {
+        throw new Error('No streaming source found');
+      }
+      
+      return responseData;
     }
-    
-    return streamData;
   } catch (error) {
     console.error('Error fetching VidSrc content:', error);
     throw error;
   }
+}
+
+function decryptWithPassword(e) {
+  let t = CryptoJS.enc.Hex.parse(e.salt),
+      a = CryptoJS.enc.Hex.parse(e.iv),
+      n = e.encryptedData,
+      l = CryptoJS.PBKDF2(e.key, t, {
+        keySize: 8,
+        iterations: e.iterations,
+        hasher: CryptoJS.algo.SHA256
+      }),
+      o = CryptoJS.AES.decrypt(n, l, {
+        iv: a,
+        padding: CryptoJS.pad.Pkcs7,
+        mode: CryptoJS.mode.CBC
+      }).toString(CryptoJS.enc.Utf8);
+  
+  return o;
 }
