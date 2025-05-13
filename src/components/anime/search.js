@@ -124,13 +124,13 @@ export async function searchAnime(query, page = 1) {
 
 export function renderSearchResults(results) {
   if (!results || !results.length) {
-    return `<div class="flex items-center justify-center p-8">
+    return `<div class="flex items-center justify-center p-4">
       <p class="text-white opacity-60">No results found</p>
     </div>`;
   }
   
   return `
-    <div class="flex flex-col space-y-4 p-4">
+    <div class="flex flex-col space-y-2 p-3">
       ${results.map(anime => renderSearchResultItem(anime)).join('')}
     </div>
   `;
@@ -139,14 +139,14 @@ export function renderSearchResults(results) {
 function renderSearchResultItem(anime) {
   if (!anime || !anime.id) return '';
   
-  const posterUrl = anime.poster || `https://placehold.co/80x120/141414/fff/?text=${encodeURIComponent(anime.title || 'Unknown')}&font=poppins`;
+  const posterUrl = anime.poster || `https://placehold.co/60x90/141414/fff/?text=${encodeURIComponent(anime.title || 'Unknown')}&font=poppins`;
   
   const tags = [];
   
   // Add show type tag
   if (anime.tvInfo.showType) {
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
         ${anime.tvInfo.showType}
       </span>
     `);
@@ -165,7 +165,7 @@ function renderSearchResultItem(anime) {
   if (anime.tvInfo.sub) {
     tags.push(`
       <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
-        <span class="bg-white text-black px-1 rounded-sm mr-1 group-hover:bg-[#1C1D21] group-hover:text-white">SUB</span>
+        <span class="bg-white text-black px-1 rounded-sm mr-1">SUB</span>
         ${anime.tvInfo.sub}
       </span>
     `);
@@ -175,7 +175,7 @@ function renderSearchResultItem(anime) {
   if (anime.tvInfo.dub) {
     tags.push(`
       <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
-        <span class="bg-white text-black px-1 rounded-sm mr-1 group-hover:bg-[#1C1D21] group-hover:text-white">DUB</span>
+        <span class="bg-white text-black px-1 rounded-sm mr-1">DUB</span>
         ${anime.tvInfo.dub}
       </span>
     `);

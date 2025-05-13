@@ -1,0 +1,1 @@
+make the anime search button not close the dropdown. probably two conflicting things

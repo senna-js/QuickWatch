@@ -17,31 +17,32 @@ export async function renderAnimeDetailsPage(container, id) {
 
   currentSeasonId = id;
   
-  container.innerHTML = `
-    <div class="flex justify-center items-center h-screen w-full">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
-    </div>
-  `;
+  window.splashScreen.show();
 
   try {
+    const animeStep = window.splashScreen.addStep('Loading anime details');
+    const episodesStep = window.splashScreen.addStep('Fetching episodes');
+    
     const [animeData, episodesData] = await Promise.all([
-      extractAnimeInfo(id),
-      extractEpisodesList(id)
+      extractAnimeInfo(id).finally(() => window.splashScreen.completeStep(animeStep)),
+      extractEpisodesList(id).finally(() => window.splashScreen.completeStep(episodesStep))
     ]);
 
     if (!animeData) {
       throw new Error('Failed to fetch anime data');
     }
 
-    console.log('Anime data:', animeData);
-
     if (episodesData?.episodes && episodesData.episodes.length > 0) {
       currentEpisode = episodesData.episodes[0];
     }
 
+    const tmdbStep = window.splashScreen.addStep('Finding TMDB match');
     renderDetailsUI(container, animeData, episodesData);
+    window.splashScreen.completeStep(tmdbStep);
+
   } catch (error) {
     console.error('Error loading anime details:', error);
+    window.splashScreen.hide();
     container.innerHTML = `
       <div class="flex justify-center items-center h-screen w-full flex-col gap-4">
         <h2 class="text-2xl font-bold text-white">Failed to load anime details</h2>
@@ -49,6 +50,8 @@ export async function renderAnimeDetailsPage(container, id) {
         <button onClick="window.history.back()" class="px-4 py-2 bg-[#141414] border border-[#F5F5F5]/10 rounded-lg text-white hover:bg-[#1e1e1e] transition duration-200 ease">Go Back</button>
       </div>
     `;
+  } finally {
+    setTimeout(() => window.splashScreen.hide(), 500);
   }
 
   initializeSearchFunctionality();
@@ -246,7 +249,7 @@ function renderEpisodesList(episodes) {
             </div>
           </div>
           <div class="w-2/3 p-3 pr-0 flex flex-col gap-1 justify-center">
-            <h3 class="font-medium">${episode.title || `Episode ${episode.episode_no}`}</h3>
+            <h3 class="font-medium line-clamp-2">${episode.title || `Episode ${episode.episode_no}`}</h3>
             <p class="text-sm text-white/70 line-clamp-3 leading-tight">${episode.description || episode.japanese_title || ''}</p>
           </div>
         </div>
