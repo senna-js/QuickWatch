@@ -4,7 +4,7 @@ import { extractEpisodesList } from '../../components/anime/episodeData.js';
 import { fetchEpisodeThumbnails, updateEpisodeListWithThumbnails, fetchTmdbThumbnails } from '../../components/anime/episodeThumbnails.js';
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { animeSources, getSourceUrl, getDefaultSource } from './sources.js';
-import { renderAnimeHeader } from '../../components/anime/ui/header.js';
+import { renderAnimeHeader, initializeSearchFunctionality } from '../../components/anime/ui/header.js';
 
 // Store global states
 let currentEpisode = null;
@@ -50,6 +50,8 @@ export async function renderAnimeDetailsPage(container, id) {
       </div>
     `;
   }
+
+  initializeSearchFunctionality();
 }
 
 function updateIframeSrc(episode, animeData, sourceId, language) {
