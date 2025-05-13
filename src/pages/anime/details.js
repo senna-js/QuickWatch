@@ -217,7 +217,7 @@ function renderDetailsUI(container, animeData, episodesData) {
 
 function renderSeasonOptions(seasons) {
   if (!seasons || seasons.length === 0) {
-    return '<option value="current">Current Season</option>';
+    return '<option value="current">Season 1</option>';
   }
   
   return seasons.map((season, index) => {

@@ -1,6 +1,6 @@
 // Anime Page
 import { extractSpotlights } from '../../components/anime/spotlightData.js';
-import { renderAnimeHeader } from '../../components/anime/ui/header.js';
+import { renderAnimeHeader, initializeSearchFunctionality } from '../../components/anime/ui/header.js';
 import { fetchAnimeData } from '../../components/anime/animeData.js';
 import { renderAnimeCard, renderSidebarAnimeItem } from '../../components/anime/ui/card.js';
  
@@ -511,7 +511,7 @@ export async function renderAnimePage(container) {
 
     // Initial render of the page structure
     container.innerHTML = `
-        <div class="min-h-screen text-white">
+        <div class="min-h-screen text-white overflow-x-hidden">
             ${renderAnimeHeader()}
 
             <main class="p-2 md:p-4 md:pt-6 mt-16">
@@ -674,4 +674,5 @@ export async function renderAnimePage(container) {
     // but in a larger app, you'd want to clean up to prevent memory leaks.
     // For example, if your router has a "beforeLeave" or "destroy" hook for the page:
     // router.onLeave('/anime', () => clearInterval(spotlightInterval));
+    initializeSearchFunctionality();
 }
