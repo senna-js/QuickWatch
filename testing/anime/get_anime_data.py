@@ -105,12 +105,8 @@ def extract_related_data(soup):
 
 def extract_anime_info(id):
     resp = requests.get(f"https://hianime.nz/{id}")
-    characterData = requests.get(f'https://hianime.nz/ajax/character/list/{id.split("-").pop()}')
 
     try:
-        # Parse HTML content
-        character_html = characterData.json().get('html', '') if characterData.status_code == 200 else ''
-        soup1 = BeautifulSoup(character_html, 'html.parser')
         soup = BeautifulSoup(resp.text, 'html.parser')
         
         # Extract basic information
@@ -223,49 +219,28 @@ def extract_anime_info(id):
             if tick_rate and "18+" in tick_rate.text.strip():
                 adult_content = True
         
-        # Extract characters and voice actors
-        characters_voice_actors = []
-        if character_html:
-            for el in soup1.select(".bac-list-wrap .bac-item"):
-                character = {
-                    "id": el.select_one(".per-info.ltr .pi-avatar").get('href').split("/")[2] if el.select_one(".per-info.ltr .pi-avatar") and el.select_one(".per-info.ltr .pi-avatar").get('href') else "",
-                    "poster": el.select_one(".per-info.ltr .pi-avatar img").get('data-src') if el.select_one(".per-info.ltr .pi-avatar img") else "",
-                    "name": el.select_one(".per-info.ltr .pi-detail a").text if el.select_one(".per-info.ltr .pi-detail a") else "",
-                    "cast": el.select_one(".per-info.ltr .pi-detail .pi-cast").text if el.select_one(".per-info.ltr .pi-detail .pi-cast") else ""
-                }
-                
-                voice_actors = []
-                rtl_voice_actors = el.select(".per-info.rtl")
-                xx_voice_actors = el.select(".per-info.per-info-xx .pix-list .pi-avatar")
-                
-                if rtl_voice_actors:
-                    for actor_el in rtl_voice_actors:
-                        voice_actor = {
-                            "id": actor_el.select_one("a").get('href').split("/")[-1] if actor_el.select_one("a") and actor_el.select_one("a").get('href') else "",
-                            "poster": actor_el.select_one("img").get('data-src') if actor_el.select_one("img") else "",
-                            "name": actor_el.select_one(".pi-detail .pi-name a").text.strip() if actor_el.select_one(".pi-detail .pi-name a") else ""
-                        }
-                        voice_actors.append(voice_actor)
-                elif xx_voice_actors:
-                    for actor_el in xx_voice_actors:
-                        voice_actor = {
-                            "id": actor_el.get('href').split("/")[-1] if actor_el.get('href') else "",
-                            "poster": actor_el.select_one("img").get('data-src') if actor_el.select_one("img") else "",
-                            "name": actor_el.get('title') if actor_el.get('title') else ""
-                        }
-                        voice_actors.append(voice_actor)
-                
-                if not voice_actors:
-                    for actor_el in el.select(".per-info.per-info-xx .pix-list .pi-avatar"):
-                        voice_actor = {
-                            "id": actor_el.get('href').split("/")[2] if actor_el.get('href') else "",
-                            "poster": actor_el.select_one("img").get('data-src') if actor_el.select_one("img") else "",
-                            "name": actor_el.get('title') if actor_el.get('title') else ""
-                        }
-                        voice_actors.append(voice_actor)
-                
-                characters_voice_actors.append({"character": character, "voiceActors": voice_actors})
-        
+        seasons = []
+        season_elements = soup.select(".os-list a")
+        for el in season_elements:
+            route = el.get('href', "") if el else ""
+            
+            name_element = el.select_one(".title")
+            name = name_element.text.strip() if name_element else ""
+            
+            background = ""
+            poster_element = el.select_one(".season-poster")
+            if poster_element and poster_element.get('style'):
+                style = poster_element.get('style')
+                bg_match = re.search(r'url\(([^)]+)\)', style)
+                if bg_match:
+                    background = bg_match.group(1)
+            
+            seasons.append({
+                "name": name,
+                "route": route,
+                "background": background
+            })
+            
         # Extract recommended and related data
         recommended_data = extract_recommended_data(soup)
         related_data = extract_related_data(soup)
@@ -284,7 +259,7 @@ def extract_anime_info(id):
             "backdrop_image": backdrop_image,
             "showType": show_type,
             "animeInfo": anime_info,
-            "charactersVoiceActors": characters_voice_actors,
+            "seasons": seasons,
             "recommended_data": recommended_data,
             "related_data": related_data
         }
@@ -345,5 +320,6 @@ def extract_mini_anime_info(id):
         print(f"Error extracting mini anime info: {e}")
         return None
 
-# anime_info = extract_anime_info("horimiya-15733")
-# print(json.dumps(anime_info, indent=2))
+anime_info = extract_anime_info("my-hero-academia-season-6-18154")
+with open("data.json", "w") as f:
+    f.write(json.dumps(anime_info, indent=2))
