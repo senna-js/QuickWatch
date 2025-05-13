@@ -7,7 +7,7 @@ export function renderAnimeHeader() {
       
       <!-- Logo -->
       <div class="flex items-center">
-        <a href="/" class="text-2xl hover:text-[#2392EE] transition duration-200 ease active:scale-90" style="font-family: 'Instrument Serif';">quickwatch anime</a>
+        <a href="/anime" class="text-2xl hover:text-[#2392EE] transition duration-200 ease active:scale-90" style="font-family: 'Instrument Serif';">quickwatch anime</a>
       </div>
 
       <!-- Search Box -->

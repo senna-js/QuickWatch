@@ -41,6 +41,8 @@ export async function renderAnimePage(container) {
             const heroData = spotlights[index];
             heroTitleElement.textContent = heroData.title || "";
             heroDescriptionElement.textContent = `${heroData.description ? heroData.description.substring(0, 220) : ''}${heroData.description && heroData.description.length > 220 ? '...' : ''}`;
+            watchNowBtn.href = `/anime/${heroData.id}`
+            detailsBtn.href = `/anime/${heroData.id}`
             
             // Set background with opacity 0 first
             const newImage = new Image();
@@ -60,21 +62,21 @@ export async function renderAnimePage(container) {
                     // Stagger button animations
                     if (watchNowBtn) {
                         requestAnimationFrame(() => {
-                            watchNowBtn.style.transition = 'opacity 0.4s ease';
+                            watchNowBtn.style.transition = '0.2s ease';
                             watchNowBtn.style.opacity = '1';
                         });
                     }
                     
                     if (detailsBtn) {
                         setTimeout(() => {
-                            detailsBtn.style.transition = 'opacity 0.4s ease';
+                            detailsBtn.style.transition = '0.2s ease';
                             detailsBtn.style.opacity = '1';
                         }, 50);
                     }
                     
                     if (addBtn) {
                         setTimeout(() => {
-                            addBtn.style.transition = 'opacity 0.4s ease';
+                            addBtn.style.transition = '0.2s ease';
                             addBtn.style.opacity = '1';
                         }, 100);
                     }
@@ -114,6 +116,27 @@ export async function renderAnimePage(container) {
         if (spotlights.length > 1) { // Only start interval if there's more than one spotlight
             clearInterval(spotlightInterval); // Clear existing interval if any
             spotlightInterval = setInterval(showNextSpotlight, SPOTLIGHT_INTERVAL_DURATION);
+        }
+    }
+
+    function initializeSpotlightControls() {
+        const prevButton = document.getElementById('prev-spotlight-btn');
+        const nextButton = document.getElementById('next-spotlight-btn');
+        
+        if (prevButton) {
+            prevButton.addEventListener('click', () => {
+                showPreviousSpotlight();
+                clearInterval(spotlightInterval);
+                startSpotlightInterval();
+            });
+        }
+        
+        if (nextButton) {
+            nextButton.addEventListener('click', () => {
+                showNextSpotlight();
+                clearInterval(spotlightInterval);
+                startSpotlightInterval();
+            });
         }
     }
 
@@ -328,7 +351,8 @@ export async function renderAnimePage(container) {
             
             if (topFiveAnime.length > 0) {
                 topFiveAnime.forEach((animeData, i) => {
-                    const item = document.createElement('div');
+                    const item = document.createElement('a');
+                    item.href = `/anime/${animeData.id}`;
                     item.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3';
                     item.style.opacity = '0';
                     item.style.transform = 'translateY(20px)';
@@ -397,7 +421,8 @@ export async function renderAnimePage(container) {
             
             if (topFiveAnime.length > 0) {
                 topFiveAnime.forEach((animeData, i) => {
-                    const item = document.createElement('div');
+                    const item = document.createElement('a');
+                    item.href = `/anime/${animeData.id}`;
                     item.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3';
                     item.style.opacity = '0';
                     item.style.transform = 'translateY(20px)';
@@ -475,7 +500,8 @@ export async function renderAnimePage(container) {
             
             if (topFiveAnime.length > 0) {
                 topFiveAnime.forEach((animeData, i) => {
-                    const item = document.createElement('div');
+                    const item = document.createElement('a');
+                    item.href = `/anime/${animeData.id}`;
                     item.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3';
                     item.style.opacity = '0';
                     item.style.transform = 'translateY(20px)';
@@ -521,20 +547,20 @@ export async function renderAnimePage(container) {
                         <h1 id="anime-hero-title" class="text-4xl md:text-5xl font-bold mb-3"></h1>
                         <p id="anime-hero-description" class="text-md md:text-lg text-gray-200 mb-6 font-normal leading-6 overflow-hidden line-clamp-3 text-ellipsis"></p>
                         <div class="flex items-center space-x-3">
-                            <button id="anime-watch-now-btn" class="bg-white text-black px-[1.2rem] py-[0.5rem] text-[1.1rem] rounded-lg font-semibold hover:bg-gray-200 transition opacity-0">Watch now</button>
-                            <button id="anime-details-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white px-[1.2rem] py-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-gray-600/70 transition backdrop-blur-sm opacity-0">Details</button>
-                            <button id="anime-add-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white p-[0.5rem] rounded-lg hover:bg-gray-600/70 transition backdrop-blur-sm opacity-0">
+                            <a id="anime-watch-now-btn" class="bg-white text-black px-[1.2rem] py-[0.5rem] text-[1.1rem] rounded-lg font-semibold hover:bg-zinc-200 transition opacity-0 hover:scale-[1.075] active:scale-95">Watch now</a>
+                            <a id="anime-details-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white px-[1.2rem] py-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-[#535458]/50 transition backdrop-blur-sm opacity-0 hover:scale-[1.075] active:scale-95">Details</a>
+                            <a id="anime-add-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-[#535458]/50 transition backdrop-blur-sm opacity-0 hover:scale-[1.075] active:scale-95 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                            </button>
+                            </a>
                         </div>
                     </div>
                      <div class="absolute bottom-6 right-6 md:bottom-10 md:right-10 flex space-x-2 z-10">
-                        <button id="prev-spotlight-btn" class="text-white p-2 bg-black/50 rounded-md hover:bg-black/70 transition backdrop-blur-sm">
+                        <a id="prev-spotlight-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-[#535458]/50 transition backdrop-blur-sm hover:scale-[1.075] active:scale-95 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                        </button>
-                        <button id="next-spotlight-btn" class="text-white p-2 bg-black/50 rounded-md hover:bg-black/70 transition backdrop-blur-sm">
+                        </a>
+                        <a id="next-spotlight-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-[#535458]/50 transition backdrop-blur-sm hover:scale-[1.075] active:scale-95 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                        </button>
+                        </a>
                     </div>
                 </section>
 
@@ -600,6 +626,7 @@ export async function renderAnimePage(container) {
     // Initialize the page
     updateHeroUI(currentSpotlightIndex);
     startSpotlightInterval();
+    initializeSpotlightControls();
     
     // Load initial anime data
     loadAnimeData(currentCategory);
@@ -608,26 +635,6 @@ export async function renderAnimePage(container) {
     loadRecentlyAddedSidebar();
     loadRecentlyUpdatedSidebar();
     loadTopUpcomingSidebar();
-    
-    // Add event listeners
-    const prevSpotlightBtn = document.getElementById('prev-spotlight');
-    const nextSpotlightBtn = document.getElementById('next-spotlight');
-    
-    if (prevSpotlightBtn) {
-        prevSpotlightBtn.addEventListener('click', () => {
-            showPreviousSpotlight();
-            clearInterval(spotlightInterval);
-            startSpotlightInterval();
-        });
-    }
-    
-    if (nextSpotlightBtn) {
-        nextSpotlightBtn.addEventListener('click', () => {
-            showNextSpotlight();
-            clearInterval(spotlightInterval);
-            startSpotlightInterval();
-        });
-    }
     
     // Tab navigation
     const trendingTab = document.getElementById('trending-tab');

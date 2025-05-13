@@ -8,7 +8,7 @@ export function renderAnimeCard(animeData) {
     const tags = renderAnimeTags(animeData);
     
     return `
-      <div class="overflow-hidden shadow-lg" data-anime-id="${animeData.id}">
+      <a class="overflow-hidden shadow-lg" data-anime-id="${animeData.id}" href="/anime/${animeData.id}">
         <div class="relative">
           <div class="aspect-[2/3] relative">
             <img src="${posterUrl}" alt="${title}" class="w-full h-full object-cover rounded-lg cursor-pointer">
@@ -18,7 +18,7 @@ export function renderAnimeCard(animeData) {
             ${tags}
           </div>
         </div>
-      </div>
+      </a>
     `;
 }
 
