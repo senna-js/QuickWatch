@@ -16,8 +16,8 @@ export const animeSources = [
   {
     id: 'aniplay',
     name: 'aniplay',
-    subUrl: '/embed/aniplay/{tmdbId}/{season}/{episode}',
-    dubUrl: '/embed/aniplay/{tmdbId}/{season}/{episode}'
+    subUrl: '/embed/aniplay/{urlepisodeId}/{episode}/sub',
+    dubUrl: '/embed/aniplay/{urlepisodeId}/{episode}/dub'
   },
   {
     id: 'flames-1',
@@ -52,6 +52,7 @@ export function getSourceUrl(sourceId, language, episodeData, animeData) {
   return template
     .replace('{epid}',        episodeData.epid)
     .replace('{episodeId}',   episodeData.episodeid || '')
+    .replace('{urlepisodeId}', encodeURIComponent(episodeData.episodeid || ''))
     .replace('{tmdbId}',      animeData.tmdbId || '')
     .replace('{season}',      animeData.season   || '1')
     .replace('{episode}',     episodeData.episode_no);

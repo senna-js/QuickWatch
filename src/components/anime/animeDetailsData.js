@@ -16,23 +16,9 @@ export async function extractAnimeInfo(id) {
       })
     });
 
-    const characterResponse = await fetch('https://varunaditya.xyz/api/proxy', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        url: `https://hianime.nz/ajax/character/list/${id.split('-').pop()}`,
-        method: 'GET'
-      })
-    });
-
-    const characterData = await characterResponse.json();
-    const characterHtml = characterData.html || '';
     const htmlContent = await response.text();
     
     const $ = cheerio.load(htmlContent);
-    const $characters = cheerio.load(characterHtml);
     
     const dataId = id.split('-').pop();
     const titleElement = $('#ani_detail .film-name');
@@ -145,58 +131,7 @@ export async function extractAnimeInfo(id) {
         adultContent = true;
       }
     }
-    
-    const charactersVoiceActors = [];
-    if (characterHtml) {
-      $characters('.bac-list-wrap .bac-item').each((_, element) => {
-        const el = $characters(element);
         
-        const character = {
-          id: el.find('.per-info.ltr .pi-avatar').attr('href')?.split('/')[2] || '',
-          poster: el.find('.per-info.ltr .pi-avatar img').attr('data-src') || '',
-          name: el.find('.per-info.ltr .pi-detail a').text() || '',
-          cast: el.find('.per-info.ltr .pi-detail .pi-cast').text() || ''
-        };
-        
-        const voiceActors = [];
-        const rtlVoiceActors = el.find('.per-info.rtl');
-        const xxVoiceActors = el.find('.per-info.per-info-xx .pix-list .pi-avatar');
-        
-        if (rtlVoiceActors.length) {
-          rtlVoiceActors.each((_, actorEl) => {
-            const actor = $characters(actorEl);
-            voiceActors.push({
-              id: actor.find('a').attr('href')?.split('/').pop() || '',
-              poster: actor.find('img').attr('data-src') || '',
-              name: actor.find('.pi-detail .pi-name a').text().trim() || ''
-            });
-          });
-        } else if (xxVoiceActors.length) {
-          xxVoiceActors.each((_, actorEl) => {
-            const actor = $characters(actorEl);
-            voiceActors.push({
-              id: actor.attr('href')?.split('/').pop() || '',
-              poster: actor.find('img').attr('data-src') || '',
-              name: actor.attr('title') || ''
-            });
-          });
-        }
-        
-        if (!voiceActors.length) {
-          el.find('.per-info.per-info-xx .pix-list .pi-avatar').each((_, actorEl) => {
-            const actor = $characters(actorEl);
-            voiceActors.push({
-              id: actor.attr('href')?.split('/')[2] || '',
-              poster: actor.find('img').attr('data-src') || '',
-              name: actor.attr('title') || ''
-            });
-          });
-        }
-        
-        charactersVoiceActors.push({ character, voiceActors });
-      });
-    }
-    
     const seasons = [];
     $('.os-list a').each((_, element) => {
       const el = $(element);
@@ -238,7 +173,6 @@ export async function extractAnimeInfo(id) {
       backdrop_image: backdropImage,
       showType,
       animeInfo,
-      charactersVoiceActors,
       seasons,
       recommended_data: recommendedData,
       related_data: relatedData

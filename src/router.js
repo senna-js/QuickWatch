@@ -8,8 +8,9 @@ import { renderDetailsMobilepage } from './pages/details/watch_mobile.js';
 import { render404Page } from './pages/404.js';
 import { renderDownloadDetailsPage } from './pages/details/download.js';
 import { renderIOSAppPage } from './pages/iosapp.js';
-import { renderAnimePaheEmbed } from './pages/embeds/animepahe-embed.js';
-import { renderNativeEmbed } from './pages/embeds/native-embed.js';
+import { renderAnimePaheEmbed } from './pages/embeds/animepahe.js';
+import { renderNativeEmbed } from './pages/embeds/native.js';
+import { renderAniplayEmbed} from './pages/embeds/aniplay.js';
 import { renderMoviesPage } from './pages/browse/movies.js';
 import { renderTvPage } from './pages/browse/tv.js';
 import { renderGenresPage } from './pages/genres/genres.js';
@@ -138,6 +139,14 @@ function handleRoute() {
     const id = parts[3];
     const type = parts[4];
     currentPagePromise = Promise.resolve(renderNativeEmbed(appContainer, { id, type }));
+  }
+  else if (path.match(/^\/embed\/aniplay\/[A-Za-z0-9\W_]+\/[\d]+\/[a-z]+$/)) {
+    document.title = 'Aniplay Embed';
+    const parts = path.split('/');
+    const episodeId = parts[3];
+    const episode = parts[4];
+    const type = parts[5];
+    currentPagePromise = Promise.resolve(renderAniplayEmbed(appContainer, { episodeId, episode, type }));
   }
   else if (path === '/movies') {
     document.title = 'Movies';
