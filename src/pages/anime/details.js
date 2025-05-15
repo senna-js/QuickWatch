@@ -114,7 +114,7 @@ function renderDetailsUI(container, animeData, episodesData) {
 
   container.innerHTML = `
     ${renderAnimeHeader()}
-    <div class="flex flex-col xl:flex-row gap-4 w-full h-screen pt-20 p-4">
+    <div class="flex flex-col xl:flex-row gap-4 w-full h-screen pt-20 p-4 transition duration-600 ease" id="anime-details-content" style="opacity: 0; transform: translateY(20px);">
       <div class="w-full h-full flex flex-col gap-4">
         <div class="w-full h-full">
           <iframe class="w-full h-[40rem] xl:h-full rounded-xl border border-[#F5F5F5]/10" src="about:blank"></iframe>
@@ -136,8 +136,8 @@ function renderDetailsUI(container, animeData, episodesData) {
                 </div>
                 <div>
                   <div class="grid grid-cols-3 gap-2" id="sub-servers">
-                    ${animeSources.map(source => 
-                      `<button data-source-id="${source.id}" data-language="sub" onclick="handleServerClick(this)" class="${source.id === currentSource.id && currentLanguage === 'sub' ? '!bg-white text-[#141414]' : 'bg-[#141414]'} border border-[#F5F5F5]/10 rounded-lg px-2 py-1 text-center text-sm cursor-pointer hover:bg-[#1e1e1e] transition duration-200 ease">${source.name}</button>`
+                    ${animeSources.map((source, index) => 
+                      `<button data-source-id="${source.id}" data-language="sub" onclick="handleServerClick(this)" class="${source.id === currentSource.id && currentLanguage === 'sub' ? '!bg-white text-[#141414]' : 'bg-[#141414]'} border border-[#F5F5F5]/10 rounded-lg px-2 py-1 text-center text-sm cursor-pointer hover:bg-[#1e1e1e] transition duration-200 ease active:scale-90" style="opacity: 0; transform: translateY(10px);">${source.name}</button>`
                     ).join('')}
                   </div>
                 </div>
@@ -150,8 +150,8 @@ function renderDetailsUI(container, animeData, episodesData) {
                 </div>
                 <div>
                   <div class="grid grid-cols-3 gap-2" id="dub-servers">
-                    ${animeSources.map(source => 
-                      `<button data-source-id="${source.id}" data-language="dub" onclick="handleServerClick(this)" class="${source.id === currentSource.id && currentLanguage === 'dub' ? '!bg-white text-[#141414]' : 'bg-[#141414]'} border border-[#F5F5F5]/10 rounded-lg px-2 py-1 text-center text-sm cursor-pointer hover:bg-[#1e1e1e] transition duration-200 ease">${source.name}</button>`
+                    ${animeSources.map((source, index) => 
+                      `<button data-source-id="${source.id}" data-language="dub" onclick="handleServerClick(this)" class="${source.id === currentSource.id && currentLanguage === 'dub' ? '!bg-white text-[#141414]' : 'bg-[#141414]'} border border-[#F5F5F5]/10 rounded-lg px-2 py-1 text-center text-sm cursor-pointer hover:bg-[#1e1e1e] transition duration-200 ease" style="opacity: 0; transform: translateY(10px);">${source.name}</button>`
                     ).join('')}
                   </div>
                 </div>
@@ -175,13 +175,35 @@ function renderDetailsUI(container, animeData, episodesData) {
           </div>
         </div>
         
-        <div class="space-x-4 xl:space-y-4 flex flex-row xl:flex-col overflow-auto" id="episodes-container">
+        <div class="space-x-4 xl:space-y-4 xl:space-x-0 flex flex-row xl:flex-col overflow-visible" id="episodes-container">
           ${renderEpisodesList(episodes)}
         </div>
       </div>
     </div>
   `;
 
+  setTimeout(() => {
+    const detailsContent = document.getElementById('anime-details-content');
+    if (detailsContent) {
+      detailsContent.style.opacity = '1';
+      detailsContent.style.transform = 'translateY(0)';
+    }
+    
+    const animateButtons = (selector) => {
+      const buttons = document.querySelectorAll(selector);
+      buttons.forEach((button, index) => {
+        setTimeout(() => {
+          button.style.opacity = '1';
+          button.style.transform = 'translateY(0)';
+        }, 50 * index);
+      });
+    };
+    
+    animateButtons('#sub-servers button');
+    setTimeout(() => {
+      animateButtons('#dub-servers button');
+    }, 200);
+  }, 100);
   
   if (episodes.length > 0) {
     if (currentEpisode) {
@@ -213,6 +235,14 @@ function renderDetailsUI(container, animeData, episodesData) {
   
   window.currentAnimeData = animeData;
   addSeasonOptionListener(animeData);
+  
+  const episodeItems = document.querySelectorAll('.EP_ITEM');
+  episodeItems.forEach((item, index) => {
+    setTimeout(() => {
+      item.style.opacity = '1';
+      item.style.transform = 'translateY(0)';
+    }, 75 * index);
+  });
 }
 
 function renderSeasonOptions(seasons) {
@@ -230,13 +260,14 @@ function renderEpisodesList(episodes) {
     return `<div class="text-center py-4">No episodes found</div>`;
   }
   
-  return episodes.map((episode) => {
+  return episodes.map((episode, index) => {
     const isCurrentEpisode = currentEpisode && episode.id === currentEpisode.id;
     return `
       <div class="EP_ITEM bg-[#141414] border border-[#F5F5F5]/10 rounded-xl xl:*:overflow-hidden hover:bg-[#1e1e1e] hover:scale-[1.02] active:scale-[0.98] transition duration-200 ease cursor-pointer ${isCurrentEpisode ? 'border-[#F5F5F5]/15 !bg-[#F5F5F5]/10 border-1' : ''}" 
            data-episode-id="${episode.id}" data-epid="${episode.epid}" data-episode-no="${episode.episode_no}" data-episodeid="${episode.episodeid || ''}"
            data-tmdbid="${window.currentAnimeData?.tmdbId || ''}"
-           onclick="handleEpisodeClick('${episode.id}', '${episode.epid}', '${episode.episode_no}', '${episode.episodeid || ''}')">
+           onclick="handleEpisodeClick('${episode.id}', '${episode.epid}', '${episode.episode_no}', '${episode.episodeid || ''}')"
+           style="opacity: 0; transform: translateY(20px);">
         <div class="flex flex-col xl:flex-row">
           <div class="aspect-video p-2 pr-0 w-80">
             <div class="w-full object-cover aspect-video h-24 rounded-md bg-[#0E0E0E] flex items-center justify-center">
@@ -311,7 +342,7 @@ function addSeasonOptionListener(animeData) {
           currentSeasonId = seasonId;
           
           const episodesContainer = document.getElementById('episodes-container');
-          if (episodesContainer) {
+          if (episodesContainer) { // add a skeleton here eventually
             episodesContainer.innerHTML = `
               <div class="flex justify-center items-center py-8">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -368,9 +399,15 @@ function addSeasonOptionListener(animeData) {
             }
             
             if (episodesContainer) {
-              if (episodesContainer) {
-                episodesContainer.innerHTML = renderEpisodesList(newEpisodes);
-              }
+              episodesContainer.innerHTML = renderEpisodesList(newEpisodes);
+              
+              const episodeItems = document.querySelectorAll('.EP_ITEM');
+              episodeItems.forEach((item, index) => {
+                setTimeout(() => {
+                  item.style.opacity = '1';
+                  item.style.transform = 'translateY(0)';
+                }, 75 * index);
+              });
             }
             
             if (newEpisodes.length > 0) {
