@@ -2,10 +2,11 @@
 
 import * as cheerio from 'cheerio';
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
+import config from '../../config.json';
 
 export async function extractAnimeInfo(id) {
   try {
-    const response = await fetch('https://varunaditya.xyz/api/proxy', {
+    const response = await fetch(config.proxy, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -3,37 +3,37 @@
 export const animeSources = [
   {
     id: 'megaplaybz-1',
-    name: 'megaplaybz-1',
+    name: 'vidplay',
     subUrl: 'https://megaplay.buzz/stream/s-2/{epid}/sub',
     dubUrl: 'https://megaplay.buzz/stream/s-2/{epid}/dub'
   },
   {
     id: 'animepahe',
-    name: 'animepahe',
+    name: 'anipahe',
     subUrl: '/embed/animepahe/{tmdbId}/{season}/{episode}',
     dubUrl: '/embed/animepahe/{tmdbId}/{season}/{episode}'
   },
   {
     id: 'aniplay',
-    name: 'aniplay',
+    name: 'hika',
     subUrl: '/embed/aniplay/{urlepisodeId}/{episode}/sub',
     dubUrl: '/embed/aniplay/{urlepisodeId}/{episode}/dub'
   },
   {
     id: 'flames-1',
-    name: 'flames-1',
+    name: 'flames',
     subUrl: '/embed/flames1/{tmdbId}/{season}/{episode}',
     dubUrl: '/embed/flames1/{tmdbId}/{season}/{episode}'
   },
   {
     id: 'flames-2',
-    name: 'flames-2',
+    name: 'blazes',
     subUrl: '/embed/flames2sub/{tmdbId}/{season}/{episode}',
     dubUrl: '/embed/flames2/{tmdbId}/{season}/{episode}'
   },
   {
     id: 'anitummy',
-    name: 'anitummy',
+    name: 'momo',
     subUrl: 'https://anitummy.com/src/player/sub.php?id={episodeId}&server=hd-1&embed=true&ep={episode}&skip=true',
     dubUrl: 'https://anitummy.com/src/player/dub.php?id={episodeId}&server=hd-1&embed=true&ep={episode}&skip=true'
   }

@@ -1,12 +1,12 @@
-// AnimePahe Embed Page
-import { renderFullPageSpinner, renderSpinner } from '../../components/misc/loading.js';
-import { renderError } from '../../components/misc/error.js';
+// Zenime Embed
 import { initializeCustomPlayer } from '../../components/player/index.js';
-import { fetchKwikVideoUrl } from '../../components/player/videoUtils.js';
-import config from '../../config.json';
+import { createProxyUrl, shouldUseProxy, createProxyHeaders } from '../../components/player/proxy.js';
+import { renderFullPageSpinner, renderSpinner } from '../../components/misc/loading.js';
+import Hls from 'hls.js';
 
-export async function renderAnimePaheEmbed(container, params) {
-  const { id, episode , season } = params;
+export async function renderZenimeEmbed(container, params) {
+  let { episodeId, server, type } = params;
+  episodeId = decodeURIComponent(episodeId);
 
   if (window.splashScreen) {
     window.splashScreen.show();
@@ -23,28 +23,81 @@ export async function renderAnimePaheEmbed(container, params) {
   `;
 
   try {
-    const isAnime = await checkIfAnime(id);
-    if (!isAnime) {
-      container.innerHTML = renderError(
-        'Not an Anime',
-        'This show is not an anime. Use a different source.',
-        '',
-        '',
-        false
-      );
-      return false;
+    const zenimeStep = window.splashScreen?.addStep('Loading video data...');
+    
+    const zenimeResponse = await fetch('https://varunaditya.xyz/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: `https://api.zenime.site/api/stream?id=${episodeId}&server=${server}&type=${type}`,
+        method: 'GET',
+        headers: { 'Origin': 'https://zenime.site' },
+      })
+    });
+
+    const zenimeData = await zenimeResponse.json();
+    
+    window.splashScreen?.completeStep(zenimeStep);
+    
+    if (!zenimeData.success || !zenimeData.results || !zenimeData.results.streamingLink) {
+      throw new Error('Failed to load video data');
     }
     
-    await loadAnimeContent(id, episode, container, params); // Pass params here
+    const streamData = zenimeData.results.streamingLink;
+    const playerContainer = container.querySelector('#player-container');
+    
+    if (playerContainer) {
+      playerContainer.innerHTML = `
+        <div class="flex justify-center items-center h-full">
+          ${renderSpinner('large')}
+        </div>
+      `;
+      
+      const m3u8Step = window.splashScreen?.addStep('Preparing video stream...');
+      
+      let videoSource = streamData.link.file;
+      
+      if (shouldUseProxy(videoSource)) {
+        const headers = createProxyHeaders(videoSource);
+        videoSource = createProxyUrl(videoSource, headers);
+      }
+      
+      const subtitleTracks = streamData.tracks ? streamData.tracks
+        .filter(track => track.kind === 'captions' || track.kind === 'subtitles')
+        .map(track => {
+          let trackUrl = track.file;
+          if (shouldUseProxy(trackUrl)) {
+            const headers = createProxyHeaders(trackUrl);
+            trackUrl = createProxyUrl(trackUrl, headers);
+          }
+          
+          return {
+            url: trackUrl,
+            lang: track.label || 'Unknown',
+            default: !!track.default
+          };
+        }) : [];
+      
+      window.splashScreen?.completeStep(m3u8Step);
+      if (window.splashScreen) {
+        window.splashScreen.hide();
+      }
+      
+      const cleanup = () => {
+        const player = playerContainer.querySelector('#custom-player');
+        if (player && player.hlsInstance) {
+          player.hlsInstance.destroy();
+          delete player.hlsInstance;
+        }
+      };
+      
+      window.addEventListener('beforeunload', cleanup);
+      
+      renderVideoPlayer(playerContainer, videoSource, 'Auto', [{url: videoSource, name: 'Auto'}], episodeId, '1', subtitleTracks);
+    }
   } catch (error) {
-    console.error('Error loading anime content:', error);
-    container.innerHTML = renderError(
-      'Error',
-      error.message || 'Failed to load anime content',
-      '',
-      '',
-      false
-    );
+    console.error('Error loading Zenime video:', error);
+    container.innerHTML = `<div class="flex h-screen w-full items-center justify-center text-xl font-medium tracking-[-0.015em] text-red-500" style="font-family: 'Inter';">Failed to load video: ${error.message}</div>`;
     
     if (window.splashScreen) {
       window.splashScreen.hide();
@@ -52,180 +105,12 @@ export async function renderAnimePaheEmbed(container, params) {
   }
 }
 
-async function checkIfAnime(tmdbId) {
-  try {
-    const tmdbResponse = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/external_ids`, {
-      method: 'GET',
-      headers: {
-        'accept': 'application/json',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q'
-      }
-    });
-    
-    const externalIds = await tmdbResponse.json();
-    const imdbId = externalIds.imdb_id;
-    
-    if (!imdbId) {
-      console.warn('IMDB ID not found for this media');
-      return false;
-    }
-    
-    const animeCheckResponse = await fetch(`https://raw.githubusercontent.com/Fribb/anime-lists/refs/heads/master/anime-list-full.json`);
-    const animeList = await animeCheckResponse.json();
-    
-    for (const item of animeList) {
-      if (item.imdb_id === imdbId) {
-        return true;
-      }
-    }
-    
-    return false;
-  } catch (error) {
-    console.error('Error checking if content is anime:', error);
-    return false;
-  }
-}
-
-async function loadAnimeContent(id, episode, container, params) {
-  const tmdbStep = window.splashScreen?.addStep('Loading anime details...');
-  
-  const tmdbResponse = await fetch(`https://api.themoviedb.org/3/tv/${id}?language=en-US`, {
-    method: 'GET',
-    headers: {
-      'accept': 'application/json',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q'
-    }
-  });
-
-  const tmdbData = await tmdbResponse.json();
-  const animeName = tmdbData.name;
-  const releaseYear = new Date(tmdbData.first_air_date).getFullYear();
-  
-  window.splashScreen?.completeStep(tmdbStep);
-  const searchStep = window.splashScreen?.addStep('Searching for anime sources...');
-  
-  const seasonNumber = params.season || '1';
-  const searchQuery = seasonNumber === '1' ? animeName : `${animeName} Season ${seasonNumber}`;
-
-  const searchResponse = await fetch(config.proxy, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      url: `https://animepahe.ru/api?m=search&q=${encodeURIComponent(searchQuery)}`,
-      method: 'GET',
-      headers: {
-        'cookie': '__ddg2_=;'
-      }
-    })
-  });
-  const searchData = await searchResponse.json();
-
-  if (!searchData.data || searchData.data.length === 0) {
-    window.splashScreen?.hide();
-    throw new Error('Anime not found');
-  }
-
-  let bestMatch = searchData.data[0];
-  for (const anime of searchData.data) {
-    if (anime.title.toLowerCase() === animeName.toLowerCase() && anime.year === releaseYear) {
-      bestMatch = anime;
-      break;
-    }
-  }
-  
-  window.splashScreen?.completeStep(searchStep);
-  const episodesStep = window.splashScreen?.addStep('Loading episode list...');
-
-  const seriesResponse = await fetch(config.proxy, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      url: `https://animepahe.ru/api?m=release&id=${bestMatch.session}&sort=episode_asc&page=1`,
-      method: 'GET',
-      headers: {
-        'cookie': '__ddg2_=;'
-      }
-    })
-  });
-  const seriesData = await seriesResponse.json();
-
-  if (!seriesData.data || seriesData.data.length === 0) {
-    window.splashScreen?.hide();
-    throw new Error('No episodes found');
-  }
-
-  const episodeIndex = parseInt(episode) - 1;
-  if (episodeIndex < 0 || episodeIndex >= seriesData.data.length) { throw new Error('Episode not found'); }
-
-  const episodeData = seriesData.data[episodeIndex];
-  
-  window.splashScreen?.completeStep(episodesStep);
-  const linksStep = window.splashScreen?.addStep('Fetching streaming links...');
-
-  const linksResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=episode&session=${bestMatch.session}&ep=${episodeData.session}`);
-  const linksData = await linksResponse.json();
-
-  window.splashScreen?.completeStep(linksStep);
-
-  if (!linksData || linksData.length === 0) {
-    throw new Error('No streaming links found');
-  }
-
-  const playerContainer = container.querySelector('#player-container');
-  if (playerContainer) {
-    playerContainer.innerHTML = `
-      <div class="flex justify-center items-center h-full">
-        ${renderSpinner('large')}
-      </div>
-    `;
-
-    const m3u8Step = window.splashScreen?.addStep('Preparing video stream...');
-    
-    fetchKwikVideoUrl(linksData[0].link)
-      .then(videoUrl => {
-        window.splashScreen?.completeStep(m3u8Step);
-        if (window.splashScreen) {
-          window.splashScreen.hide();
-        }
-        
-        if (videoUrl) {
-          renderVideoPlayer(playerContainer, videoUrl, 'Auto', linksData, id, episode);
-        } else {
-          playerContainer.innerHTML = `
-            <div class="flex justify-center items-center h-full">
-              <p class="text-white text-xl">Failed to load video. Please try another source.</p>
-            </div>
-          `;
-        }
-      })
-      .catch(error => {
-        window.splashScreen?.completeStep(m3u8Step);
-        if (window.splashScreen) {
-          window.splashScreen.hide();
-        }
-        
-        console.error('Error fetching video URL:', error);
-        playerContainer.innerHTML = `
-          <div class="flex justify-center items-center h-full">
-            <p class="text-white text-xl">Failed to load video. Please try another source.</p>
-          </div>
-        `;
-      });
-  }
-}
-
-
-function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber) {
+function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber, subtitleTracks = []) {
   const isIPhone = /iPhone/i.test(navigator.userAgent);
   container.innerHTML = `
     <div class="custom-player relative w-full h-full bg-black">
       <video 
         id="custom-player"
-        src="${videoUrl}"
         class="w-full h-full" 
         style="object-fit: cover; object-position: center"
         autoplay
@@ -294,7 +179,6 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
               </div>
             </div>
 
-            <div clx
             <div class="flex flex-row items-center gap-1">
               <div class="quality-selector relative mr-2">
                 <button class="quality-btn text-white transition text-3xl">
@@ -312,10 +196,6 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
                 </div>
               </div>
               
-              <button class="download-btn text-white transition h-8 w-8 mr-2" title="Download">
-                <i class="icon-download text-[1.6rem]"></i>
-              </button>
-              
               <button class="pip-btn text-white transition text-3xl mr-2 p-[0.45rem]" title="Picture in Picture">
                 <svg xmlns="http://www.w3.org/2000/svg" height="1em" width="1em" fill="currentColor" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"></path><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path></svg>
               </button>
@@ -330,5 +210,50 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
     </div>
   `;
   
-  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, false);
+  const player = container.querySelector('#custom-player');
+  
+  if (videoUrl.includes('.m3u8') && Hls.isSupported()) {
+    const hls = new Hls({
+      maxBufferLength: 30,
+      maxMaxBufferLength: 60,
+      fragLoadingTimeOut: 60000,
+      manifestLoadingTimeOut: 60000
+    });
+    
+    hls.loadSource(videoUrl);
+    hls.attachMedia(player);
+    
+    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+      player.play().catch(error => {
+        console.warn('Auto-play was prevented:', error);
+      });
+    });
+    
+    hls.on(Hls.Events.ERROR, function(event, data) {
+      if (data.fatal) {
+        console.error('HLS error:', data);
+        switch(data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            console.log('Fatal network error encountered, trying to recover');
+            hls.startLoad();
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            console.log('Fatal media error encountered, trying to recover');
+            hls.recoverMediaError();
+            break;
+          default:
+            hls.destroy();
+            break;
+        }
+      }
+    });
+    
+    player.hlsInstance = hls;
+  } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
+    player.src = videoUrl;
+  } else {
+    player.src = videoUrl;
+  }
+  
+  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, true, subtitleTracks);
 }

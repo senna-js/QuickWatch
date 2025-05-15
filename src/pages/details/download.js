@@ -2,6 +2,7 @@
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { renderHeader } from '../../components/header.js';
 import { renderError, renderAlert } from '../../components/misc/error.js';
+import config from '../../config.json';
 
 let currentLoadingPromise = null;
 
@@ -139,7 +140,7 @@ async function loadMediaDetails(type, id) {
       const qualities = ['SD', 'HD'];
       
       for (let i = 0; i < pbCategories.length; i++) {
-        const pbResponse = await fetch('https://varunaditya.xyz/api/proxy', {
+        const pbResponse = await fetch(config.proxy, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

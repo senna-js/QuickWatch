@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import config from '../../config.json';
 
 export async function searchAnime(query, page = 1) {
   try {
@@ -7,7 +8,7 @@ export async function searchAnime(query, page = 1) {
     }
     
     const encodedQuery = encodeURIComponent(query.trim());
-    const resp = fetch('https://varunaditya.xyz/api/proxy', {
+    const resp = fetch(config.proxy, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

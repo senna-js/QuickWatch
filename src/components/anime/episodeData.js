@@ -1,6 +1,7 @@
 // Episode data component
 
 import * as cheerio from 'cheerio';
+import config from '../../config.json';
 
 export async function extractEpisodesList(id, v1_base_url = "hianime.nz") {
   try {
@@ -14,7 +15,7 @@ export async function extractEpisodesList(id, v1_base_url = "hianime.nz") {
       "Referer": `https://${v1_base_url}/watch/${id}`
     };
 
-    const response = await fetch('https://varunaditya.xyz/api/proxy', {
+    const response = await fetch(config.proxy, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

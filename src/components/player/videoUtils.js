@@ -1,5 +1,6 @@
 // Utility functions for video quality options
 import CryptoJS from 'crypto-js';
+import config from '../../config.json';
 
 export async function fetchKwikVideoUrl(kwikLink) {
   try {
@@ -41,7 +42,7 @@ export async function fetchVidSrcContent(id, episode, season, type) {
       apiUrl = `https://player.vidsrc.co/api/server?id=${id}&sr=1&ep=${episode}&ss=${season}`;
     }
     
-    const streamResponse = await fetch('https://varunaditya.xyz/api/proxy', {
+    const streamResponse = await fetch(config.proxy, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

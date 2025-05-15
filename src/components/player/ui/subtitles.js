@@ -1,3 +1,5 @@
+import config from '../../../config.json';
+
 export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
   if (!subtitleBtn || !subtitleMenu) return;
   
@@ -22,7 +24,7 @@ export function setupSubtitles(player, subtitleBtn, subtitleMenu) {
   
   const parseSubtitle = async (url) => {
     try {
-      const response = await fetch('https://varunaditya.xyz/api/proxy', {
+      const response = await fetch(config.proxy, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

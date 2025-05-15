@@ -11,6 +11,7 @@ import { renderIOSAppPage } from './pages/iosapp.js';
 import { renderAnimePaheEmbed } from './pages/embeds/animepahe.js';
 import { renderNativeEmbed } from './pages/embeds/native.js';
 import { renderAniplayEmbed} from './pages/embeds/aniplay.js';
+import { renderZenimeEmbed } from './pages/embeds/zenime.js';
 import { renderMoviesPage } from './pages/browse/movies.js';
 import { renderTvPage } from './pages/browse/tv.js';
 import { renderGenresPage } from './pages/genres/genres.js';
@@ -147,6 +148,14 @@ function handleRoute() {
     const episode = parts[4];
     const type = parts[5];
     currentPagePromise = Promise.resolve(renderAniplayEmbed(appContainer, { episodeId, episode, type }));
+  }
+  else if (path.match(/^\/embed\/zenime\/[A-Za-z0-9\W_]+\/[A-Za-z0-9\W_]+\/[a-z]+$/)) {
+    document.title = 'Zenime Embed';
+    const parts = path.split('/');
+    const episodeId = parts[3];
+    const server = parts[4];
+    const type = parts[5];
+    currentPagePromise = Promise.resolve(renderZenimeEmbed(appContainer, { episodeId, server, type }));
   }
   else if (path === '/movies') {
     document.title = 'Movies';

@@ -3,6 +3,7 @@
 import { renderFullPageSpinner, renderSpinner } from '../../components/misc/loading.js';
 import { extractAnimeInfo } from '../../components/anime/animeDetailsData.js';
 import './aniplay.css';
+import config from '../../config.json';
 
 export async function renderAniplayEmbed(container, params) {
   let { episodeId, episode, type } = params;
@@ -12,7 +13,7 @@ export async function renderAniplayEmbed(container, params) {
   episodeId = decodeURIComponent(episodeId);
   let info = await extractAnimeInfo(episodeId);
 
-  const aniplayData = await fetch('https://varunaditya.xyz/api/proxy', {
+  const aniplayData = await fetch(config.proxy, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

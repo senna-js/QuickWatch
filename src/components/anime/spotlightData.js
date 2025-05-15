@@ -1,8 +1,9 @@
 import * as cheerio from "cheerio";
+import config from '../../config.json';
 
 export async function extractSpotlights() {
   try {
-    const resp = fetch('https://varunaditya.xyz/api/proxy', {
+    const resp = fetch(config.proxy, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
