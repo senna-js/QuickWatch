@@ -342,10 +342,27 @@ function addSeasonOptionListener(animeData) {
           currentSeasonId = seasonId;
           
           const episodesContainer = document.getElementById('episodes-container');
-          if (episodesContainer) { // add a skeleton here eventually
+          if (episodesContainer) {
+            const skeletonItems = Array(10).fill().map(() => `
+              <div class="EP_ITEM bg-[#141414] border border-[#F5F5F5]/10 rounded-xl xl:*:overflow-hidden transition duration-200 ease animate-pulse" 
+                   style="opacity: 1; transform: translateY(0);">
+                <div class="flex flex-col xl:flex-row">
+                  <div class="aspect-video p-2 pr-0 w-80">
+                    <div class="w-full object-cover aspect-video h-full rounded-md bg-[#1e1e1e] flex items-center justify-center">
+                    </div>
+                  </div>
+                  <div class="w-2/3 p-3 pr-0 flex flex-col gap-2 justify-center">
+                    <div class="h-4 bg-[#1e1e1e] rounded w-3/4"></div>
+                    <div class="h-3 bg-[#1e1e1e] rounded w-full"></div>
+                    <div class="h-3 bg-[#1e1e1e] rounded w-1/2"></div>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+            
             episodesContainer.innerHTML = `
-              <div class="flex justify-center items-center py-8">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <div class="space-x-4 xl:space-y-4 xl:space-x-0 flex flex-row xl:flex-col overflow-visible">
+                ${skeletonItems}
               </div>
             `;
           }
