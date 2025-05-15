@@ -5,6 +5,7 @@ import { fetchEpisodeThumbnails, updateEpisodeListWithThumbnails, fetchTmdbThumb
 import { TMDB_API_KEY, TMDB_BASE_URL, TMDB_IMAGE_BASE_URL } from '../../router.js';
 import { animeSources, getSourceUrl, getDefaultSource } from './sources.js';
 import { renderAnimeHeader, initializeSearchFunctionality } from '../../components/anime/ui/header.js';
+import { renderAnimeDetailsModal, openAnimeDetailsModal } from '../../components/anime/ui/animeDetailsModal.js';
 
 // Store global states
 let currentEpisode = null;
@@ -114,6 +115,7 @@ function renderDetailsUI(container, animeData, episodesData) {
 
   container.innerHTML = `
     ${renderAnimeHeader()}
+    ${renderAnimeDetailsModal()}
     <div class="flex flex-col xl:flex-row gap-4 w-full h-screen pt-20 p-4 transition duration-600 ease" id="anime-details-content" style="opacity: 0; transform: translateY(20px);">
       <div class="w-full h-full flex flex-col gap-4">
         <div class="w-full h-full">
@@ -243,6 +245,13 @@ function renderDetailsUI(container, animeData, episodesData) {
       item.style.transform = 'translateY(0)';
     }, 75 * index);
   });
+  
+  const moreInfoBtn = document.getElementById('more-info-btn');
+  if (moreInfoBtn) {
+    moreInfoBtn.addEventListener('click', () => {
+      openAnimeDetailsModal(animeData);
+    });
+  }
 }
 
 function renderSeasonOptions(seasons) {

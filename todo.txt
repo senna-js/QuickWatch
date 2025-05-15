@@ -2,3 +2,4 @@
 - save anime home data and details data to localstorage, and update them periodically (or manual refresh)
 - add theming/settings
 - add more config options for colors and wtv
+- remove 'show more' in animedetailsmodal.js if overview less than 4 lines
