@@ -39,8 +39,14 @@ export async function renderZenimeEmbed(container, params) {
     
     window.splashScreen?.completeStep(zenimeStep);
     
-    if (!zenimeData.success || !zenimeData.results || !zenimeData.results.streamingLink) {
+    if (!zenimeData.success || !zenimeData.results) {
       throw new Error('Failed to load video data');
+    }
+    
+    if (!zenimeData.results.streamingLink || 
+        Array.isArray(zenimeData.results.streamingLink) && zenimeData.results.streamingLink.length === 0 ||
+        !zenimeData.results.streamingLink.link) {
+      throw new Error('Sorry, we couldn\'t find a video');
     }
     
     const streamData = zenimeData.results.streamingLink;
@@ -78,6 +84,22 @@ export async function renderZenimeEmbed(container, params) {
           };
         }) : [];
       
+      let qualityOptions = [{url: videoSource, name: 'Auto'}];
+      
+      if (videoSource.includes('.m3u8')) {
+        try {
+          const m3u8Response = await fetch(videoSource);
+          const m3u8Content = await m3u8Response.text();
+          
+          const extractedOptions = parseM3U8ForQualities(m3u8Content, videoSource);
+          if (extractedOptions.length > 0) {
+            qualityOptions = extractedOptions;
+          }
+        } catch (error) {
+          console.error('Error parsing m3u8 for qualities:', error);
+        }
+      }
+      
       window.splashScreen?.completeStep(m3u8Step);
       if (window.splashScreen) {
         window.splashScreen.hide();
@@ -93,16 +115,75 @@ export async function renderZenimeEmbed(container, params) {
       
       window.addEventListener('beforeunload', cleanup);
       
-      renderVideoPlayer(playerContainer, videoSource, 'Auto', [{url: videoSource, name: 'Auto'}], episodeId, '1', subtitleTracks);
+      renderVideoPlayer(playerContainer, videoSource, 'Auto', qualityOptions, episodeId, '1', subtitleTracks);
     }
   } catch (error) {
     console.error('Error loading Zenime video:', error);
-    container.innerHTML = `<div class="flex h-screen w-full items-center justify-center text-xl font-medium tracking-[-0.015em] text-red-500" style="font-family: 'Inter';">Failed to load video: ${error.message}</div>`;
+    container.innerHTML = `<div class="flex h-screen w-full items-center justify-center text-4xl font-medium tracking-[-0.015em] text-white px-[10%] text-center" style="font-family: 'Inter';">${error.message}</div>`;
     
     if (window.splashScreen) {
       window.splashScreen.hide();
     }
   }
+}
+
+function parseM3U8ForQualities(m3u8Content, sourceUrl) {
+  const qualityOptions = [];
+  const lines = m3u8Content.split('\n');
+  const baseUrl = sourceUrl.substring(0, sourceUrl.lastIndexOf('/') + 1);
+  
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
+      const streamInfo = lines[i];
+      const nextLine = lines[i + 1];
+      
+      if (nextLine && !nextLine.startsWith('#')) {
+        const resolutionMatch = streamInfo.match(/RESOLUTION=(\d+x\d+)/);
+        const bandwidthMatch = streamInfo.match(/BANDWIDTH=(\d+)/);
+        
+        let qualityName = 'Unknown';
+        if (resolutionMatch && resolutionMatch[1]) {
+          const resolution = resolutionMatch[1];
+          const height = resolution.split('x')[1];
+          qualityName = `${height}p`;
+          
+          if (bandwidthMatch && bandwidthMatch[1]) {
+            const bandwidth = parseInt(bandwidthMatch[1]);
+            const mbps = (bandwidth / 1000000).toFixed(1);
+            qualityName += ` (${mbps} Mbps)`;
+          }
+        }
+        
+        let qualityUrl = nextLine;
+        if (!qualityUrl.startsWith('http')) {
+          qualityUrl = new URL(qualityUrl, baseUrl).href;
+        }
+        
+        if (sourceUrl.includes('proxy.varunaditya.xyz') && !qualityUrl.includes('proxy.varunaditya.xyz')) {
+          const urlParams = new URLSearchParams(new URL(sourceUrl).search);
+          const originalUrl = urlParams.get('url');
+          const headers = urlParams.get('headers');
+          
+          const proxyBase = sourceUrl.substring(0, sourceUrl.indexOf('/m3u8-proxy'));
+          qualityUrl = `${proxyBase}/m3u8-proxy?url=${encodeURIComponent(qualityUrl)}&headers=${headers}`;
+        }
+        
+        qualityOptions.push({
+          url: qualityUrl,
+          name: qualityName
+        });
+      }
+    }
+  }
+  
+  if (qualityOptions.length > 0) {
+    qualityOptions.unshift({
+      url: sourceUrl,
+      name: 'Auto'
+    });
+  }
+  
+  return qualityOptions;
 }
 
 function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber, subtitleTracks = []) {

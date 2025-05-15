@@ -20,16 +20,16 @@ export const animeSources = [
     dubUrl: '/embed/aniplay/{urlepisodeId}/{episode}/dub'
   },
   {
-    id: 'flames-1',
-    name: 'flames',
-    subUrl: '/embed/flames1/{tmdbId}/{season}/{episode}',
-    dubUrl: '/embed/flames1/{tmdbId}/{season}/{episode}'
+    id: 'zenime-1',
+    name: 'zen-1',
+    subUrl: '/embed/zenime/{urlepisodeId}/hd-2/sub',
+    dubUrl: '/embed/zenime/{urlepisodeId}/hd-2/dub'
   },
   {
-    id: 'flames-2',
-    name: 'blazes',
-    subUrl: '/embed/flames2sub/{tmdbId}/{season}/{episode}',
-    dubUrl: '/embed/flames2/{tmdbId}/{season}/{episode}'
+    id: 'zenime-2',
+    name: 'zen-2',
+    subUrl: '/embed/zenime/{urlepisodeId}/hd-3/sub',
+    dubUrl: '/embed/zenime/{urlepisodeId}/hd-3/dub'
   },
   {
     id: 'anitummy',
