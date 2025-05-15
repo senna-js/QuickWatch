@@ -17,15 +17,10 @@ export async function renderAnimeDetailsPage(container, id) {
 
   currentSeasonId = id;
   
-  window.splashScreen.show();
-
   try {
-    const animeStep = window.splashScreen.addStep('Loading anime details');
-    const episodesStep = window.splashScreen.addStep('Fetching episodes');
-    
     const [animeData, episodesData] = await Promise.all([
-      extractAnimeInfo(id).finally(() => window.splashScreen.completeStep(animeStep)),
-      extractEpisodesList(id).finally(() => window.splashScreen.completeStep(episodesStep))
+      extractAnimeInfo(id),
+      extractEpisodesList(id)
     ]);
 
     if (!animeData) {
@@ -36,9 +31,7 @@ export async function renderAnimeDetailsPage(container, id) {
       currentEpisode = episodesData.episodes[0];
     }
 
-    const tmdbStep = window.splashScreen.addStep('Finding TMDB match');
     renderDetailsUI(container, animeData, episodesData);
-    window.splashScreen.completeStep(tmdbStep);
 
   } catch (error) {
     console.error('Error loading anime details:', error);
@@ -74,6 +67,8 @@ function updateIframeSrc(episode, animeData, sourceId, language) {
 function renderDetailsUI(container, animeData, episodesData) {
   const { title, japanese_title, animeInfo, poster } = animeData;
   const episodes = episodesData?.episodes || [];
+  
+  animeData.name = title;
   
   if (episodes.length > 0 && !currentEpisode) {
     currentEpisode = episodes[0];

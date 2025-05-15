@@ -2,22 +2,10 @@
 
 export const animeSources = [
   {
-    id: 'megaplaybz-1',
-    name: 'vidplay',
-    subUrl: 'https://megaplay.buzz/stream/s-2/{epid}/sub',
-    dubUrl: 'https://megaplay.buzz/stream/s-2/{epid}/dub'
-  },
-  {
     id: 'animepahe',
-    name: 'anipahe',
-    subUrl: '/embed/animepahe/{tmdbId}/{season}/{episode}',
-    dubUrl: '/embed/animepahe/{tmdbId}/{season}/{episode}'
-  },
-  {
-    id: 'aniplay',
-    name: 'hika',
-    subUrl: '/embed/aniplay/{urlepisodeId}/{episode}/sub',
-    dubUrl: '/embed/aniplay/{urlepisodeId}/{episode}/dub'
+    name: 'pahe',
+    subUrl: '/embed/animepahev2/{urlepisodeId}/{name}/{season}/{episode}',
+    dubUrl: '/embed/animepahev2/{urlepisodeId}/{name}/{season}/{episode}'
   },
   {
     id: 'zenime-1',
@@ -30,6 +18,18 @@ export const animeSources = [
     name: 'zen-2',
     subUrl: '/embed/zenime/{urlepisodeId}/hd-3/sub',
     dubUrl: '/embed/zenime/{urlepisodeId}/hd-3/dub'
+  },
+  {
+    id: 'aniplay',
+    name: 'hika',
+    subUrl: '/embed/aniplay/{urlepisodeId}/{episode}/sub',
+    dubUrl: '/embed/aniplay/{urlepisodeId}/{episode}/dub'
+  },
+  {
+    id: 'megaplaybz-1',
+    name: 'vidplay',
+    subUrl: 'https://megaplay.buzz/stream/s-2/{epid}/sub',
+    dubUrl: 'https://megaplay.buzz/stream/s-2/{epid}/dub'
   },
   {
     id: 'anitummy',
@@ -55,7 +55,8 @@ export function getSourceUrl(sourceId, language, episodeData, animeData) {
     .replace('{urlepisodeId}', encodeURIComponent(episodeData.episodeid || ''))
     .replace('{tmdbId}',      animeData.tmdbId || '')
     .replace('{season}',      animeData.season   || '1')
-    .replace('{episode}',     episodeData.episode_no);
+    .replace('{episode}',     episodeData.episode_no)
+    .replace('{name}',     encodeURIComponent(animeData.name));
 }
 
 export function getDefaultSource() {

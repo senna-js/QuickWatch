@@ -1,12 +1,12 @@
-// Zenime Embed
-import { initializeCustomPlayer } from '../../components/player/index.js';
-import { createProxyUrl, shouldUseProxy, createProxyHeaders } from '../../components/player/proxy.js';
+// AnimePahe Embed Page
 import { renderFullPageSpinner, renderSpinner } from '../../components/misc/loading.js';
-import Hls from 'hls.js';
+import { renderError } from '../../components/misc/error.js';
+import { initializeCustomPlayer } from '../../components/player/index.js';
+import { fetchKwikVideoUrl } from '../../components/player/videoUtils.js';
+import config from '../../config.json';
 
-export async function renderZenimeEmbed(container, params) {
-  let { episodeId, server, type } = params;
-  episodeId = decodeURIComponent(episodeId);
+export async function renderAnimePahev2Embed(container, params) {
+  const { id, name, episode, season } = params;
 
   if (window.splashScreen) {
     window.splashScreen.show();
@@ -23,103 +23,16 @@ export async function renderZenimeEmbed(container, params) {
   `;
 
   try {
-    const zenimeStep = window.splashScreen?.addStep('Loading video data...');
-    
-    const zenimeResponse = await fetch('https://varunaditya.xyz/api/proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url: `https://api.zenime.site/api/stream?id=${episodeId}&server=${server}&type=${type}`,
-        method: 'GET',
-        headers: { 'Origin': 'https://zenime.site' },
-      })
-    });
-
-    const zenimeData = await zenimeResponse.json();
-    
-    window.splashScreen?.completeStep(zenimeStep);
-    
-    if (!zenimeData.success || !zenimeData.results) {
-      throw new Error('Failed to load video data');
-    }
-    
-    if (!zenimeData.results.streamingLink || 
-        Array.isArray(zenimeData.results.streamingLink) && zenimeData.results.streamingLink.length === 0 ||
-        !zenimeData.results.streamingLink.link) {
-      throw new Error('Sorry, we couldn\'t find a video');
-    }
-    
-    const streamData = zenimeData.results.streamingLink;
-    const playerContainer = container.querySelector('#player-container');
-    
-    if (playerContainer) {
-      playerContainer.innerHTML = `
-        <div class="flex justify-center items-center h-full">
-          ${renderSpinner('large')}
-        </div>
-      `;
-      
-      const m3u8Step = window.splashScreen?.addStep('Preparing video stream...');
-      
-      let videoSource = streamData.link.file;
-      
-      if (shouldUseProxy(videoSource)) {
-        const headers = createProxyHeaders(videoSource);
-        videoSource = createProxyUrl(videoSource, headers);
-      }
-      
-      const subtitleTracks = streamData.tracks ? streamData.tracks
-        .filter(track => track.kind === 'captions' || track.kind === 'subtitles')
-        .map(track => {
-          let trackUrl = track.file;
-          if (shouldUseProxy(trackUrl)) {
-            const headers = createProxyHeaders(trackUrl);
-            trackUrl = createProxyUrl(trackUrl, headers);
-          }
-          
-          return {
-            url: trackUrl,
-            lang: track.label || 'Unknown',
-            default: !!track.default
-          };
-        }) : [];
-      
-      let qualityOptions = [{url: videoSource, name: 'Auto'}];
-      
-      if (videoSource.includes('.m3u8')) {
-        try {
-          const m3u8Response = await fetch(videoSource);
-          const m3u8Content = await m3u8Response.text();
-          
-          const extractedOptions = parseM3U8ForQualities(m3u8Content, videoSource);
-          if (extractedOptions.length > 0) {
-            qualityOptions = extractedOptions;
-          }
-        } catch (error) {
-          console.error('Error parsing m3u8 for qualities:', error);
-        }
-      }
-      
-      window.splashScreen?.completeStep(m3u8Step);
-      if (window.splashScreen) {
-        window.splashScreen.hide();
-      }
-      
-      const cleanup = () => {
-        const player = playerContainer.querySelector('#custom-player');
-        if (player && player.hlsInstance) {
-          player.hlsInstance.destroy();
-          delete player.hlsInstance;
-        }
-      };
-      
-      window.addEventListener('beforeunload', cleanup);
-      
-      renderVideoPlayer(playerContainer, videoSource, 'Auto', qualityOptions, episodeId, episodeId, subtitleTracks);
-    }
+    await loadAnimeContent(name, episode, season, container, params);
   } catch (error) {
-    console.error('Error loading Zenime video:', error);
-    container.innerHTML = `<div class="flex h-screen w-full items-center justify-center text-4xl font-medium tracking-[-0.015em] text-white px-[10%] text-center" style="font-family: 'Inter';">${error.message}</div>`;
+    console.error('Error loading anime content:', error);
+    container.innerHTML = renderError(
+      'Error',
+      error.message || 'Failed to load anime content',
+      '',
+      '',
+      false
+    );
     
     if (window.splashScreen) {
       window.splashScreen.hide();
@@ -127,71 +40,127 @@ export async function renderZenimeEmbed(container, params) {
   }
 }
 
-function parseM3U8ForQualities(m3u8Content, sourceUrl) {
-  const qualityOptions = [];
-  const lines = m3u8Content.split('\n');
-  const baseUrl = sourceUrl.substring(0, sourceUrl.lastIndexOf('/') + 1);
+async function loadAnimeContent(animeName, episode, season, container, params) {
+  const tmdbStep = window.splashScreen?.addStep('Loading anime details...');
   
-  for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith('#EXT-X-STREAM-INF:')) {
-      const streamInfo = lines[i];
-      const nextLine = lines[i + 1];
-      
-      if (nextLine && !nextLine.startsWith('#')) {
-        const resolutionMatch = streamInfo.match(/RESOLUTION=(\d+x\d+)/);
-        const bandwidthMatch = streamInfo.match(/BANDWIDTH=(\d+)/);
-        
-        let qualityName = 'Unknown';
-        if (resolutionMatch && resolutionMatch[1]) {
-          const resolution = resolutionMatch[1];
-          const height = resolution.split('x')[1];
-          qualityName = `${height}p`;
-          
-          if (bandwidthMatch && bandwidthMatch[1]) {
-            const bandwidth = parseInt(bandwidthMatch[1]);
-            const mbps = (bandwidth / 1000000).toFixed(1);
-            qualityName += ` (${mbps} Mbps)`;
-          }
-        }
-        
-        let qualityUrl = nextLine;
-        if (!qualityUrl.startsWith('http')) {
-          qualityUrl = new URL(qualityUrl, baseUrl).href;
-        }
-        
-        if (sourceUrl.includes('proxy.varunaditya.xyz') && !qualityUrl.includes('proxy.varunaditya.xyz')) {
-          const urlParams = new URLSearchParams(new URL(sourceUrl).search);
-          const originalUrl = urlParams.get('url');
-          const headers = urlParams.get('headers');
-          
-          const proxyBase = sourceUrl.substring(0, sourceUrl.indexOf('/m3u8-proxy'));
-          qualityUrl = `${proxyBase}/m3u8-proxy?url=${encodeURIComponent(qualityUrl)}&headers=${headers}`;
-        }
-        
-        qualityOptions.push({
-          url: qualityUrl,
-          name: qualityName
-        });
+  window.splashScreen?.completeStep(tmdbStep);
+  const searchStep = window.splashScreen?.addStep('Searching for anime sources...');
+  
+  const seasonNumber = season || '1';
+  const searchQuery = seasonNumber === '1' ? animeName : `${animeName} Season ${seasonNumber}`;
+
+  const searchResponse = await fetch(config.proxy, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      url: `https://animepahe.ru/api?m=search&q=${encodeURIComponent(searchQuery)}`,
+      method: 'GET',
+      headers: {
+        'cookie': '__ddg2_=;'
       }
-    }
+    })
+  });
+  const searchData = await searchResponse.json();
+
+  if (!searchData.data || searchData.data.length === 0) {
+    window.splashScreen?.hide();
+    throw new Error('Anime not found');
   }
+
+  let bestMatch = searchData.data[0];
   
-  if (qualityOptions.length > 0) {
-    qualityOptions.unshift({
-      url: sourceUrl,
-      name: 'Auto'
-    });
+  window.splashScreen?.completeStep(searchStep);
+  const episodesStep = window.splashScreen?.addStep('Loading episode list...');
+
+  const seriesResponse = await fetch(config.proxy, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      url: `https://animepahe.ru/api?m=release&id=${bestMatch.session}&sort=episode_asc&page=1`,
+      method: 'GET',
+      headers: {
+        'cookie': '__ddg2_=;'
+      }
+    })
+  });
+  const seriesData = await seriesResponse.json();
+
+  if (!seriesData.data || seriesData.data.length === 0) {
+    window.splashScreen?.hide();
+    throw new Error('No episodes found');
   }
+
+  const episodeIndex = parseInt(episode) - 1;
+  if (episodeIndex < 0 || episodeIndex >= seriesData.data.length) { throw new Error('Episode not found'); }
+
+  const episodeData = seriesData.data[episodeIndex];
   
-  return qualityOptions;
+  window.splashScreen?.completeStep(episodesStep);
+  const linksStep = window.splashScreen?.addStep('Fetching streaming links...');
+
+  const linksResponse = await fetch(`https://anime.apex-cloud.workers.dev/?method=episode&session=${bestMatch.session}&ep=${episodeData.session}`);
+  const linksData = await linksResponse.json();
+
+  window.splashScreen?.completeStep(linksStep);
+
+  if (!linksData || linksData.length === 0) {
+    throw new Error('No streaming links found');
+  }
+
+  const playerContainer = container.querySelector('#player-container');
+  if (playerContainer) {
+    playerContainer.innerHTML = `
+      <div class="flex justify-center items-center h-full">
+        ${renderSpinner('large')}
+      </div>
+    `;
+
+    const m3u8Step = window.splashScreen?.addStep('Preparing video stream...');
+    
+    fetchKwikVideoUrl(linksData[0].link)
+      .then(videoUrl => {
+        window.splashScreen?.completeStep(m3u8Step);
+        if (window.splashScreen) {
+          window.splashScreen.hide();
+        }
+        
+        if (videoUrl) {
+          renderVideoPlayer(playerContainer, videoUrl, 'Auto', linksData, params.episodeId, params.episodeId);
+        } else {
+          playerContainer.innerHTML = `
+            <div class="flex justify-center items-center h-full">
+              <p class="text-white text-xl">Failed to load video. Please try another source.</p>
+            </div>
+          `;
+        }
+      })
+      .catch(error => {
+        window.splashScreen?.completeStep(m3u8Step);
+        if (window.splashScreen) {
+          window.splashScreen.hide();
+        }
+        
+        console.error('Error fetching video URL:', error);
+        playerContainer.innerHTML = `
+          <div class="flex justify-center items-center h-full">
+            <p class="text-white text-xl">Failed to load video. Please try another source.</p>
+          </div>
+        `;
+      });
+  }
 }
 
-function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber, subtitleTracks = []) {
+function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, showId, episodeNumber) {
   const isIPhone = /iPhone/i.test(navigator.userAgent);
   container.innerHTML = `
     <div class="custom-player relative w-full h-full bg-black">
       <video 
         id="custom-player"
+        src="${videoUrl}"
         class="w-full h-full" 
         style="object-fit: cover; object-position: center"
         autoplay
@@ -260,6 +229,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
               </div>
             </div>
 
+            <div clx
             <div class="flex flex-row items-center gap-1">
               <div class="quality-selector relative mr-2">
                 <button class="quality-btn text-white transition text-3xl">
@@ -277,6 +247,10 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
                 </div>
               </div>
               
+              <button class="download-btn text-white transition h-8 w-8 mr-2" title="Download">
+                <i class="icon-download text-[1.6rem]"></i>
+              </button>
+              
               <button class="pip-btn text-white transition text-3xl mr-2 p-[0.45rem]" title="Picture in Picture">
                 <svg xmlns="http://www.w3.org/2000/svg" height="1em" width="1em" fill="currentColor" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"></path><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 1.98 2 1.98h18c1.1 0 2-.88 2-1.98V5c0-1.1-.9-2-2-2zm0 16.01H3V4.98h18v14.03z"></path></svg>
               </button>
@@ -291,50 +265,5 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
     </div>
   `;
   
-  const player = container.querySelector('#custom-player');
-  
-  if (videoUrl.includes('.m3u8') && Hls.isSupported()) {
-    const hls = new Hls({
-      maxBufferLength: 30,
-      maxMaxBufferLength: 60,
-      fragLoadingTimeOut: 60000,
-      manifestLoadingTimeOut: 60000
-    });
-    
-    hls.loadSource(videoUrl);
-    hls.attachMedia(player);
-    
-    hls.on(Hls.Events.MANIFEST_PARSED, function() {
-      player.play().catch(error => {
-        console.warn('Auto-play was prevented:', error);
-      });
-    });
-    
-    hls.on(Hls.Events.ERROR, function(event, data) {
-      if (data.fatal) {
-        console.error('HLS error:', data);
-        switch(data.type) {
-          case Hls.ErrorTypes.NETWORK_ERROR:
-            console.log('Fatal network error encountered, trying to recover');
-            hls.startLoad();
-            break;
-          case Hls.ErrorTypes.MEDIA_ERROR:
-            console.log('Fatal media error encountered, trying to recover');
-            hls.recoverMediaError();
-            break;
-          default:
-            hls.destroy();
-            break;
-        }
-      }
-    });
-    
-    player.hlsInstance = hls;
-  } else if (player.canPlayType('application/vnd.apple.mpegurl')) {
-    player.src = videoUrl;
-  } else {
-    player.src = videoUrl;
-  }
-  
-  initializeCustomPlayer(container, qualityOptions, episodeNumber, episodeNumber, false, subtitleTracks, 'anime');
+  initializeCustomPlayer(container, qualityOptions, showId, episodeNumber, false, [], 'anime');
 }

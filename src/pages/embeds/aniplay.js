@@ -8,6 +8,7 @@ import config from '../../config.json';
 export async function renderAniplayEmbed(container, params) {
   let { episodeId, episode, type } = params;
 
+  document.body.style.backgroundColor = '#000';
   container.innerHTML = `<div class="flex h-screen w-full items-center justify-center text-4xl font-medium tracking-[-0.015em]" style="font-family: 'Inter';">Loading...</div>`;
 
   episodeId = decodeURIComponent(episodeId);

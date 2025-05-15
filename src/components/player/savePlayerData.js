@@ -12,8 +12,8 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber, medi
   };
   player.addEventListener('volumechange', saveVolume);
 
-  const parsedShowId = parseInt(showId);
-  if (isNaN(parsedShowId)) {
+  const parsedShowId = mediaType === 'anime' ? showId : parseInt(showId);
+  if (mediaType !== 'anime' && isNaN(parsedShowId)) {
     console.error('Invalid show ID:', showId);
     return { saveTimestamp: () => {}, cleanupPlayer: () => {} };
   }
@@ -65,7 +65,8 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber, medi
 
   let continueData = [];
   try {
-    continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+    const storageKey = mediaType === 'anime' ? 'anime-continue' : 'quickwatch-continue';
+    continueData = JSON.parse(localStorage.getItem(storageKey) || '[]');
     
     continueData = continueData.filter(item => 
       item && 
@@ -75,7 +76,7 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber, medi
     
     continueData = continueData.map(item => ({
       ...item,
-      id: typeof item.id === 'string' ? parseInt(item.id) : item.id,
+      id: mediaType === 'anime' ? item.id : (typeof item.id === 'string' ? parseInt(item.id) : item.id),
       mediaType: item.mediaType || 'tv',
       season: item.season || 1,
       episode: item.episode || 1
@@ -87,7 +88,7 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber, medi
   const existingProgress = continueData.find(item => 
     item.id === parsedShowId && 
     item.mediaType === mediaType &&
-    (mediaType === 'movie' || (item.season === season && item.episode === episode))
+    (mediaType === 'movie' || mediaType === 'anime' || (item.season === season && item.episode === episode))
   );
   
   if (existingProgress && typeof existingProgress.watchedDuration === 'number') {
@@ -102,7 +103,8 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber, medi
     if (player.currentTime > 0 && player.duration) {
       let continueData = [];
       try {
-        continueData = JSON.parse(localStorage.getItem('quickwatch-continue') || '[]');
+        const storageKey = mediaType === 'anime' ? 'anime-continue' : 'quickwatch-continue';
+        continueData = JSON.parse(localStorage.getItem(storageKey) || '[]');
         
         continueData = continueData.filter(item => 
           item && 
@@ -110,7 +112,7 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber, medi
           item.id !== null
         ).map(item => ({
           ...item,
-          id: typeof item.id === 'string' ? parseInt(item.id) : item.id,
+          id: mediaType === 'anime' ? item.id : (typeof item.id === 'string' ? parseInt(item.id) : item.id),
           mediaType: item.mediaType || 'tv'
         }));
       } catch (e) {
@@ -131,7 +133,7 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber, medi
       const existingIndex = continueData.findIndex(item => 
         item.id === progressData.id && 
         item.mediaType === progressData.mediaType &&
-        (mediaType === 'movie' || (item.season === progressData.season && item.episode === progressData.episode))
+        (mediaType === 'movie' || mediaType === 'anime' || (item.season === progressData.season && item.episode === progressData.episode))
       );
       
       if (existingIndex >= 0) {
@@ -145,7 +147,8 @@ export function setupPlayerData(player, volumeLevel, showId, episodeNumber, medi
         continueData = continueData.slice(0, 50);
       }
       
-      localStorage.setItem('quickwatch-continue', JSON.stringify(continueData));
+      const storageKey = mediaType === 'anime' ? 'anime-continue' : 'quickwatch-continue';
+      localStorage.setItem(storageKey, JSON.stringify(continueData));
     }
   };
 

@@ -1,7 +1,3 @@
-body {
-  background-color: black !important;
-}
-
 #source-menu.open #menu-container {
   width: 100%;
   border-radius: 8px;
