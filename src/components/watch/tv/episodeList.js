@@ -39,11 +39,11 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
               <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
               <div class="absolute inset-0 flex items-end justify-start">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center">
-                  <i class="fas fa-play text-white text-lg" style="filter: drop-shadow(2px 2px 8px black);"></i>
+                  <i class="fas fa-play text-text-primary text-lg" style="filter: drop-shadow(2px 2px 8px black);"></i>
                 </div>
               </div>
               <div class="episode-status-overlay absolute inset-0 bg-black bg-opacity-70 hidden items-center justify-center">
-                <span class="text-white font-medium text-sm"></span>
+                <span class="text-text-primary font-medium text-sm"></span>
               </div>
               ${(() => {
                 const progress = getEpisodeProgress(showId, episode.season_number, episode.episode_number);
@@ -51,7 +51,7 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
                   return `
                   <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent h-12"></div>
                   <div class="absolute inset-x-0 bottom-0 h-1 bg-gray-800">
-                    <div class="h-full bg-[#2392EE]" style="width: ${progress.progress * 100}%"></div>
+                    <div class="h-full bg-accent" style="width: ${progress.progress * 100}%"></div>
                   </div>
                   `;
                 }
@@ -61,7 +61,7 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
           </div>
           <div class="flex flex-col justify-center flex-1">
             <div class="flex justify-between items-start">
-              <h3 class="text-base font-medium text-white leading-tight w-[90%]">S${episode.season_number} E${episode.episode_number} - ${episode.name}</h3>
+              <h3 class="text-base font-medium text-text-primary leading-tight w-[90%]">S${episode.season_number} E${episode.episode_number} - ${episode.name}</h3>
             </div>
             <div class="flex flex-row gap-2 text-sm text-zinc-400 font-light">
               <span>${episode.runtime || 0}m</span>
@@ -83,7 +83,7 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
             <div class="bg-zinc-600 h-44 aspect-video rounded-lg overflow-hidden relative episode-thumbnail">
               <img class="object-cover w-full h-full" src="${episode.still_path ? `${TMDB_IMAGE_BASE_URL}original${episode.still_path}` : 'https://placehold.co/600x400/0e1117/fff/?text=No%20thumbnail%20found&font=poppins'}">
               <div class="episode-status-overlay absolute inset-0 bg-black bg-opacity-60 hidden items-center justify-center">
-                <span class="text-white font-medium text-lg"></span>
+                <span class="text-text-primary font-medium text-lg"></span>
               </div>
               ${(() => {
                 const progress = getEpisodeProgress(showId, episode.season_number, episode.episode_number);
@@ -91,7 +91,7 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
                   return `
                   <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent h-16"></div>
                   <div class="absolute inset-x-0 bottom-0 h-1.5 bg-gray-800">
-                    <div class="h-full bg-[#2392EE]" style="width: ${progress.progress * 100}%"></div>
+                    <div class="h-full bg-accent" style="width: ${progress.progress * 100}%"></div>
                   </div>
                   `;
                 }
@@ -104,12 +104,12 @@ export function renderEpisodeList(episodes, contentRating, isMobile = false) {
             <div class="flex flex-row gap-3 mb-3 font-medium text-lg opacity-[95%]">
               <span>${new Date(episode.air_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
               <span>${episode.runtime || 0} min</span>
-              <span class="px-2 bg-[#32363D] rounded-[0.275rem]">${contentRating}</span>
+              <span class="px-2 bg-button-primary rounded-[0.275rem]">${contentRating}</span>
             </div>
 
             <p class="text-[#aaa] text-xl font-light max-w-3xl mb-3 overflow-hidden line-clamp-2 text-ellipsis">${episode.overview || 'No overview available'}</p>
 
-            <span class="text-base font-normal"><i class="fas fa-circle-check mr-1.5 text-[#2392EE]"></i> Available on QuickWatch</span>
+            <span class="text-base font-normal"><i class="fas fa-circle-check mr-1.5 text-accent"></i> Available on QuickWatch</span>
           </div>
         </div>
       `).join('')}
@@ -189,7 +189,7 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
       
       const playerModal = document.getElementById('player-modal');
       if (playerModal) {
-        playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
+        playerModal.classList.remove('bg-background-primary', 'bg-opacity-90');
         playerModal.classList.add('bg-transparent');
         
         playerModal.classList.remove('hidden');
@@ -197,7 +197,7 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
         void playerModal.offsetWidth;
         
         playerModal.classList.remove('bg-transparent');
-        playerModal.classList.add('bg-[#00050d]', 'bg-opacity-90');
+        playerModal.classList.add('bg-background-primary', 'bg-opacity-90');
         
         const iframeContainer = document.getElementById('iframe-container');
         if (iframeContainer) {
@@ -264,7 +264,7 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
       
       const playerModal = document.getElementById('player-modal');
       if (playerModal) {
-        playerModal.classList.remove('bg-[#00050d]', 'bg-opacity-90');
+        playerModal.classList.remove('bg-background-primary', 'bg-opacity-90');
         
         if (window.currentPlayingEpisode) {
           setEpisodeStatus(
@@ -301,11 +301,11 @@ export function initEpisodeList(id, initialSeason, initialEpisode, sources, init
       initialSourceIndex = sourceIndex;
       
       sourceButtons.forEach(btn => {
-        btn.classList.remove('bg-[#2392EE]');
+        btn.classList.remove('bg-accent');
         btn.classList.add('bg-[#272c36]');
       });
       button.classList.remove('bg-[#272c36]');
-      button.classList.add('bg-[#2392EE]');
+      button.classList.add('bg-accent');
       
       if (window.currentTrackerCleanup) {
         window.currentTrackerCleanup();
@@ -418,11 +418,11 @@ function updateProgressIndicators(id, season) {
         const progressValue = typeof progress.progress === 'number' ? 
           Math.min(Math.max(progress.progress, 0), 1) : 0;
         
-        progressBar.innerHTML = `<div class="h-full bg-[#2392EE]" style="width: ${progressValue * 100}%"></div>`;
+        progressBar.innerHTML = `<div class="h-full bg-accent" style="width: ${progressValue * 100}%"></div>`;
         thumbnailContainer.appendChild(progressBar);
         
         remainingTime = document.createElement('div');
-        remainingTime.className = 'remaining-time absolute bottom-2 right-3 text-sm text-white font-medium';
+        remainingTime.className = 'remaining-time absolute bottom-2 right-3 text-sm text-text-primary font-medium';
         remainingTime.textContent = `${progress.remaining || 0}m left`;
         thumbnailContainer.appendChild(remainingTime);
       }

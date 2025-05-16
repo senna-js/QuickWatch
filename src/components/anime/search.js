@@ -147,7 +147,7 @@ function renderSearchResultItem(anime) {
   // Add show type tag
   if (anime.tvInfo.showType) {
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+      <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1 py-0.5 rounded-md hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
         ${anime.tvInfo.showType}
       </span>
     `);
@@ -156,7 +156,7 @@ function renderSearchResultItem(anime) {
   // Add rating tag
   if (anime.tvInfo.rating) {
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+      <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
         ★ ${anime.tvInfo.rating}
       </span>
     `);
@@ -165,7 +165,7 @@ function renderSearchResultItem(anime) {
   // Add sub count
   if (anime.tvInfo.sub) {
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+      <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
         <span class="bg-white text-black px-1 rounded-sm mr-1">SUB</span>
         ${anime.tvInfo.sub}
       </span>
@@ -175,7 +175,7 @@ function renderSearchResultItem(anime) {
   // Add dub count
   if (anime.tvInfo.dub) {
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+      <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
         <span class="bg-white text-black px-1 rounded-sm mr-1">DUB</span>
         ${anime.tvInfo.dub}
       </span>
@@ -185,7 +185,7 @@ function renderSearchResultItem(anime) {
   // Add episode count
   if (anime.tvInfo.eps) {
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+      <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
         ${anime.tvInfo.eps} Episodes
       </span>
     `);
@@ -194,7 +194,7 @@ function renderSearchResultItem(anime) {
   // Add duration
   if (anime.duration) {
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+      <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
         ${anime.duration}
       </span>
     `);
@@ -204,7 +204,7 @@ function renderSearchResultItem(anime) {
   
   // Return the complete result item
   return `
-    <div class="anime-card bg-[#141414] border border-[#F5F5F5]/10 rounded-lg overflow-hidden hover:bg-[#1A1A1A] transition duration-200 ease cursor-pointer" data-id="${anime.id}">
+    <div class="anime-card bg-anime-card-bg border border-anime-border/10 rounded-lg overflow-hidden hover:bg-anime-skeleton-bg transition duration-200 ease cursor-pointer" data-id="${anime.id}">
       <div class="flex items-center p-3">
         <div class="w-16 h-24 min-w-[4rem] mr-4">
           <img src="${posterUrl}" alt="${anime.title || 'Anime'}" class="w-full h-full object-cover rounded-md">
@@ -254,7 +254,7 @@ export function renderPagination(currentPage, totalPages, query) {
   // Previous button
   if (currentPage > 1) {
     pages.push(`
-      <button data-page="${currentPage - 1}" data-query="${query}" class="bg-[#141414] border border-[#F5F5F5]/10 rounded-md px-3 py-1 hover:bg-[#1f1f1f] transition-colors">
+      <button data-page="${currentPage - 1}" data-query="${query}" class="bg-anime-card-bg border border-anime-border/10 rounded-md px-3 py-1 hover:bg-[#1f1f1f] transition-colors">
         &laquo;
       </button>
     `);
@@ -263,7 +263,7 @@ export function renderPagination(currentPage, totalPages, query) {
   // First page
   if (startPage > 1) {
     pages.push(`
-      <button data-page="1" data-query="${query}" class="bg-[#141414] border border-[#F5F5F5]/10 rounded-md px-3 py-1 hover:bg-[#1f1f1f] transition-colors">
+      <button data-page="1" data-query="${query}" class="bg-anime-card-bg border border-anime-border/10 rounded-md px-3 py-1 hover:bg-[#1f1f1f] transition-colors">
         1
       </button>
     `);
@@ -280,8 +280,8 @@ export function renderPagination(currentPage, totalPages, query) {
       <button data-page="${i}" data-query="${query}" 
         class="border rounded-md px-3 py-1 transition-colors ${
           isActive 
-            ? 'bg-[#2392EE] text-white border-[#2392EE]' 
-            : 'bg-[#141414] border-[#F5F5F5]/10 hover:bg-[#1f1f1f]'
+            ? 'bg-accent text-white border-accent' 
+            : 'bg-anime-card-bg border-anime-border/10 hover:bg-[#1f1f1f]'
         }">
         ${i}
       </button>
@@ -295,7 +295,7 @@ export function renderPagination(currentPage, totalPages, query) {
     }
     
     pages.push(`
-      <button data-page="${totalPages}" data-query="${query}" class="bg-[#141414] border border-[#F5F5F5]/10 rounded-md px-3 py-1 hover:bg-[#1f1f1f] transition-colors">
+      <button data-page="${totalPages}" data-query="${query}" class="bg-anime-card-bg border border-anime-border/10 rounded-md px-3 py-1 hover:bg-[#1f1f1f] transition-colors">
         ${totalPages}
       </button>
     `);
@@ -304,7 +304,7 @@ export function renderPagination(currentPage, totalPages, query) {
   // Next button
   if (currentPage < totalPages) {
     pages.push(`
-      <button data-page="${currentPage + 1}" data-query="${query}" class="bg-[#141414] border border-[#F5F5F5]/10 rounded-md px-3 py-1 hover:bg-[#1f1f1f] transition-colors">
+      <button data-page="${currentPage + 1}" data-query="${query}" class="bg-anime-card-bg border border-anime-border/10 rounded-md px-3 py-1 hover:bg-[#1f1f1f] transition-colors">
         &raquo;
       </button>
     `);

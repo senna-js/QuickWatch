@@ -14,7 +14,7 @@ let currentLanguage = 'sub';
 let currentSeasonId = null;
 
 export async function renderAnimeDetailsPage(container, id) {
-  document.body.style.backgroundColor = '#080808';
+  document.body.style.backgroundColor = 'var(--color-anime-background)';
 
   currentSeasonId = id;
   
@@ -41,7 +41,7 @@ export async function renderAnimeDetailsPage(container, id) {
       <div class="flex justify-center items-center h-screen w-full flex-col gap-4">
         <h2 class="text-2xl font-bold text-white">Failed to load anime details</h2>
         <p class="text-white/80">${error.message}</p>
-        <button onClick="window.history.back()" class="px-4 py-2 bg-[#141414] border border-[#F5F5F5]/10 rounded-lg text-white hover:bg-[#1e1e1e] transition duration-200 ease">Go Back</button>
+        <button onClick="window.history.back()" class="px-4 py-2 bg-anime-card-bg border border-anime-border/10 rounded-lg text-white hover:bg-anime-card-hover transition duration-200 ease">Go Back</button>
       </div>
     `;
   } finally {
@@ -119,41 +119,41 @@ function renderDetailsUI(container, animeData, episodesData) {
     <div class="flex flex-col xl:flex-row gap-4 w-full h-screen pt-20 p-4 transition duration-600 ease" id="anime-details-content" style="opacity: 0; transform: translateY(20px);">
       <div class="w-full h-full flex flex-col gap-4">
         <div class="w-full h-full">
-          <iframe class="w-full h-[40rem] xl:h-full rounded-xl border border-[#F5F5F5]/10" src="about:blank"></iframe>
+          <iframe class="w-full h-[40rem] xl:h-full rounded-xl border border-anime-border/10" src="about:blank"></iframe>
         </div>
         <div class="w-full">
           <div class="h-full flex flex-row gap-4">
-            <div class="bg-[#0E0E0E] border border-[#F5F5F5]/10 rounded-xl w-full h-full p-6 flex flex-col justify-between gap-2">
+            <div class="bg-anime-modal-bg border border-anime-border/10 rounded-xl w-full h-full p-6 flex flex-col justify-between gap-2">
               <h2 class="text-3xl font-bold">${title}</h2>
               <p class="text-white/80 overflow-hidden line-clamp-3 text-ellipsis mb-2">${animeInfo.Overview || 'No description available'}</p>
-              <button id="more-info-btn" class="w-full py-2 bg-[#141414] border border-[#F5F5F5]/10 rounded-lg text-center cursor-pointer hover:bg-[#1e1e1e] transition duration-200 ease">More info</button>
+              <button id="more-info-btn" class="w-full py-2 bg-anime-card-bg border border-anime-border/10 rounded-lg text-center cursor-pointer hover:bg-anime-card-hover transition duration-200 ease">More info</button>
             </div>
-            <div class="w-[45rem] bg-[#0E0E0E] border border-[#F5F5F5]/10 rounded-xl h-full p-4 overflow-y-auto">
+            <div class="w-[45rem] bg-anime-modal-bg border border-anime-border/10 rounded-xl h-full p-4 overflow-y-auto">
               <div class="flex flex-col gap-2" id="servers-container">
                 <!-- SUB Section -->
                 <div class="flex items-center w-full">
-                  <div class="flex-grow h-px bg-[#F5F5F5]/10"></div>
-                  <span class="px-2 text-sm text-[#F5F5F5]/50">SUB</span>
-                  <div class="flex-grow h-px bg-[#F5F5F5]/10"></div>
+                  <div class="flex-grow h-px bg-anime-border/10"></div>
+                  <span class="px-2 text-sm text-anime-border/50">SUB</span>
+                  <div class="flex-grow h-px bg-anime-border/10"></div>
                 </div>
                 <div>
                   <div class="grid grid-cols-3 gap-2" id="sub-servers">
                     ${animeSources.map((source, index) => 
-                      `<button data-source-id="${source.id}" data-language="sub" onclick="handleServerClick(this)" class="${source.id === currentSource.id && currentLanguage === 'sub' ? '!bg-white text-[#141414]' : 'bg-[#141414]'} border border-[#F5F5F5]/10 rounded-lg px-2 py-1 text-center text-sm cursor-pointer hover:bg-[#1e1e1e] transition duration-200 ease active:scale-90" style="opacity: 0; transform: translateY(10px);">${source.name}</button>`
+                      `<button data-source-id="${source.id}" data-language="sub" onclick="handleServerClick(this)" class="${source.id === currentSource.id && currentLanguage === 'sub' ? '!bg-white text-anime-card-bg' : 'bg-anime-card-bg'} border border-anime-border/10 rounded-lg px-2 py-1 text-center text-sm cursor-pointer hover:bg-anime-card-hover transition duration-200 ease active:scale-90" style="opacity: 0; transform: translateY(10px);">${source.name}</button>`
                     ).join('')}
                   </div>
                 </div>
                 
                 <!-- DUB Section -->
                 <div class="flex items-center w-full mt-2">
-                  <div class="flex-grow h-px bg-[#F5F5F5]/10"></div>
-                  <span class="px-2 text-sm text-[#F5F5F5]/50">DUB</span>
-                  <div class="flex-grow h-px bg-[#F5F5F5]/10"></div>
+                  <div class="flex-grow h-px bg-anime-border/10"></div>
+                  <span class="px-2 text-sm text-anime-border/50">DUB</span>
+                  <div class="flex-grow h-px bg-anime-border/10"></div>
                 </div>
                 <div>
                   <div class="grid grid-cols-3 gap-2" id="dub-servers">
                     ${animeSources.map((source, index) => 
-                      `<button data-source-id="${source.id}" data-language="dub" onclick="handleServerClick(this)" class="${source.id === currentSource.id && currentLanguage === 'dub' ? '!bg-white text-[#141414]' : 'bg-[#141414]'} border border-[#F5F5F5]/10 rounded-lg px-2 py-1 text-center text-sm cursor-pointer hover:bg-[#1e1e1e] transition duration-200 ease" style="opacity: 0; transform: translateY(10px);">${source.name}</button>`
+                      `<button data-source-id="${source.id}" data-language="dub" onclick="handleServerClick(this)" class="${source.id === currentSource.id && currentLanguage === 'dub' ? '!bg-white text-anime-card-bg' : 'bg-anime-card-bg'} border border-anime-border/10 rounded-lg px-2 py-1 text-center text-sm cursor-pointer hover:bg-anime-card-hover transition duration-200 ease" style="opacity: 0; transform: translateY(10px);">${source.name}</button>`
                     ).join('')}
                   </div>
                 </div>
@@ -162,11 +162,11 @@ function renderDetailsUI(container, animeData, episodesData) {
           </div>
         </div>
       </div>
-      <div class="bg-[#0E0E0E] w-full xl:w-[45rem] h-full rounded-xl border border-[#F5F5F5]/10 p-4 overflow-y-auto">
+      <div class="bg-anime-modal-bg w-full xl:w-[45rem] h-full rounded-xl border border-anime-border/10 p-4 overflow-y-auto">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold">Episodes</h2>
           <div class="relative">
-            <select id="season-selector" class="appearance-none bg-[#141414] border border-[#F5F5F5]/10 rounded-lg px-4 py-2 pr-8 text-white cursor-pointer outline-none">
+            <select id="season-selector" class="appearance-none bg-anime-card-bg border border-anime-border/10 rounded-lg px-4 py-2 pr-8 text-white cursor-pointer outline-none">
               ${renderSeasonOptions(animeData.seasons)}
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
@@ -226,7 +226,7 @@ function renderDetailsUI(container, animeData, episodesData) {
     
     const episodeElement = document.querySelector(`[data-episode-id="${currentEpisode.id}"]`);
     if (episodeElement) {
-      episodeElement.classList.add('border-[#F5F5F5]/15', '!bg-[#F5F5F5]/10', 'border-1');
+      episodeElement.classList.add('border-anime-border/15', '!bg-anime-border/10', 'border-1');
       
       if (tmdbId) {
         animeData.tmdbId = tmdbId;
@@ -272,14 +272,14 @@ function renderEpisodesList(episodes) {
   return episodes.map((episode, index) => {
     const isCurrentEpisode = currentEpisode && episode.id === currentEpisode.id;
     return `
-      <div class="EP_ITEM bg-[#141414] border border-[#F5F5F5]/10 rounded-xl xl:*:overflow-hidden hover:bg-[#1e1e1e] hover:scale-[1.02] active:scale-[0.98] transition duration-200 ease cursor-pointer ${isCurrentEpisode ? 'border-[#F5F5F5]/15 !bg-[#F5F5F5]/10 border-1' : ''}" 
+      <div class="EP_ITEM bg-anime-card-bg border border-anime-border/10 rounded-xl xl:*:overflow-hidden hover:bg-anime-card-hover hover:scale-[1.02] active:scale-[0.98] transition duration-200 ease cursor-pointer ${isCurrentEpisode ? 'border-anime-border/15 !bg-anime-border/10 border-1' : ''}" 
            data-episode-id="${episode.id}" data-epid="${episode.epid}" data-episode-no="${episode.episode_no}" data-episodeid="${episode.episodeid || ''}"
            data-tmdbid="${window.currentAnimeData?.tmdbId || ''}"
            onclick="handleEpisodeClick('${episode.id}', '${episode.epid}', '${episode.episode_no}', '${episode.episodeid || ''}')"
            style="opacity: 0; transform: translateY(20px);">
         <div class="flex flex-col xl:flex-row">
           <div class="aspect-video p-2 pr-0 w-80">
-            <div class="w-full object-cover aspect-video h-24 rounded-md bg-[#0E0E0E] flex items-center justify-center">
+            <div class="w-full object-cover aspect-video h-24 rounded-md bg-anime-modal-bg flex items-center justify-center">
               <span class="text-xl font-bold">${episode.episode_no}</span>
             </div>
           </div>
@@ -300,11 +300,11 @@ window.handleEpisodeClick = function (episodeId, epid, episodeNo, episodeid = ''
   currentEpisode = episode;
 
   document.querySelectorAll('[data-episode-id]').forEach(el =>
-    el.classList.remove('border-[#F5F5F5]/15', '!bg-[#F5F5F5]/10', 'border-1')
+    el.classList.remove('border-anime-border/15', '!bg-anime-border/10', 'border-1')
   );
   const el = document.querySelector(`[data-episode-id="${episodeId}"]`);
   if (el) {
-    el.classList.add('border-[#F5F5F5]/15', '!bg-[#F5F5F5]/10', 'border-1');
+    el.classList.add('border-anime-border/15', '!bg-anime-border/10', 'border-1');
     const tmdbId = el.getAttribute('data-tmdbid');
     if (tmdbId && window.currentAnimeData) {
       window.currentAnimeData.tmdbId = tmdbId;
@@ -328,11 +328,11 @@ window.handleServerClick = function(button) {
   currentLanguage = language;
   
   document.querySelectorAll('#sub-servers button, #dub-servers button').forEach(el => {
-    el.classList.remove('!bg-white', 'text-[#141414]');
-    el.classList.add('bg-[#141414]');
+    el.classList.remove('!bg-white', 'text-anime-card-bg');
+    el.classList.add('bg-anime-card-bg');
   });
-  button.classList.remove('bg-[#141414]');
-  button.classList.add('!bg-white', 'text-[#141414]');
+  button.classList.remove('bg-anime-card-bg');
+  button.classList.add('!bg-white', 'text-anime-card-bg');
   
   if (currentEpisode) {
     const animeData = window.currentAnimeData;
@@ -353,17 +353,17 @@ function addSeasonOptionListener(animeData) {
           const episodesContainer = document.getElementById('episodes-container');
           if (episodesContainer) {
             const skeletonItems = Array(10).fill().map(() => `
-              <div class="EP_ITEM bg-[#141414] border border-[#F5F5F5]/10 rounded-xl xl:*:overflow-hidden transition duration-200 ease animate-pulse" 
+              <div class="EP_ITEM bg-anime-card-bg border border-anime-border/10 rounded-xl xl:*:overflow-hidden transition duration-200 ease animate-pulse" 
                    style="opacity: 1; transform: translateY(0);">
                 <div class="flex flex-col xl:flex-row">
                   <div class="aspect-video p-2 pr-0 w-80">
-                    <div class="w-full object-cover aspect-video h-full rounded-md bg-[#1e1e1e] flex items-center justify-center">
+                    <div class="w-full object-cover aspect-video h-full rounded-md bg-anime-card-hover flex items-center justify-center">
                     </div>
                   </div>
                   <div class="w-2/3 p-3 pr-0 flex flex-col gap-2 justify-center">
-                    <div class="h-4 bg-[#1e1e1e] rounded w-3/4"></div>
-                    <div class="h-3 bg-[#1e1e1e] rounded w-full"></div>
-                    <div class="h-3 bg-[#1e1e1e] rounded w-1/2"></div>
+                    <div class="h-4 bg-anime-card-hover rounded w-3/4"></div>
+                    <div class="h-3 bg-anime-card-hover rounded w-full"></div>
+                    <div class="h-3 bg-anime-card-hover rounded w-1/2"></div>
                   </div>
                 </div>
               </div>
@@ -492,7 +492,7 @@ function addSeasonOptionListener(animeData) {
                     if (currentEpisode) {
                       const episodeElement = document.querySelector(`[data-episode-id="${currentEpisode.id}"]`);
                       if (episodeElement) {
-                        episodeElement.classList.add('border-[#F5F5F5]/15', '!bg-[#F5F5F5]/10', 'border-1');
+                        episodeElement.classList.add('border-anime-border/15', '!bg-anime-border/10', 'border-1');
                       }
 
                       const episodes = document.querySelectorAll('[data-episode-id]');

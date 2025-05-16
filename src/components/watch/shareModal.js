@@ -6,9 +6,9 @@ export function renderShareModal(type, id, title, posterPath) {
   const fullUrl = `${window.location.href}`;
   
   return `
-    <div id="share-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 flex items-center justify-center p-4">
-      <div class="relative w-full max-w-md bg-[#181c23] rounded-lg">
-        <button id="close-share-modal" class="absolute -top-3 -right-3 text-white text-3xl z-[8]">
+    <div id="share-modal" class="fixed inset-0 bg-background-primary bg-opacity-90 z-50 flex items-center justify-center p-4">
+      <div class="relative w-full max-w-md bg-background-tertiary rounded-lg">
+        <button id="close-share-modal" class="absolute -top-3 -right-3 text-text-primary text-3xl z-[8]">
           <i class="icon-x"></i>
         </button>
         
@@ -28,8 +28,8 @@ export function renderShareModal(type, id, title, posterPath) {
           <div class="mb-6">
             <label for="share-url" class="block text-sm font-medium text-zinc-400 mb-2">Share link</label>
             <div class="flex">
-              <input type="text" id="share-url" value="${shareUrl}" class="flex-grow px-3 py-2 bg-[#272c36] rounded-l-lg text-white focus:outline-none" readonly>
-              <button id="copy-url" class="bg-[#2392EE] px-4 pb-1 pt-2 rounded-r-lg">
+              <input type="text" id="share-url" value="${shareUrl}" class="flex-grow px-3 py-2 bg-[#272c36] rounded-l-lg text-text-primary focus:outline-none" readonly>
+              <button id="copy-url" class="bg-accent px-4 pb-1 pt-2 rounded-r-lg">
                 <i class="icon-copy"></i>
               </button>
             </div>

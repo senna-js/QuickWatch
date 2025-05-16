@@ -13,7 +13,7 @@ export function renderError(title = 'Error', message = 'Something went wrong', b
 
   return `
     <div class="flex flex-col items-center justify-center h-screen">
-      <i class="fas fa-exclamation-circle text-4xl mb-4 text-[#2392EE]"></i>
+      <i class="fas fa-exclamation-circle text-4xl mb-4 text-accent"></i>
       <h1 class="text-4xl font-bold mb-4">${title}</h1>
       <p class="text-xl mb-8">${message}</p>
       ${showButton ? buttonHtml : ''}

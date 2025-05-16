@@ -164,8 +164,8 @@ async function loadMediaDetails(type, id) {
       <section class="w-full relative" style="height: calc(100vh - 4rem);">
         <img class="object-cover w-full h-full object-right-top" src="${TMDB_IMAGE_BASE_URL}original${data.backdrop_path}">
         
-        <div class="absolute inset-0 bg-gradient-to-t from-[#00050D] via-transparent to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-[#00050D] via-[#00050D80] to-transparent w-full">
+        <div class="absolute inset-0 bg-gradient-to-t from-background-primary via-transparent to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-background-primary via-background-primary/50 to-transparent w-full">
           <div class="absolute bottom-0 left-0 pl-16 pb-16 w-full">
             
             ${networkLogo}
@@ -183,11 +183,11 @@ async function loadMediaDetails(type, id) {
               <span>TMDB ${data.vote_average?.toFixed(1) || 'N/A'}</span>
               <span>${year}</span>
               ${type === 'tv' ? `<span>${data.number_of_episodes || 0} episodes</span>` : ''}
-              <button class="bg-[#32363D] px-2.5 py-0 rounded-[0.275rem] text-white">
+              <button class="bg-button-primary px-2.5 py-0 rounded-[0.275rem] text-text-primary">
                 ${contentRating}
               </button>
               ${type === 'tv' ? `
-              <button class="bg-[#32363D] px-2.5 py-0 rounded-[0.275rem] text-white">
+              <button class="bg-button-primary px-2.5 py-0 rounded-[0.275rem] text-text-primary">
                 ${data.status || 'Returning series'}
               </button>
               ` : ''}
@@ -199,7 +199,7 @@ async function loadMediaDetails(type, id) {
             
             <div class="flex items-center gap-4 mb-6">
               
-              <button class="px-6 py-3 rounded-lg bg-[#32363D] text-lg md:text-xl pagebtn font-medium flex flex-row items-center justify-center gap-4" id="play-button">
+              <button class="px-6 py-3 rounded-lg bg-button-primary text-lg md:text-xl pagebtn font-medium flex flex-row items-center justify-center gap-4" id="play-button">
                 <i class="fas fa-play text-[1.65rem]"></i>
                 <div class="flex flex-col items-start justify-center text-lg leading-tight">
                   ${(() => {
@@ -213,7 +213,7 @@ async function loadMediaDetails(type, id) {
                         if (nextEpisode <= seasonData.episodes.length) {
                           return `
                             <span class="mr-2 font-bold">Watch Episode ${nextEpisode}</span>
-                            <span class="mr-2 text-base font-regular text-[#a5abb5]">Next episode</span>
+                            <span class="mr-2 text-base font-regular text-text-secondary">Next episode</span>
                             <span class="hidden" id="next-episode-data" 
                               data-season="${initialSeason}" 
                               data-episode="${nextEpisode}">
@@ -225,7 +225,7 @@ async function loadMediaDetails(type, id) {
                           if (nextSeason <= data.number_of_seasons) {
                             return `
                               <span class="mr-2 font-bold">Watch Season ${nextSeason}</span>
-                              <span class="mr-2 text-base font-regular text-[#a5abb5]">Next season</span>
+                              <span class="mr-2 text-base font-regular text-text-secondary">Next season</span>
                               <span class="hidden" id="next-episode-data" 
                                 data-season="${nextSeason}" 
                                 data-episode="1">
@@ -235,7 +235,7 @@ async function loadMediaDetails(type, id) {
                             // No more seasons: rewatch
                             return `
                               <span class="mr-2 font-bold">Rewatch Episode 1</span>
-                              <span class="mr-2 text-base font-regular text-[#a5abb5]">Start over</span>
+                              <span class="mr-2 text-base font-regular text-text-secondary">Start over</span>
                               <span class="hidden" id="next-episode-data" 
                                 data-season="1" 
                                 data-episode="1">
@@ -247,7 +247,7 @@ async function loadMediaDetails(type, id) {
                       
                       return `
                         <span class="mr-2 font-bold">Continue Episode ${initialEpisode}</span>
-                        <span class="mr-2 text-base font-regular text-[#a5abb5]">${progress && progress.watchedDuration > 0 ? 
+                        <span class="mr-2 text-base font-regular text-text-secondary">${progress && progress.watchedDuration > 0 ? 
                           `${remainingMinutes}min left` : 
                           'Start watching'}</span>
                       `;
@@ -255,9 +255,9 @@ async function loadMediaDetails(type, id) {
                       const progress = getProgress(id, 'movie');
                       return progress && progress.watchedDuration > 0 ? 
                         `<span class="mr-2 font-bold">Continue Watching</span>
-                        <span class="mr-2 text-base font-regular text-[#a5abb5]">${formatRemainingTime(progress.fullDuration, progress.watchedDuration)}</span>` :
+                        <span class="mr-2 text-base font-regular text-text-secondary">${formatRemainingTime(progress.fullDuration, progress.watchedDuration)}</span>` :
                         `<span class="mr-2">Play movie</span>
-                        <span class="mr-2 text-base font-regular text-[#a5abb5]">${
+                        <span class="mr-2 text-base font-regular text-text-secondary">${
                           data.runtime 
                             ? data.runtime >= 60
                               ? `${Math.floor(data.runtime/60)}h${data.runtime % 60}m left`
@@ -269,10 +269,10 @@ async function loadMediaDetails(type, id) {
                 </div>
               </button>
               
-              <button id="trailer-button" class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-film text-3xl"></i></button>
-              <button class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full add-to-watchlist"><i class="icon-plus text-4xl"></i></button>
-              <a href="/dl/${type}/${id}" class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full flex items-center justify-center"><i class="icon-download text-3xl"></i></a>
-              <button id="share-button" class="pagebtn bg-[#32363D] w-[4.3125rem] aspect-square rounded-full"><i class="icon-share text-3xl"></i></button>
+              <button id="trailer-button" class="pagebtn bg-button-primary w-[4.3125rem] aspect-square rounded-full"><i class="icon-film text-3xl"></i></button>
+              <button class="pagebtn bg-button-primary w-[4.3125rem] aspect-square rounded-full add-to-watchlist"><i class="icon-plus text-4xl"></i></button>
+              <a href="/dl/${type}/${id}" class="pagebtn bg-button-primary w-[4.3125rem] aspect-square rounded-full flex items-center justify-center"><i class="icon-download text-3xl"></i></a>
+              <button id="share-button" class="pagebtn bg-button-primary w-[4.3125rem] aspect-square rounded-full"><i class="icon-share text-3xl"></i></button>
             </div>
           </div>
         </div>
@@ -280,8 +280,8 @@ async function loadMediaDetails(type, id) {
       
       <section class="w-full mb-16 relative">
         <div class="flex flex-row gap-8 px-16 text-xl text-bold">
-          ${type === 'tv' ? `<span class="tab-item active border-b-2 border-white pb-2 cursor-pointer" data-tab="episodes">Episodes</span>` : ''}
-          <span class="tab-item ${type === 'movie' ? 'active border-b-2 border-white pb-2' : 'text-zinc-400'} cursor-pointer" data-tab="related">Related</span>
+          ${type === 'tv' ? `<span class="tab-item active border-b-2 border-text-primary pb-2 cursor-pointer" data-tab="episodes">Episodes</span>` : ''}
+          <span class="tab-item ${type === 'movie' ? 'active border-b-2 border-text-primary pb-2' : 'text-zinc-400'} cursor-pointer" data-tab="related">Related</span>
           <span class="tab-item text-zinc-400 cursor-pointer" data-tab="details">Details</span>
         </div>
         <div class="px-16 mt-8">

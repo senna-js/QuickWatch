@@ -5,17 +5,17 @@ import { TMDB_API_KEY, TMDB_BASE_URL } from '../../router.js';
 export function renderTrailerModal(mediaTitle, trailer) {
   if (!trailer) {
     return `
-      <div id="trailer-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 flex items-center justify-center p-4">
+      <div id="trailer-modal" class="fixed inset-0 bg-background-primary bg-opacity-90 z-50 flex items-center justify-center p-4">
         <div class="relative w-full max-w-6xl">
-          <button id="close-trailer-modal" class="absolute -top-3 -right-3 text-white text-3xl z-[8]"><i class="icon-x"></i></button>
+          <button id="close-trailer-modal" class="absolute -top-3 -right-3 text-text-primary text-3xl z-[8]"><i class="icon-x"></i></button>
           
-          <div class="iframe-container rounded-t-lg p-4 bg-[#111419]">
+          <div class="iframe-container rounded-t-lg p-4 bg-background-secondary">
             <div class="flex flex-col items-center justify-center h-[700px]">
               <p class="text-xl text-zinc-400 mb-4">No trailer available</p>
             </div>
           </div>
           
-          <div class="bg-[#181c23] p-4 rounded-b-lg">
+          <div class="bg-background-tertiary p-4 rounded-b-lg">
             <h3 class="text-xl font-medium">No trailer found</h3>
           </div>
         </div>
@@ -24,11 +24,11 @@ export function renderTrailerModal(mediaTitle, trailer) {
   }
 
   return `
-    <div id="trailer-modal" class="fixed inset-0 bg-[#00050d] bg-opacity-90 z-50 flex items-center justify-center p-4">
+    <div id="trailer-modal" class="fixed inset-0 bg-background-primary bg-opacity-90 z-50 flex items-center justify-center p-4">
       <div class="relative w-full max-w-6xl">
-        <button id="close-trailer-modal" class="absolute -top-3 -right-3 text-white text-3xl z-[8]"><i class="icon-x"></i></button>
+        <button id="close-trailer-modal" class="absolute -top-3 -right-3 text-text-primary text-3xl z-[8]"><i class="icon-x"></i></button>
         
-        <div class="iframe-container rounded-t-lg p-4 bg-[#111419]">
+        <div class="iframe-container rounded-t-lg p-4 bg-background-secondary">
           <iframe 
             width="100%" 
             height="700" 
@@ -41,7 +41,7 @@ export function renderTrailerModal(mediaTitle, trailer) {
           </iframe>
         </div>
         
-        <div class="bg-[#181c23] p-4 rounded-b-lg">
+        <div class="bg-background-tertiary p-4 rounded-b-lg">
           <h3 class="text-xl font-medium">${trailer.name}</h3>
         </div>
       </div>

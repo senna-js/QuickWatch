@@ -76,14 +76,14 @@ export function renderGenresPage(container) {
   container.innerHTML = `
     ${renderHeader()}
     
-    <div class="pt-24 pb-20 md:pb-0 bg-[#00050d] min-h-screen">
+    <div class="pt-24 pb-20 md:pb-0 bg-background-primary min-h-screen">
       <div class="px-[4.4rem]">
         <h1 class="text-4xl font-bold mb-8 font-medium">Genres</h1>
         
         <div class="mb-6">
           <div class="flex items-center space-x-4 mb-4">
-            <button id="movies-tab" class="px-4 py-2 rounded-lg bg-[#32363D] font-medium text-white">Movies</button>
-            <button id="tv-tab" class="px-4 py-2 rounded-lg font-medium text-white">TV Shows</button>
+            <button id="movies-tab" class="px-4 py-2 rounded-lg bg-button-primary font-medium text-text-primary">Movies</button>
+            <button id="tv-tab" class="px-4 py-2 rounded-lg font-medium text-text-primary">TV Shows</button>
           </div>
         </div>
         
@@ -110,7 +110,7 @@ export function renderGenresPage(container) {
       genreCard.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
       
       genreCard.innerHTML = `
-        <h3 class="text-xl md:text-2xl font-bold text-white text-center px-4">${genre.name}</h3>
+        <h3 class="text-xl md:text-2xl font-bold text-text-primary text-center px-4">${genre.name}</h3>
       `;
       
       genreCard.addEventListener('click', () => {
@@ -130,14 +130,14 @@ export function renderGenresPage(container) {
   };
   
   moviesTab.addEventListener('click', () => {
-    moviesTab.classList.add('bg-[#32363D]');
-    tvTab.classList.remove('bg-[#32363D]');
+    moviesTab.classList.add('bg-button-primary');
+    tvTab.classList.remove('bg-button-primary');
     displayGenres(movieGenres);
   });
   
   tvTab.addEventListener('click', () => {
-    tvTab.classList.add('bg-[#32363D]');
-    moviesTab.classList.remove('bg-[#32363D]');
+    tvTab.classList.add('bg-button-primary');
+    moviesTab.classList.remove('bg-button-primary');
     displayGenres(tvGenres);
   });
   

@@ -27,14 +27,14 @@ export function renderAnimeTags(animeData) {
 
     // Add HD tag
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">HD</span>
+      <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">HD</span>
     `);
 
     // Add sub count
     if (animeData.tvInfo.sub) {
         tags.push(`
-          <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md flex items-center justify-center group hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
-            <span class="bg-white text-black px-1 pt-[0.08rem] pb-[0.03rem] rounded-sm mr-1 text-[0.5rem] group-hover:bg-[#1C1D21] group-hover:text-white">CC</span>
+          <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md flex items-center justify-center group hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
+            <span class="bg-white text-black px-1 pt-[0.08rem] pb-[0.03rem] rounded-sm mr-1 text-[0.5rem] group-hover:bg-anime-badge-bg group-hover:text-white">CC</span>
             ${animeData.tvInfo.sub}
           </span>
         `);
@@ -43,8 +43,8 @@ export function renderAnimeTags(animeData) {
     // Add dub count
     if (animeData.tvInfo.dub) {
         tags.push(`
-          <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md flex items-center justify-center group hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
-            <span class="bg-white text-black px-1 pt-[0.08rem] pb-[0.03rem] rounded-sm mr-1 text-[0.5rem] group-hover:bg-[#1C1D21] group-hover:text-white">DUB</span>
+          <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md flex items-center justify-center group hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
+            <span class="bg-white text-black px-1 pt-[0.08rem] pb-[0.03rem] rounded-sm mr-1 text-[0.5rem] group-hover:bg-anime-badge-bg group-hover:text-white">DUB</span>
             ${animeData.tvInfo.dub}
           </span>
         `);
@@ -53,7 +53,7 @@ export function renderAnimeTags(animeData) {
     // Add duration
     if (animeData.duration) {
         tags.push(`
-          <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+          <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
             ${animeData.duration}
           </span>
         `);
@@ -71,14 +71,14 @@ export function renderSidebarAnimeItem(animeData, index) {
     
     // Add HD tag
     tags.push(`
-      <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">HD</span>
+      <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">HD</span>
     `);
     
     // Add sub count
     if (animeData.tvInfo.sub) {
         tags.push(`
-          <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
-            <span class="bg-white text-black px-1 rounded-sm mr-1 group-hover:bg-[#1C1D21] group-hover:text-white">CC</span>
+          <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
+            <span class="bg-white text-black px-1 rounded-sm mr-1 group-hover:bg-anime-badge-bg group-hover:text-white">CC</span>
             ${animeData.tvInfo.sub}
           </span>
         `);
@@ -87,8 +87,8 @@ export function renderSidebarAnimeItem(animeData, index) {
     // Add dub count
     if (animeData.tvInfo.dub) {
         tags.push(`
-          <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
-            <span class="bg-white text-black px-1 rounded-sm mr-1 group-hover:bg-[#1C1D21] group-hover:text-white">DUB</span>
+          <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md group hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
+            <span class="bg-white text-black px-1 rounded-sm mr-1 group-hover:bg-anime-badge-bg group-hover:text-white">DUB</span>
             ${animeData.tvInfo.dub}
           </span>
         `);
@@ -97,7 +97,7 @@ export function renderSidebarAnimeItem(animeData, index) {
     // Add duration
     if (animeData.duration) {
         tags.push(`
-          <span class="text-xs bg-[#1C1D21] border border-[#24262B] px-1.5 py-0.5 rounded-md hover:bg-white hover:text-[#1C1D21] transition duration-200 ease cursor-pointer">
+          <span class="text-xs bg-anime-badge-bg border border-anime-badge-border px-1.5 py-0.5 rounded-md hover:bg-white hover:text-anime-badge-bg transition duration-200 ease cursor-pointer">
             ${animeData.duration}
           </span>
         `);

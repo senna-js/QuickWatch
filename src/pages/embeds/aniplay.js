@@ -65,19 +65,19 @@ export async function renderAniplayEmbed(container, params) {
       
       <div id="source-menu" class="absolute top-4 left-4 z-10 transition-all duration-300 ease-in-out">
         <div id="menu-container" class="bg-zinc-800 rounded-lg shadow-lg overflow-hidden transition-all duration-300 ease-in-out w-10">
-          <button id="source-toggle" class="w-10 h-10 flex items-center justify-center text-white cursor-pointer hover:scale-110 active:scale-90 transition-all duration-300 ease-in-out">
+          <button id="source-toggle" class="w-10 h-10 flex items-center justify-center text-text-primary cursor-pointer hover:scale-110 active:scale-90 transition-all duration-300 ease-in-out">
             <i class="icon-tv text-[1.2rem]"></i>
           </button>
-          <button id="close-menu" class="absolute -top-2 -right-2 w-7 h-7 flex items-center justify-center text-white rounded-full bg-zinc-600 hover:bg-zinc-500 opacity-0 invisible transition-all duration-300 ease-in-out z-10 cursor-pointer hover:scale-110 active:scale-90">
+          <button id="close-menu" class="absolute -top-2 -right-2 w-7 h-7 flex items-center justify-center text-text-primary rounded-full bg-zinc-600 hover:bg-zinc-500 opacity-0 invisible transition-all duration-300 ease-in-out z-10 cursor-pointer hover:scale-110 active:scale-90">
             <i class="icon-x text-[1.3rem]"></i>
           </button>
           <div id="source-options" class="flex flex-col max-h-0 overflow-hidden transition-all duration-300 ease-in-out opacity-0">
             ${sources.map((source, index) => `
               <button
                 data-index="${index}"
-                class="source-option px-4 py-2 text-white hover:bg-zinc-700 whitespace-nowrap transition-all duration-300 ease-in-out text-left opacity-0 cursor-pointer flex flex-row items-center justify-start gap-1.5 ${index === currentSource ? 'bg-zinc-700' : ''}"
+                class="source-option px-4 py-2 text-text-primary hover:bg-zinc-700 whitespace-nowrap transition-all duration-300 ease-in-out text-left opacity-0 cursor-pointer flex flex-row items-center justify-start gap-1.5 ${index === currentSource ? 'bg-zinc-700' : ''}"
               >
-                ${source.embed_name} <span class="bg-white text-black px-1.5 py-0.5 text-xs rounded-full">${source.quality.toUpperCase()}</span>
+                ${source.embed_name} <span class="bg-text-primary text-black px-1.5 py-0.5 text-xs rounded-full">${source.quality.toUpperCase()}</span>
               </button>
             `).join('')}
           </div>

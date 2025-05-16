@@ -7,7 +7,7 @@ import { renderAnimeCard, renderSidebarAnimeItem } from '../../components/anime/
 // todo - fix <> buttons in hero section
 
 export async function renderAnimePage(container) {
-    document.body.style.backgroundColor = '#080808';
+    document.body.style.backgroundColor = 'var(--color-anime-background)';
     document.body.style.fontFamily = 'Inter, sans-serif';
 
     let spotlights = [];
@@ -146,7 +146,7 @@ export async function renderAnimePage(container) {
         
         items.forEach((item, index) => {
             const animeItem = document.createElement('div');
-            animeItem.className = 'bg-[#141414] rounded-lg overflow-hidden shadow-lg aspect-[2/3]';
+            animeItem.className = 'bg-anime-card-bg rounded-lg overflow-hidden shadow-lg aspect-[2/3]';
             animeItem.style.opacity = '0';
             animeItem.style.transform = 'translateY(20px)';
             
@@ -178,10 +178,10 @@ export async function renderAnimePage(container) {
             const skeletonItem = document.createElement('div');
             skeletonItem.className = 'rounded-lg overflow-hidden shadow-lg aspect-[2/3] animate-pulse';
             skeletonItem.innerHTML = `
-                <div class="w-full h-full bg-[#141414]"></div>
+                <div class="w-full h-full bg-anime-card-bg"></div>
                 <div class="p-3 space-y-2">
-                    <div class="h-4 bg-[#141414] rounded w-3/4"></div>
-                    <div class="h-3 bg-[#141414] rounded w-1/2"></div>
+                    <div class="h-4 bg-anime-card-bg rounded w-3/4"></div>
+                    <div class="h-3 bg-anime-card-bg rounded w-1/2"></div>
                 </div>
             `;
             animeGrid.appendChild(skeletonItem);
@@ -258,12 +258,12 @@ export async function renderAnimePage(container) {
         // Create 5 skeleton items for the sidebar
         for (let i = 0; i < 5; i++) {
             const skeletonItem = document.createElement('div');
-            skeletonItem.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3 animate-pulse';
+            skeletonItem.className = 'bg-anime-card-bg p-3 rounded-lg flex items-center space-x-3 animate-pulse';
             skeletonItem.innerHTML = `
-                <div class="flex-shrink-0 w-12 h-16 bg-[#1a1a1a] rounded"></div>
+                <div class="flex-shrink-0 w-12 h-16 bg-anime-skeleton-bg rounded"></div>
                 <div class="flex-1 space-y-2">
-                    <div class="h-3 bg-[#1a1a1a] rounded w-3/4"></div>
-                    <div class="h-2 bg-[#1a1a1a] rounded w-1/2"></div>
+                    <div class="h-3 bg-anime-skeleton-bg rounded w-3/4"></div>
+                    <div class="h-2 bg-anime-skeleton-bg rounded w-1/2"></div>
                 </div>
             `;
             topUpcomingContainer.appendChild(skeletonItem);
@@ -283,7 +283,7 @@ export async function renderAnimePage(container) {
             if (topFiveAnime.length > 0) {
                 topFiveAnime.forEach((animeData, i) => {
                     const item = document.createElement('div');
-                    item.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3';
+                    item.className = 'bg-anime-card-bg p-3 rounded-lg flex items-center space-x-3';
                     item.style.opacity = '0';
                     item.style.transform = 'translateY(20px)';
                     item.setAttribute('data-anime-id', animeData.id);
@@ -327,12 +327,12 @@ export async function renderAnimePage(container) {
         // Create 5 skeleton items for the sidebar
         for (let i = 0; i < 5; i++) {
             const skeletonItem = document.createElement('div');
-            skeletonItem.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3 animate-pulse';
+            skeletonItem.className = 'bg-anime-card-bg p-3 rounded-lg flex items-center space-x-3 animate-pulse';
             skeletonItem.innerHTML = `
-                <div class="flex-shrink-0 w-12 h-16 bg-[#1a1a1a] rounded"></div>
+                <div class="flex-shrink-0 w-12 h-16 bg-anime-skeleton-bg rounded"></div>
                 <div class="flex-1 space-y-2">
-                    <div class="h-3 bg-[#1a1a1a] rounded w-3/4"></div>
-                    <div class="h-2 bg-[#1a1a1a] rounded w-1/2"></div>
+                    <div class="h-3 bg-anime-skeleton-bg rounded w-3/4"></div>
+                    <div class="h-2 bg-anime-skeleton-bg rounded w-1/2"></div>
                 </div>
             `;
             recentlyAddedContainer.appendChild(skeletonItem);
@@ -353,7 +353,7 @@ export async function renderAnimePage(container) {
                 topFiveAnime.forEach((animeData, i) => {
                     const item = document.createElement('a');
                     item.href = `/anime/${animeData.id}`;
-                    item.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3';
+                    item.className = 'bg-anime-card-bg p-3 rounded-lg flex items-center space-x-3';
                     item.style.opacity = '0';
                     item.style.transform = 'translateY(20px)';
                     item.setAttribute('data-anime-id', animeData.id);
@@ -397,12 +397,12 @@ export async function renderAnimePage(container) {
         // Create 5 skeleton items for the sidebar
         for (let i = 0; i < 5; i++) {
             const skeletonItem = document.createElement('div');
-            skeletonItem.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3 animate-pulse';
+            skeletonItem.className = 'bg-anime-card-bg p-3 rounded-lg flex items-center space-x-3 animate-pulse';
             skeletonItem.innerHTML = `
-                <div class="flex-shrink-0 w-12 h-16 bg-[#1a1a1a] rounded"></div>
+                <div class="flex-shrink-0 w-12 h-16 bg-anime-skeleton-bg rounded"></div>
                 <div class="flex-1 space-y-2">
-                    <div class="h-3 bg-[#1a1a1a] rounded w-3/4"></div>
-                    <div class="h-2 bg-[#1a1a1a] rounded w-1/2"></div>
+                    <div class="h-3 bg-anime-skeleton-bg rounded w-3/4"></div>
+                    <div class="h-2 bg-anime-skeleton-bg rounded w-1/2"></div>
                 </div>
             `;
             recentlyUpdatedContainer.appendChild(skeletonItem);
@@ -423,7 +423,7 @@ export async function renderAnimePage(container) {
                 topFiveAnime.forEach((animeData, i) => {
                     const item = document.createElement('a');
                     item.href = `/anime/${animeData.id}`;
-                    item.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3';
+                    item.className = 'bg-anime-card-bg p-3 rounded-lg flex items-center space-x-3';
                     item.style.opacity = '0';
                     item.style.transform = 'translateY(20px)';
                     item.setAttribute('data-anime-id', animeData.id);
@@ -467,12 +467,12 @@ export async function renderAnimePage(container) {
         // Create 5 skeleton items for the sidebar
         for (let i = 0; i < 5; i++) {
             const skeletonItem = document.createElement('div');
-            skeletonItem.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3 animate-pulse';
+            skeletonItem.className = 'bg-anime-card-bg p-3 rounded-lg flex items-center space-x-3 animate-pulse';
             skeletonItem.innerHTML = `
-                <div class="flex-shrink-0 w-12 h-16 bg-[#1a1a1a] rounded"></div>
+                <div class="flex-shrink-0 w-12 h-16 bg-anime-skeleton-bg rounded"></div>
                 <div class="flex-1 space-y-2">
-                    <div class="h-3 bg-[#1a1a1a] rounded w-3/4"></div>
-                    <div class="h-2 bg-[#1a1a1a] rounded w-1/2"></div>
+                    <div class="h-3 bg-anime-skeleton-bg rounded w-3/4"></div>
+                    <div class="h-2 bg-anime-skeleton-bg rounded w-1/2"></div>
                 </div>
             `;
             topAiringContainer.appendChild(skeletonItem);
@@ -502,7 +502,7 @@ export async function renderAnimePage(container) {
                 topFiveAnime.forEach((animeData, i) => {
                     const item = document.createElement('a');
                     item.href = `/anime/${animeData.id}`;
-                    item.className = 'bg-[#141414] p-3 rounded-lg flex items-center space-x-3';
+                    item.className = 'bg-anime-card-bg p-3 rounded-lg flex items-center space-x-3';
                     item.style.opacity = '0';
                     item.style.transform = 'translateY(20px)';
                     item.setAttribute('data-anime-id', animeData.id);
@@ -542,23 +542,23 @@ export async function renderAnimePage(container) {
 
             <main class="p-2 md:p-4 md:pt-6 mt-16">
                 <section id="anime-hero-section" class="relative bg-cover bg-center rounded-2xl overflow-hidden h-[55vh] mb-4 opacity-0" style="background-image: url('https://placehold.co/1200x500/0e1117/fff/?text=Loading...&font=poppins');">
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#080808]/90 via-[#080808]/50 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-anime-background/90 via-anime-background/50 to-transparent"></div>
                     <div id="anime-hero-content" class="absolute bottom-0 left-0 p-6 md:p-10 w-full md:w-3/5 lg:w-1/2 z-10 opacity-0" style="transform: translateY(30px);">
                         <h1 id="anime-hero-title" class="text-4xl md:text-5xl font-bold mb-3"></h1>
                         <p id="anime-hero-description" class="text-md md:text-lg text-gray-200 mb-6 font-normal leading-6 overflow-hidden line-clamp-3 text-ellipsis"></p>
                         <div class="flex items-center space-x-3">
                             <a id="anime-watch-now-btn" class="bg-white text-black px-[1.2rem] py-[0.5rem] text-[1.1rem] rounded-lg font-semibold hover:bg-zinc-200 transition opacity-0 hover:scale-[1.075] active:scale-95">Watch now</a>
-                            <a id="anime-details-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white px-[1.2rem] py-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-[#535458]/50 transition backdrop-blur-sm opacity-0 hover:scale-[1.075] active:scale-95">Details</a>
-                            <a id="anime-add-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-[#535458]/50 transition backdrop-blur-sm opacity-0 hover:scale-[1.075] active:scale-95 cursor-pointer">
+                            <a id="anime-details-btn" class="bg-anime-button-bg/30 border border-anime-border/10 text-white px-[1.2rem] py-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-anime-button-bg/50 transition backdrop-blur-sm opacity-0 hover:scale-[1.075] active:scale-95">Details</a>
+                            <a id="anime-add-btn" class="bg-anime-button-bg/30 border border-anime-border/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-anime-button-bg/50 transition backdrop-blur-sm opacity-0 hover:scale-[1.075] active:scale-95 cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                             </a>
                         </div>
                     </div>
                      <div class="absolute bottom-6 right-6 md:bottom-10 md:right-10 flex space-x-2 z-10">
-                        <a id="prev-spotlight-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-[#535458]/50 transition backdrop-blur-sm hover:scale-[1.075] active:scale-95 cursor-pointer">
+                        <a id="prev-spotlight-btn" class="bg-anime-button-bg/30 border border-anime-border/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-anime-button-bg/50 transition backdrop-blur-sm hover:scale-[1.075] active:scale-95 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                         </a>
-                        <a id="next-spotlight-btn" class="bg-[#535458]/30 border border-[#F5F5F5]/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-[#535458]/50 transition backdrop-blur-sm hover:scale-[1.075] active:scale-95 cursor-pointer">
+                        <a id="next-spotlight-btn" class="bg-anime-button-bg/30 border border-anime-border/10 text-white p-[0.5rem] text-[1.1rem] rounded-lg font-medium hover:bg-anime-button-bg/50 transition backdrop-blur-sm hover:scale-[1.075] active:scale-95 cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                         </a>
                     </div>
@@ -567,9 +567,9 @@ export async function renderAnimePage(container) {
                 <!-- Content Sections -->
                 <div class="flex flex-col lg:flex-row gap-4">
                     <!-- Main Content Area (Trending, Popular, Top Rated) -->
-                    <div class="flex-grow lg:w-3/4 bg-[#0E0E0E] p-6 rounded-2xl">
+                    <div class="flex-grow lg:w-3/4 bg-anime-modal-bg p-6 rounded-2xl">
                         <!-- Tabs -->
-                        <div class="flex space-x-1 mb-6 border-b border-[#F5F5F5]/10">
+                        <div class="flex space-x-1 mb-6 border-b border-anime-border/10">
                             <button id="trending-tab" class="px-4 py-2 text-white border-b-2 border-white font-semibold">Trending</button>
                             <button id="popular-tab" class="px-4 py-2 text-gray-400 hover:text-white font-semibold">Popular</button>
                             <button id="toprated-tab" class="px-4 py-2 text-gray-400 hover:text-white font-semibold">Top rated</button>
@@ -582,7 +582,7 @@ export async function renderAnimePage(container) {
                     </div>
 
                     <!-- Sidebar (Top Airing) -->
-                    <aside class="lg:w-2/5 bg-[#0E0E0E] p-6 rounded-2xl h-full">
+                    <aside class="lg:w-2/5 bg-anime-modal-bg p-6 rounded-2xl h-full">
                         <div class="w-full space-y-6">
                             <!-- Recently Added Section -->
                             <div>

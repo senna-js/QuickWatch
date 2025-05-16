@@ -311,7 +311,7 @@ async function loadMediaDetails(type, id) {
                     class="block no-underline">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-zinc-800 rounded-lg hover:bg-[#36363c] transition-colors select-none">
                   <div class="flex-grow flex flex-col md:flex-row items-start md:items-center">
-                    <span class="text-white mb-2 md:mb-0 md:mr-4">
+                    <span class="text-text-primary mb-2 md:mb-0 md:mr-4">
                       ${torrent.title || data.title || data.name}
                     </span>
                     <div class="flex flex-wrap gap-2 mb-2 md:mb-0">
@@ -326,7 +326,7 @@ async function loadMediaDetails(type, id) {
                     </span>
                     <div class="flex space-x-2">
                       <button 
-                        class="text-zinc-200 hover:text-white bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
+                        class="text-zinc-200 hover:text-text-primary bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
                         onclick="event.stopPropagation(); event.preventDefault(); navigator.clipboard.writeText('${torrent.url}'); alert('Magnet link copied to clipboard');"
                         aria-label="Copy magnet link">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -334,7 +334,7 @@ async function loadMediaDetails(type, id) {
                         </svg>
                       </button>
                       <button
-                        class="text-zinc-200 hover:text-white bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
+                        class="text-zinc-200 hover:text-text-primary bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
                         onclick="event.stopPropagation(); event.preventDefault(); window.location.href='${torrent.url}';"
                         aria-label="Open magnet link">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -342,7 +342,7 @@ async function loadMediaDetails(type, id) {
                         </svg>
                       </button>
                       <button
-                        class="text-zinc-200 hover:text-white bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
+                        class="text-zinc-200 hover:text-text-primary bg-zinc-700 hover:bg-zinc-500 p-2 focus:outline-none rounded"
                         onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/${type}/${id}';"
                         aria-label="Watch media">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

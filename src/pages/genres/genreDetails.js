@@ -59,10 +59,10 @@ export function renderGenreDetailsPage(container, params) {
   container.innerHTML = `
     ${renderHeader()}
     
-    <div class="pt-24 pb-20 md:pb-0 bg-[#00050d] min-h-screen">
+    <div class="pt-24 pb-20 md:pb-0 bg-background-primary min-h-screen">
       <div class="px-[4.4rem]">
         <div class="flex items-center mb-8">
-          <h1 class="text-xl md:text-2xl text-white font-medium">${genreName}</h1>
+          <h1 class="text-xl md:text-2xl text-text-primary font-medium">${genreName}</h1>
         </div>
         
         <div id="content-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
@@ -130,7 +130,7 @@ export function renderGenreDetailsPage(container, params) {
           }
         });
       } else {
-        contentGrid.innerHTML = `<p class="text-white col-span-full">No content found for this genre.</p>`;
+        contentGrid.innerHTML = `<p class="text-text-primary col-span-full">No content found for this genre.</p>`;
       }
     } catch (error) {
       console.error(`Error fetching content for genre:`, error);

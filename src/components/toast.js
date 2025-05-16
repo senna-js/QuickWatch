@@ -25,7 +25,7 @@ export function renderToast(message = '', type = 'success', duration = 3000) {
   const toastType = toastTypes[type] || toastTypes.success;
   
   return `
-    <div id="${toastId}" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded-lg ${toastType.bgColor} backdrop-blur-sm text-white flex items-center gap-2 shadow-lg z-[9999] opacity-0 translate-y-4 transition-all duration-300">
+    <div id="${toastId}" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 px-4 py-3 rounded-lg ${toastType.bgColor} backdrop-blur-sm text-text-primary flex items-center gap-2 shadow-lg z-[9999] opacity-0 translate-y-4 transition-all duration-300">
       <i class="fas ${toastType.icon}"></i>
       <span>${message}</span>
     </div>

@@ -39,7 +39,7 @@ async function loadWatchlist() {
         <i class="fas fa-bookmark text-4xl mb-4 text-zinc-500"></i>
         <h2 class="text-2xl font-bold mb-2">Your watchlist is empty</h2>
         <p class="text-zinc-400 mb-6">Add movies and TV shows to keep track of what you want to watch</p>
-        <a href="/" class="px-6 py-3 bg-white text-black rounded-md hover:bg-zinc-200 transition">
+        <a href="/" class="px-6 py-3 bg-text-primary text-black rounded-md hover:bg-zinc-200 transition">
           Browse Content
         </a>
       </div>
@@ -75,7 +75,7 @@ async function loadWatchlist() {
         }
         
         const removeBtn = document.createElement('button');
-        removeBtn.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 pb-1 text-white hover:text-red-500 hover:scale-105 focus:scale-90 z-20';
+        removeBtn.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full p-2 pb-1 text-text-primary hover:text-red-500 hover:scale-105 focus:scale-90 z-20';
         removeBtn.innerHTML = '<i class="icon-x text-2xl"></i>';
         
         removeBtn.addEventListener('click', (e) => {

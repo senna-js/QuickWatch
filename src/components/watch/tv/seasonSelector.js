@@ -20,11 +20,11 @@ export function renderSeasonSelector(data, initialSeason, isMobile = false) {
   } else {
     return `
       <div class="relative inline-block w-48 mb-4">
-        <div id="custom-select" class="w-full px-4 py-3 rounded-lg bg-[#32363D] text-lg md:text-xl font-medium cursor-pointer flex items-center justify-between">
+        <div id="custom-select" class="w-full px-4 py-3 rounded-lg bg-button-primary text-lg md:text-xl font-medium cursor-pointer flex items-center justify-between">
           <span id="selected-season">Season ${initialSeason}</span>
           <i class="icon-chevron-down transition-transform duration-200"></i>
         </div>
-        <div id="season-options" class="absolute w-full mt-2 bg-[#32363D] rounded-lg shadow-lg hidden z-10 max-h-60 overflow-y-auto">
+        <div id="season-options" class="absolute w-full mt-2 bg-button-primary rounded-lg shadow-lg hidden z-10 max-h-60 overflow-y-auto">
           ${data.seasons.map((season, i) => 
             `<div class="season-option px-4 py-2 hover:bg-[#454950] cursor-pointer transition-colors duration-150 ${i+1 === initialSeason ? 'bg-[#454950]' : ''}" data-value="${season.season_number}">${season.name}</div>`
           ).join('')}

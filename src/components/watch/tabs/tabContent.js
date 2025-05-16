@@ -185,7 +185,7 @@ export async function loadDetailsContent(type, data, container) {
       return `
       <div class="review-item mb-6 p-4 bg-[#1a1f27] rounded-lg">
         <div class="flex items-center mb-2">
-          <div class="w-10 h-10 rounded-full overflow-hidden mr-3 bg-[#32363D] flex items-center justify-center">
+          <div class="w-10 h-10 rounded-full overflow-hidden mr-3 bg-button-primary flex items-center justify-center">
             ${review.author_details.avatar_path ? 
               `<img src="${review.author_details.avatar_path.startsWith('/http') ? 
                 review.author_details.avatar_path.substring(1) : 

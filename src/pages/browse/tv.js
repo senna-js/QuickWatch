@@ -10,50 +10,50 @@ export function renderTvPage(container) {
     
     <div class="pb-32 md:pb-64">
       <div id="hero-section" class="h-[700px] w-full flex items-end justify-end relative">
-        <div class="absolute inset-x-0 md:inset-x-auto md:left-[4.4rem] text-white z-[6] flex flex-col items-center md:items-start opacity-0" style="transform: translateY(30px);">
+        <div class="absolute inset-x-0 md:inset-x-auto md:left-[4.4rem] text-text-primary z-[6] flex flex-col items-center md:items-start opacity-0" style="transform: translateY(30px);">
           <img id="logo" class="w-[250px] md:w-[400px] opacity-0" style="transform: translateY(20px);">
           <span id="overview" class="text-[14px] md:text-[18px] mt-4 w-[80%] md:w-[37%] line-clamp-3 md:line-clamp-2 font-light text-center md:text-left">
             Loading TV show information...
           </span>
-          <div class="flex flex-row gap-4 mt-4 text-white">
-            <button id="watch-now-btn" class="px-4 py-2 md:px-6 md:py-4 rounded-lg bg-[#32363D] text-lg md:text-xl pagebtn font-medium opacity-0">Watch now</button>
-            <button id="info-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-2xl md:text-3xl flex items-center justify-center pagebtn font-medium opacity-0"><i class="icon-info"></i></button>
-            <button id="add-watchlist-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-[#32363D] text-3xl md:text-4xl flex items-center justify-center pagebtn font-medium opacity-0"><i class="icon-plus"></i></button>
+          <div class="flex flex-row gap-4 mt-4 text-text-primary">
+            <button id="watch-now-btn" class="px-4 py-2 md:px-6 md:py-4 rounded-lg bg-button-primary text-lg md:text-xl pagebtn font-medium opacity-0">Watch now</button>
+            <button id="info-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-button-primary text-2xl md:text-3xl flex items-center justify-center pagebtn font-medium opacity-0"><i class="icon-info"></i></button>
+            <button id="add-watchlist-btn" class="w-[2.75rem] h-[2.75rem] md:w-[3.75rem] md:h-[3.75rem] rounded-full bg-button-primary text-3xl md:text-4xl flex items-center justify-center pagebtn font-medium opacity-0"><i class="icon-plus"></i></button>
           </div>
         </div>
-        <div class="absolute inset-y-0 left-0 w-full md:w-[50%] bg-gradient-to-r from-[#00050d] to-transparent z-[3]"></div>
-        <div class="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-[#00050d] to-transparent z-[3]"></div>
+        <div class="absolute inset-y-0 left-0 w-full md:w-[50%] bg-gradient-to-r from-background-primary to-transparent z-[3]"></div>
+        <div class="absolute inset-x-0 bottom-0 h-[80%] bg-gradient-to-t from-background-primary to-transparent z-[3]"></div>
         <img id="herobk" class="h-[700px] w-full md:w-full object-cover items-center ml-auto opacity-0">
       </div>
       
-      <div class="bg-[#00050d]">
+      <div class="bg-background-primary">
         <div class="mt-12 md:mt-24">
-          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Drama Series</h2>
+          <h2 class="text-xl md:text-2xl text-text-primary mb-4 ml-4 md:ml-[4.4rem] font-medium">Drama Series</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="drama"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Comedy Series</h2>
+          <h2 class="text-xl md:text-2xl text-text-primary mb-4 ml-4 md:ml-[4.4rem] font-medium">Comedy Series</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="comedy"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Crime Series</h2>
+          <h2 class="text-xl md:text-2xl text-text-primary mb-4 ml-4 md:ml-[4.4rem] font-medium">Crime Series</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="crime"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Sci-Fi & Fantasy</h2>
+          <h2 class="text-xl md:text-2xl text-text-primary mb-4 ml-4 md:ml-[4.4rem] font-medium">Sci-Fi & Fantasy</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="sci-fi-fantasy"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Action & Adventure</h2>
+          <h2 class="text-xl md:text-2xl text-text-primary mb-4 ml-4 md:ml-[4.4rem] font-medium">Action & Adventure</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="action-adventure"></div>
         </div>
         
         <div class="mt-6">
-          <h2 class="text-xl md:text-2xl text-white mb-4 ml-4 md:ml-[4.4rem] font-medium">Animation</h2>
+          <h2 class="text-xl md:text-2xl text-text-primary mb-4 ml-4 md:ml-[4.4rem] font-medium">Animation</h2>
           <div class="movie-carousel flex flex-row gap-4 overflow-x-auto pb-4 pl-4" data-category="animation"></div>
         </div>
       </div>

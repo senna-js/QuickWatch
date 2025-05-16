@@ -3,10 +3,10 @@
 export function renderAnimeDetailsModal() {
   return `
     <div id="anime-details-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hidden">
-      <div class="bg-[#0E0E0E] border border-[#F5F5F5]/10 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 transform transition-all duration-300 ease-in-out scale-95 opacity-0" id="modal-content">
+      <div class="bg-anime-modal-bg border border-anime-border/10 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 transform transition-all duration-300 ease-in-out scale-95 opacity-0" id="modal-content">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold" id="modal-title">Anime Details</h2>
-          <button id="close-modal-btn" class="p-2 bg-[#141414] border border-[#F5F5F5]/10 rounded-lg hover:bg-[#1e1e1e] transition duration-200 ease active:scale-90">
+          <button id="close-modal-btn" class="p-2 bg-anime-card-bg border border-anime-border/10 rounded-lg hover:bg-anime-card-hover transition duration-200 ease active:scale-90">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -41,16 +41,16 @@ function generateModalContent(animeData) {
   let content = `
     <div class="flex flex-col md:flex-row gap-6">
       <div class="w-full md:w-1/3 flex flex-col gap-3">
-        <img src="${poster || ''}" alt="${title}" class="w-full rounded-lg border border-[#F5F5F5]/10">
+        <img src="${poster || ''}" alt="${title}" class="w-full rounded-lg border border-anime-border/10">
         
         <!-- External Links -->
         <div class="flex gap-2">
           ${anilistId ? `
-            <a href="https://anilist.co/anime/${anilistId}" target="_blank" class="flex-1 flex items-center justify-center h-10 px-4 bg-[#18212C] border border-[#F5F5F5]/10 rounded-lg hover:bg-[#202b39] transition duration-200 ease text-center">
+            <a href="https://anilist.co/anime/${anilistId}" target="_blank" class="flex-1 flex items-center justify-center h-10 px-4 bg-[#18212C] border border-anime-border/10 rounded-lg hover:bg-[#202b39] transition duration-200 ease text-center">
               <svg fill="#01ABFF" stroke-width="0" role="img" viewBox="0 0 24 24" height="1.4rem" width="1.4rem" xmlns="http://www.w3.org/2000/svg"><path d="M24 17.53v2.421c0 .71-.391 1.101-1.1 1.101h-5l-.057-.165L11.84 3.736c.106-.502.46-.788 1.053-.788h2.422c.71 0 1.1.391 1.1 1.1v12.38H22.9c.71 0 1.1.392 1.1 1.101zM11.034 2.947l6.337 18.104h-4.918l-1.052-3.131H6.019l-1.077 3.131H0L6.361 2.948h4.673zm-.66 10.96-1.69-5.014-1.541 5.015h3.23z"></path></svg>
             </a>` : ''}
           ${malId ? `
-            <a href="https://myanimelist.net/anime/${malId}" target="_blank" class="flex-1 flex items-center justify-center px-4 h-10 bg-[#2E51A2] border border-[#F5F5F5]/10 rounded-lg hover:bg-[#3963c5] transition duration-200 ease text-center">
+            <a href="https://myanimelist.net/anime/${malId}" target="_blank" class="flex-1 flex items-center justify-center px-4 h-10 bg-[#2E51A2] border border-anime-border/10 rounded-lg hover:bg-[#3963c5] transition duration-200 ease text-center">
               <svg fill="#fff" stroke-width="0" role="img" viewBox="0 7 24 9" height="1rem" xmlns="http://www.w3.org/2000/svg"><path d="M8.273 7.247v8.423l-2.103-.003v-5.216l-2.03 2.404-1.989-2.458-.02 5.285H.001L0 7.247h2.203l1.865 2.545 2.015-2.546 2.19.001zm8.628 2.069l.025 6.335h-2.365l-.008-2.871h-2.8c.07.499.21 1.266.417 1.779.155.381.298.751.583 1.128l-1.705 1.125c-.349-.636-.622-1.337-.878-2.082a9.296 9.296 0 0 1-.507-2.179c-.085-.75-.097-1.471.107-2.212a3.908 3.908 0 0 1 1.161-1.866c.313-.293.749-.5 1.1-.687.351-.187.743-.264 1.107-.359a7.405 7.405 0 0 1 1.191-.183c.398-.034 1.107-.066 2.39-.028l.545 1.749H14.51c-.593.008-.878.001-1.341.209a2.236 2.236 0 0 0-1.278 1.92l2.663.033.038-1.81h2.309zm3.992-2.099v6.627l3.107.032-.43 1.775h-4.807V7.187l2.13.03z"></path></svg>
             </a>` : ''}
         </div>
@@ -116,7 +116,7 @@ function generateModalContent(animeData) {
     
     seasons.forEach(season => {
       content += `
-        <a href="/anime/${season.route}" class="relative bg-[#141414] border border-[#F5F5F5]/10 rounded-lg p-4 py-5 hover:bg-[#1e1e1e] transition duration-200 ease overflow-hidden">
+        <a href="/anime/${season.route}" class="relative bg-anime-card-bg border border-anime-border/10 rounded-lg p-4 py-5 hover:bg-anime-card-hover transition duration-200 ease overflow-hidden">
           ${season.background ? `
             <div class="absolute inset-0 z-0">
               <img src="${season.background}" alt="" class="w-full h-full object-cover opacity-30">
@@ -145,7 +145,7 @@ function generateModalContent(animeData) {
     
     related_data.slice(0, 6).forEach(anime => {
       content += `
-        <a href="/anime/${anime.id}" class="bg-[#141414] border border-[#F5F5F5]/10 rounded-lg p-4 hover:bg-[#1e1e1e] transition duration-200 ease">
+        <a href="/anime/${anime.id}" class="bg-anime-card-bg border border-anime-border/10 rounded-lg p-4 hover:bg-anime-card-hover transition duration-200 ease">
           <div class="flex items-center gap-3">
             <div class="w-16 h-24 rounded overflow-hidden">
               <img src="${anime.poster}" alt="${anime.title}" class="w-full h-full object-cover">
@@ -175,7 +175,7 @@ function generateModalContent(animeData) {
     
     recommended_data.slice(0, 6).forEach(anime => {
       content += `
-        <a href="/anime/${anime.id}" class="bg-[#141414] border border-[#F5F5F5]/10 rounded-lg p-4 hover:bg-[#1e1e1e] transition duration-200 ease">
+        <a href="/anime/${anime.id}" class="bg-anime-card-bg border border-anime-border/10 rounded-lg p-4 hover:bg-anime-card-hover transition duration-200 ease">
           <div class="flex items-center gap-3">
             <div class="w-16 h-24 rounded overflow-hidden">
               <img src="${anime.poster}" alt="${anime.title}" class="w-full h-full object-cover">

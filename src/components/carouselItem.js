@@ -39,11 +39,11 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   const card = document.createElement('div');
   
   if (context === 'grid') {
-    card.className = 'carousel-item w-full bg-[#32363D] rounded-lg transition-all duration-500 ease-in-out relative cursor-pointer';
+    card.className = 'carousel-item w-full bg-button-primary rounded-lg transition-all duration-500 ease-in-out relative cursor-pointer';
   } else {
     card.className = isFirstItem 
-      ? 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg ml-2 transition-all duration-500 ease-in-out relative cursor-pointer'
-      : 'carousel-item flex-shrink-0 bg-[#32363D] rounded-lg transition-all duration-500 ease-in-out relative cursor-pointer';
+      ? 'carousel-item flex-shrink-0 bg-button-primary rounded-lg ml-2 transition-all duration-500 ease-in-out relative cursor-pointer'
+      : 'carousel-item flex-shrink-0 bg-button-primary rounded-lg transition-all duration-500 ease-in-out relative cursor-pointer';
   }
   
   if (usePoster) {
@@ -65,27 +65,27 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
 
   const infoPanel = document.createElement('div');
 
-  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-white p-3 rounded-b-lg opacity-0 transition-opacity duration-500 pointer-events-none'; 
+  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-text-primary p-3 rounded-b-lg opacity-0 transition-opacity duration-500 pointer-events-none'; 
   infoPanel.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
   infoPanel.style.transform = 'translateY(-10px)';
   infoPanel.style.position = 'absolute';
   infoPanel.style.zIndex = '50';
       
   infoPanel.innerHTML = `
-    <h3 class="text-white font-semibold text-xl">${title}</h3>
-    <button class="play-button pagebtn px-4 py-3 text-lg my-2 w-full rounded-lg bg-[#32363D] font-medium flex flex-row items-center justify-center gap-2">
+    <h3 class="text-text-primary font-semibold text-xl">${title}</h3>
+    <button class="play-button pagebtn px-4 py-3 text-lg my-2 w-full rounded-lg bg-button-primary font-medium flex flex-row items-center justify-center gap-2">
         <i class="fas fa-play text-xl mr-0.5"></i>
         <span>${displayProgressData?.continueText || 'Play'}</span>
     </button>
-    <span class="text-sm font-normal"><i class="fas fa-circle-check mr-1 text-[#2392EE]"></i> Available on QuickWatch</span>
+    <span class="text-sm font-normal"><i class="fas fa-circle-check mr-1 text-accent"></i> Available on QuickWatch</span>
     <div class="flex flex-row items-center gap-2 mt-1 text-[0.9rem] text-zinc-300">
       <span class="mr-[0.2rem]">${formattedDate}</span>
-      <span class="mr-[0.2rem]">${user_rating} <i class="fas fa-star text-[#2392EE]"></i></span>
+      <span class="mr-[0.2rem]">${user_rating} <i class="fas fa-star text-accent"></i></span>
       ${rating ? `<div class="flex items-center bg-gray-700 px-1.5 py-0.5 rounded text-xs">${rating}</div>` : ''}
     </div>
   `;
   
-  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-white p-4 rounded-b-lg opacity-0 transition-opacity duration-500 pointer-events-none shadow-lg';
+  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-text-primary p-4 rounded-b-lg opacity-0 transition-opacity duration-500 pointer-events-none shadow-lg';
   
   const playButton = infoPanel.querySelector('.play-button');
   
@@ -101,7 +101,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     
     if (displayProgressData.continueText) {
       const continueTextElement = document.createElement('div');
-      continueTextElement.className = 'hidden md:block text-sm font-bold text-white absolute m-2 bottom-0 z-[3]';
+      continueTextElement.className = 'hidden md:block text-sm font-bold text-text-primary absolute m-2 bottom-0 z-[3]';
       continueTextElement.style.textShadow = '0 0 0.5rem #000';
       continueTextElement.innerHTML = displayProgressData.statusText 
         ? `${displayProgressData.continueText} <span class="font-light">(${displayProgressData.statusText})</span>`
@@ -116,7 +116,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     progressBar.className = 'absolute inset-x-0 bottom-0 h-1.5 bg-[#666] rounded-b-lg';
     
     const progressFill = document.createElement('div');
-    progressFill.className = 'h-full bg-[#fff] rounded-b-lg';
+    progressFill.className = 'h-full bg-text-primary rounded-b-lg';
     progressFill.style.width = `${displayProgressData.percentage}%`;
     
     progressBar.appendChild(progressFill);
@@ -221,7 +221,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   let removeButton = null;
   if (onRemove) {
     removeButton = document.createElement('button');
-    removeButton.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full w-6 h-6 flex items-center justify-center text-white z-20 opacity-0 transition-opacity duration-500';
+    removeButton.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full w-6 h-6 flex items-center justify-center text-text-primary z-20 opacity-0 transition-opacity duration-500';
     removeButton.innerHTML = '×';
     removeButton.style.fontSize = '18px';
     

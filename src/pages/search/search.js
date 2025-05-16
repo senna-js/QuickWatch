@@ -25,7 +25,7 @@ export function renderSearchPage(container) {
         <div class="mb-6 md:mb-8">
           <h1 class="text-3xl md:text-4xl font-bold mt-2 mb-4 md:mb-6 md:mt-0 hidden md:block">What do you feel like watching?</h1>
           <input type="text" id="search-input" placeholder="Enter your search query..." 
-            class="w-full p-3 md:p-4 bg-gray-800 rounded-lg text-white outline-none focus:ring-2 focus:ring-gray-700">
+            class="w-full p-3 md:p-4 bg-gray-800 rounded-lg text-text-primary outline-none focus:ring-2 focus:ring-gray-700">
         </div>
         <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"></div>
       </div>
@@ -107,7 +107,7 @@ function displaySearchResults(results, container) {
           <img src="${TMDB_IMAGE_BASE_URL}w300${imagePath}" alt="${title}" class="w-full h-full object-cover rounded-lg">
         </div>
         <div class="flex flex-col justify-center p-3 flex-1">
-          <h3 class="text-white font-medium text-lg line-clamp-1">${title}</h3>
+          <h3 class="text-text-primary font-medium text-lg line-clamp-1">${title}</h3>
           <p class="text-zinc-400 text-sm">
             ${seasons ? `${seasons} • ` : ''}${formattedDate ? `${formattedDate} • ` : ''}${rating ? `★ ${rating}` : ''}
           </p>

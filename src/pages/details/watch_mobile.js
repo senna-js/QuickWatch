@@ -189,9 +189,9 @@ async function loadMediaDetails(type, id) {
       <section class="w-full relative h-[60vh]">
         <img class="object-cover w-full h-full object-center" src="${TMDB_IMAGE_BASE_URL}original${data.backdrop_path}">
         
-        <div class="absolute inset-0 bg-gradient-to-t from-[#00050d] via-[#00050d]/70 via-[#00050d]/40 via-transparent to-transparent bottom-[-2px]"></div>
-        <div class="absolute inset-0 bg-gradient-to-b from-[#00050d]/80 via-[#00050d]/60 via-[#00050d]/30 via-transparent to-transparent"></div>
-        <div class="absolute inset-0 bg-gradient-to-r from-[#00050d]/30 via-transparent to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-background-primary via-background-primary/70 via-background-primary/40 via-transparent to-transparent bottom-[-2px]"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-background-primary/80 via-background-primary/60 via-background-primary/30 via-transparent to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-background-primary/30 via-transparent to-transparent"></div>
         
         <div class="absolute bottom-0 left-0 w-full px-5 py-4">
           ${networkLogo ? `<div class="mb-2">${networkLogo}</div>` : ''}
@@ -200,11 +200,11 @@ async function loadMediaDetails(type, id) {
           </div>
           
           <div class="flex items-center gap-1 mb-1 text-[0.83rem] text-bold">
-            <span class="bg-[#3B54F6] px-1.5 pt-0.5 pb-[0.07rem] rounded text-white">${data.status.toUpperCase()}</span>
-            <span class="px-2 py-0.5 rounded text-white">TMDB ${data.vote_average?.toFixed(1) || 'N/A'}</span>
+            <span class="bg-[#3B54F6] px-1.5 pt-0.5 pb-[0.07rem] rounded text-text-primary">${data.status.toUpperCase()}</span>
+            <span class="px-2 py-0.5 rounded text-text-primary">TMDB ${data.vote_average?.toFixed(1) || 'N/A'}</span>
           </div>
           
-          <div class="flex items-center gap-3 text-[0.8rem] text-white/80 mb-4 ml-1 font-light">
+          <div class="flex items-center gap-3 text-[0.8rem] text-text-primary/80 mb-4 ml-1 font-light">
             ${year}
             ${type === 'tv' ? `<span>${data.number_of_seasons || 0} SEASONS</span>` : ''}
             ${contentRating}
@@ -212,9 +212,9 @@ async function loadMediaDetails(type, id) {
         </div>
       </section>
       
-      <section class="px-5 py-6 bg-[#00050d]">
+      <section class="px-5 py-6 bg-background-primary">
         <div class="flex flex-col w-full items-center justify-center mb-6">
-          <button class="flex-1 py-3 bg-white text-black rounded-lg font-medium flex items-center justify-center gap-2 w-full mb-3" id="play-button">
+          <button class="flex-1 py-3 bg-text-primary text-black rounded-lg font-medium flex items-center justify-center gap-2 w-full mb-3" id="play-button">
             <i class="fas fa-play"></i>            
             ${(() => {
               if (type === 'tv') {
@@ -270,34 +270,34 @@ async function loadMediaDetails(type, id) {
           </button>
           
           <div class="flex flex-row gap-8 ml-4 p-2 w-full items-center justify-start">
-            <button class="h-12 bg-[#00050d] flex flex-col items-center justify-center add-to-watchlist">
+            <button class="h-12 bg-background-primary flex flex-col items-center justify-center add-to-watchlist">
               <i class="icon-plus text-3xl"></i>
               <span class="text-xs font-light">My List</span>
             </button>
-            <button id="trailer-button" class="h-12 bg-[#00050d] flex flex-col items-center justify-center">
+            <button id="trailer-button" class="h-12 bg-background-primary flex flex-col items-center justify-center">
               <i class="icon-film text-2xl mb-1"></i>
               <span class="text-xs font-light">Trailer</span>
             </button>
-            <button id="share-button" class="h-12 bg-[#00050d] flex flex-col items-center justify-center">
+            <button id="share-button" class="h-12 bg-background-primary flex flex-col items-center justify-center">
               <i class="icon-share text-2xl mb-1"></i>
               <span class="text-xs font-light">Share</span>
             </button>
           </div>
         </div>
         
-        <p class="text-[1.07rem] text-white/80 mb-2 font-light leading-tight overflow-hidden line-clamp-4 text-ellipsis">
+        <p class="text-[1.07rem] text-text-primary/80 mb-2 font-light leading-tight overflow-hidden line-clamp-4 text-ellipsis">
           ${data.overview || 'No overview available'}
         </p>
         
-        <div class="flex items-center text-xs text-white/60 gap-2 mb-4 font-light">
+        <div class="flex items-center text-xs text-text-primary/60 gap-2 mb-4 font-light">
           ${genresText}
         </div>
       </section>
       
       <section class="w-full mb-16 relative">
         <div class="flex flex-row gap-8 px-5 text-xl text-bold">
-          ${type === 'tv' ? `<span class="tab-item active border-b-2 border-white pb-2 cursor-pointer" data-tab="episodes">Episodes</span>` : ''}
-          <span class="tab-item ${type === 'movie' ? 'active border-b-2 border-white pb-2' : 'text-zinc-400'} cursor-pointer" data-tab="related">Related</span>
+          ${type === 'tv' ? `<span class="tab-item active border-b-2 border-text-primary pb-2 cursor-pointer" data-tab="episodes">Episodes</span>` : ''}
+          <span class="tab-item ${type === 'movie' ? 'active border-b-2 border-text-primary pb-2' : 'text-zinc-400'} cursor-pointer" data-tab="related">Related</span>
           <span class="tab-item text-zinc-400 cursor-pointer" data-tab="details">Details</span>
         </div>
 
