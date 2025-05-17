@@ -10,6 +10,7 @@ import { setupPlayPause } from './ui/playPause.js';
 import { setupFullscreenPiP } from './ui/fullscreenPiP.js';
 import { setupDownloadVideo } from './downloadVideo.js';
 import { setupSubtitles } from './ui/subtitles.js';
+import { setupSkipButtons } from './ui/skipButtons.js';
 
 export function initializeCustomPlayer(playerContainer, linksData, showId, episodeNumber, isNativeEmbed = false, subtitleTracks = [], mediaType = 'tv') {
   // get player elements
@@ -40,6 +41,8 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   const aspectToggleBtn = playerContainer.querySelector('.aspect-toggle-btn');
   const topControls = playerContainer.querySelector('.top-controls');
   const volumeContainer = playerContainer.querySelector('.volume-container');
+  const backwardBtn = playerContainer.querySelector('.back-10s');
+  const forwardBtn = playerContainer.querySelector('.forwards-10s');
   
   if (!player) return;
   
@@ -74,6 +77,9 @@ export function initializeCustomPlayer(playerContainer, linksData, showId, episo
   
   // setup fullscreen and PiP
   setupFullscreenPiP(player, customPlayer, fullscreenBtn, pipBtn);
+
+  // setup skip buttons
+  setupSkipButtons(player, backwardBtn, forwardBtn);
   
   // store subtitle handler for cleanup
   let subtitleHandler = null;

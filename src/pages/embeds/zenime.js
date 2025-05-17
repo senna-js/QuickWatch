@@ -234,7 +234,7 @@ function renderVideoPlayer(container, videoUrl, initialQuality, qualityOptions, 
 
           <div class="flex flex-row items-center justify-between mx-4">
             <div class="flex flex-row items-center gap-1">
-              <button class="play-pause-btn text-text-primary transition text-2xl mr-3">
+              <button onkeydown="if (event.key === ' ') event.preventDefault();" class="play-pause-btn text-text-primary transition text-2xl mr-3">
                 <i class="fas fa-play"></i>
               </button>
 

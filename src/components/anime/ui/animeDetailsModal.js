@@ -69,7 +69,7 @@ function generateModalContent(animeData) {
         <div class="col-span-1 md:col-span-2">
           <div class="relative">
             <p class="text-white/80 overflow-hidden line-clamp-4 text-ellipsis" id="overview-text">${animeInfo.Overview}</p>
-            <button id="show-more-btn" class="text-blue-400 hover:text-blue-300 transition duration-200 ease mt-1">Show more</button>
+            <button id="show-more-btn" class="text-blue-400 hover:text-blue-300 transition duration-200 ease mt-1 hidden">Show more</button>
           </div>
         </div>
       `;
@@ -233,6 +233,10 @@ export function openAnimeDetailsModal(animeData) {
   const overviewText = document.getElementById('overview-text');
   
   if (showMoreBtn && overviewText) {
+    if (overviewText.scrollHeight > overviewText.clientHeight) {
+      showMoreBtn.classList.remove('hidden');
+    }
+    
     showMoreBtn.addEventListener('click', () => {
       if (overviewText.classList.contains('line-clamp-4')) {
         overviewText.classList.remove('line-clamp-4');
