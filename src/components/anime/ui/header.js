@@ -65,14 +65,12 @@ export function initializeSearchFunctionality() {
   if (searchButton) {
     searchButton.addEventListener('click', () => {
       if (searchDropdown) {
-        if (searchDropdown.classList.contains('hidden')) {
-          searchDropdown.classList.remove('hidden');
-          const searchValue = searchInput.value.trim();
-          if (searchValue) {
-            initSearch(searchValue);
-          }
-        } else {
-          searchDropdown.classList.add('hidden');
+        const searchValue = searchInput.value.trim();
+        
+        searchDropdown.classList.remove('hidden');
+        
+        if (searchValue) {
+          initSearch(searchValue);
         }
       }
     });
