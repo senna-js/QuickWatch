@@ -39,11 +39,11 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   const card = document.createElement('div');
   
   if (context === 'grid') {
-    card.className = 'carousel-item w-full bg-button-primary rounded-lg transition-all duration-500 ease-in-out relative cursor-pointer';
+    card.className = 'carousel-item w-full bg-button-primary rounded-lg transition-all duration-400 ease-in-out relative cursor-pointer';
   } else {
     card.className = isFirstItem 
-      ? 'carousel-item flex-shrink-0 bg-button-primary rounded-lg ml-2 transition-all duration-500 ease-in-out relative cursor-pointer'
-      : 'carousel-item flex-shrink-0 bg-button-primary rounded-lg transition-all duration-500 ease-in-out relative cursor-pointer';
+      ? 'carousel-item flex-shrink-0 bg-button-primary rounded-lg ml-2 transition-all duration-400 ease-in-out relative cursor-pointer'
+      : 'carousel-item flex-shrink-0 bg-button-primary rounded-lg transition-all duration-400 ease-in-out relative cursor-pointer';
   }
   
   if (usePoster) {
@@ -65,9 +65,10 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
 
   const infoPanel = document.createElement('div');
 
-  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-text-primary p-3 rounded-b-lg opacity-0 transition-opacity duration-500 pointer-events-none'; 
-  infoPanel.style.transition = 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out';
-  infoPanel.style.transform = 'translateY(-10px)';
+  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-text-primary p-3 rounded-b-lg opacity-0 transition-all duration-300 ease-in-out pointer-events-none'; 
+  infoPanel.style.transition = 'opacity 0.4s ease-in-out, transform 0.4s ease-in-out';
+  infoPanel.style.transform = 'translateY(-6px) scale(0.95)';
+  infoPanel.style.opacity = '0';
   infoPanel.style.position = 'absolute';
   infoPanel.style.zIndex = '50';
       
@@ -85,7 +86,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     </div>
   `;
   
-  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-text-primary p-4 rounded-b-lg opacity-0 transition-opacity duration-500 pointer-events-none shadow-lg';
+  infoPanel.className = 'carousel-info-popup hidden md:block bg-[#1A1D21] text-text-primary p-4 rounded-b-lg opacity-0 transition-opacity duration-400 pointer-events-none shadow-lg';
   
   const playButton = infoPanel.querySelector('.play-button');
   
@@ -133,7 +134,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
       if (panel !== infoPanel) {
         panel.classList.remove('visible');
         panel.style.opacity = '0';
-        panel.style.transform = 'translateY(-10px)';
+        panel.style.transform = 'translateY(-6px) scale(0.95)';
         panel.style.pointerEvents = 'none';
         panel.addEventListener('transitionend', () => panel.remove(), { once: true });
       }
@@ -142,20 +143,29 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
     card.style.transform = 'scale(1.05)';
     card.style.zIndex = '10';
     card.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.5)';
+    card.style.borderBottomLeftRadius = '0';
+    card.style.borderBottomRightRadius = '0';
 
     if (!document.body.contains(infoPanel)) {
       const rect = card.getBoundingClientRect();
       infoPanel.style.width = `${rect.width * 1.05}px`;
       infoPanel.style.left = `${rect.left + window.scrollX - (rect.width * 0.05 / 2)}px`;
       infoPanel.style.top = `${rect.bottom + window.scrollY}px`;
+      infoPanel.style.opacity = '0';
+      infoPanel.style.transform = 'translateY(-6px) scale(0.95)';
       document.body.appendChild(infoPanel);
+      
+      infoPanel.offsetHeight;
+      
       currentInfoPanel = infoPanel;
     }
 
-    infoPanel.classList.add('visible');
-    infoPanel.style.opacity = '1';
-    infoPanel.style.transform = 'translateY(0)';
-    infoPanel.style.pointerEvents = 'auto';
+    setTimeout(() => {
+      infoPanel.classList.add('visible');
+      infoPanel.style.opacity = '1';
+      infoPanel.style.transform = 'translateY(4.2px) scale(1)';
+      infoPanel.style.pointerEvents = 'auto';
+    }, 2);
 
     if (removeButton) {
         removeButton.classList.remove('opacity-0');
@@ -168,11 +178,13 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
         card.style.transform = 'scale(1)';
         card.style.zIndex = '1';
         card.style.boxShadow = 'none';
+        card.style.borderBottomLeftRadius = '0.5rem';
+        card.style.borderBottomRightRadius = '0.5rem';
 
         if (currentInfoPanel) {
           currentInfoPanel.classList.remove('visible');
           currentInfoPanel.style.opacity = '0';
-          currentInfoPanel.style.transform = 'translateY(-10px)';
+          currentInfoPanel.style.transform = 'translateY(-6px) scale(0.95)';
           currentInfoPanel.style.pointerEvents = 'none';
           
           const panelToRemove = currentInfoPanel;
@@ -221,7 +233,7 @@ export function createCarouselItem(item, isFirstItem = false, context = 'carouse
   let removeButton = null;
   if (onRemove) {
     removeButton = document.createElement('button');
-    removeButton.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full w-6 h-6 flex items-center justify-center text-text-primary z-20 opacity-0 transition-opacity duration-500';
+    removeButton.className = 'absolute top-2 right-2 bg-black bg-opacity-70 rounded-full w-6 h-6 flex items-center justify-center text-text-primary z-20 opacity-0 transition-opacity duration-400';
     removeButton.innerHTML = '×';
     removeButton.style.fontSize = '18px';
     

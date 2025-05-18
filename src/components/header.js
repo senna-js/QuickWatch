@@ -47,8 +47,8 @@ export function renderHeader() {
     
     <style>
       header.scrolled {
-        background-color: #141920cc;
-        backdrop-filter: blur(10px);
+        background-color: #181d25cc;
+        backdrop-filter: blur(16px);
       }
     </style>
     

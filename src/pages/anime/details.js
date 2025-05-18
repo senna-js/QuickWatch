@@ -279,7 +279,7 @@ function renderEpisodesList(episodes) {
            style="opacity: 0; transform: translateY(20px);">
         <div class="flex flex-col xl:flex-row">
           <div class="aspect-video p-2 pr-0 w-80">
-            <div class="w-full object-cover aspect-video h-24 rounded-md bg-anime-modal-bg flex items-center justify-center">
+            <div class="w-full h-full object-cover aspect-video rounded-md bg-anime-modal-bg flex items-center justify-center">
               <span class="text-xl font-bold">${episode.episode_no}</span>
             </div>
           </div>
