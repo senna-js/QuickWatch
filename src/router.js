@@ -19,6 +19,7 @@ import { renderGenresPage } from './pages/genres/genres.js';
 import { renderGenreDetailsPage } from './pages/genres/genreDetails.js';
 import { renderAnimePage } from './pages/anime/home.js';
 import { renderAnimeDetailsPage } from './pages/anime/details.js';
+import { renderHianimeDetailsPage } from './pages/anime/details_ha.js';
 
 export const TMDB_API_KEY = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3MmJhMTBjNDI5OTE0MTU3MzgwOGQyNzEwNGVkMThmYSIsInN1YiI6IjY0ZjVhNTUwMTIxOTdlMDBmZWE5MzdmMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.84b7vWpVEilAbly4RpS01E9tyirHdhSXjcpfmTczI3Q';
 export const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
@@ -191,7 +192,14 @@ function handleRoute() {
   else if (path.match(/^\/anime\/([\w-]+)$/)) {
     const id = path.split('/')[2];
     document.title = 'Loading...';
-    currentPagePromise = Promise.resolve(renderAnimeDetailsPage(appContainer, id));
+    
+    const useHiAnime = window.location.search.includes('ha=true');
+    
+    if (useHiAnime) {
+      currentPagePromise = Promise.resolve(renderHianimeDetailsPage(appContainer, id));
+    } else {
+      currentPagePromise = Promise.resolve(renderAnimeDetailsPage(appContainer, id)); 
+    }
   }
   else {
     document.title = '404';
