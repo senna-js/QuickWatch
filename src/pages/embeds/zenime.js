@@ -64,7 +64,7 @@ export async function renderZenimeEmbed(container, params) {
       let videoSource = streamData.link.file;
       
       if (shouldUseProxy(videoSource)) {
-        const headers = createProxyHeaders(videoSource);
+        const headers = createProxyHeaders("https://megacloud.blog/");
         videoSource = createProxyUrl(videoSource, headers);
       }
       

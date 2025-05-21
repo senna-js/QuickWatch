@@ -2,22 +2,28 @@
 
 export const animeSources = [
   {
-    id: 'animepahe',
-    name: 'pahe',
-    subUrl: '/embed/animepahev2/{urlepisodeId}/{name}/{season}/{episode}',
-    dubUrl: '/embed/animepahev2/{urlepisodeId}/{name}/{season}/{episode}'
+    id: 'zenime-1',
+    name: 'hd-1',
+    subUrl: '/embed/zenime/{urlepisodeId}/hd-1/sub',
+    dubUrl: '/embed/zenime/{urlepisodeId}/hd-1/dub'
   },
   {
-    id: 'zenime-1',
-    name: 'zen-1',
+    id: 'zenime-2',
+    name: 'hd-2',
     subUrl: '/embed/zenime/{urlepisodeId}/hd-2/sub',
     dubUrl: '/embed/zenime/{urlepisodeId}/hd-2/dub'
   },
   {
-    id: 'zenime-2',
-    name: 'zen-2',
+    id: 'zenime-3',
+    name: 'hd-3',
     subUrl: '/embed/zenime/{urlepisodeId}/hd-3/sub',
     dubUrl: '/embed/zenime/{urlepisodeId}/hd-3/dub'
+  },
+  {
+    id: 'animepahe',
+    name: 'pahe',
+    subUrl: '/embed/animepahev2/{urlepisodeId}/{name}/{season}/{episode}',
+    dubUrl: '/embed/animepahev2/{urlepisodeId}/{name}/{season}/{episode}'
   },
   {
     id: 'aniplay',
@@ -31,12 +37,6 @@ export const animeSources = [
     subUrl: 'https://megaplay.buzz/stream/s-2/{epid}/sub',
     dubUrl: 'https://megaplay.buzz/stream/s-2/{epid}/dub'
   },
-  {
-    id: 'anitummy',
-    name: 'momo',
-    subUrl: 'https://anitummy.com/src/player/sub.php?id={episodeId}&server=hd-1&embed=true&ep={episode}&skip=true',
-    dubUrl: 'https://anitummy.com/src/player/dub.php?id={episodeId}&server=hd-1&embed=true&ep={episode}&skip=true'
-  }
 ];
 
 export function getSourceUrl(sourceId, language, episodeData, animeData) {

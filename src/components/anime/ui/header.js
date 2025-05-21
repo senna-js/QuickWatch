@@ -39,9 +39,12 @@ export function renderAnimeHeader() {
         <button aria-label="Search" id="anime-search-button" class="p-2 w-10 h-10 bg-anime-card-bg border border-anime-border/10 rounded-md hover:bg-[#1f1f1f] cursor-pointer active:scale-90 focus:outline-none focus:border-accent focus:text-accent">
           <i class="icon-search"></i>
         </button>
-        <button aria-label="Watchlist" class="p-2 w-10 h-10 bg-anime-card-bg border border-anime-border/10 rounded-md hover:bg-[#1f1f1f] cursor-pointer active:scale-90 focus:outline-none focus:border-accent focus:text-accent">
+        <button aria-label="Watchlist" onclick="alert('not coded yet. coming soon')" class="p-2 w-10 h-10 bg-anime-card-bg border border-anime-border/10 rounded-md hover:bg-[#1f1f1f] cursor-pointer active:scale-90 focus:outline-none focus:border-accent focus:text-accent">
           <i class="icon-bookmark"></i>
         </button>
+        <!-- <button aria-label="Settings" onclick="window.location.href='/anime/settings'" class="p-2 w-10 h-10 bg-anime-card-bg border border-anime-border/10 rounded-md hover:bg-[#1f1f1f] cursor-pointer active:scale-90 focus:outline-none focus:border-accent focus:text-accent">
+          <i class="icon-settings"></i>
+        </button> -->
       </div>
       
     </header>
